@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL auto-task strings (community edition). -->
+<resources>
+
+    <string name="setting_ui_auto_task">Auto tasks</string>
+
+    <string name="auto_task_title">Auto tasks</string>
+    <string name="auto_task_subtitle">Backups and cleanups that run on their own. Everything is stored locally.</string>
+
+    <string name="auto_task_scheduled_backup">Scheduled backup</string>
+    <string name="auto_task_scheduled_hint">Snapshots the current instance on a schedule.</string>
+
+    <string name="auto_task_before_launch">Back up before launch</string>
+    <string name="auto_task_before_launch_hint">Snapshot the instance right before the game starts.</string>
+
+    <string name="auto_task_after_crash">Back up after a crash</string>
+    <string name="auto_task_after_crash_hint">If the last run ended abnormally, snapshot on next open.</string>
+
+    <string name="auto_task_clean_cache">Scheduled cache cleanup</string>
+    <string name="auto_task_clean_cache_hint">Clears temporary install files. Never touches game data.</string>
+
+    <string name="auto_task_keep">Backups to keep</string>
+    <string name="auto_task_keep_hint">Older backups are removed automatically.</string>
+
+    <string name="auto_task_on">On</string>
+    <string name="auto_task_off">Off</string>
+    <string name="auto_task_every_day">Daily</string>
+    <string name="auto_task_every_week">Weekly</string>
+    <string name="auto_task_every_month">Monthly</string>
+    <string name="auto_task_keep_unlimited">Unlimited</string>
+
+    <string name="auto_task_world_backup">Back up worlds on exit</string>
+    <string name="auto_task_world_backup_hint">After every game exit, back up each world in the current game directory. Off by default — worlds can be hundreds of MB.</string>
+    <string name="auto_task_world_keep">World backups to keep</string>
+    <string name="auto_task_world_keep_hint">How many copies to keep per world; the oldest are removed. Only applies when "Back up worlds on exit" is on.</string>
+    <!-- %1$d count -->
+    <string name="auto_task_world_keep_value">%1$d per world</string>
+
+    <string name="auto_task_run_now">Back up current instance now</string>
+    <string name="auto_task_run_done">Backup created</string>
+    <string name="auto_task_run_failed">Backup failed</string>
+
+    <string name="auto_task_last_run">Last scheduled run</string>
+    <string name="auto_task_never">never</string>
+    <string name="auto_task_backup_count">%1$d backups, %2$s total</string>
+    <string name="auto_task_timing_note">Note: scheduled tasks are checked each time you open the launcher — not in the background.</string>
+
+    <string name="auto_task_pre_script">Script before launch</string>
+    <string name="auto_task_post_script">Script after exit</string>
+    <string name="auto_task_script_hint">Runs via sh, working directory is the instance folder.</string>
+    <string name="auto_task_script_empty">not set</string>
+    <string name="auto_task_script_placeholder">e.g. cp ./config/options.txt ./backup/</string>
+    <string name="auto_task_script_ok">Save</string>
+
+</resources>

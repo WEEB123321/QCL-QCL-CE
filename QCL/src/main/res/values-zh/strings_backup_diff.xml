@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 快照对比文案（社区版新增）。 -->
+<resources>
+
+    <string name="backup_diff">对比</string>
+    <string name="backup_diff_working">正在对比…</string>
+    <string name="backup_diff_current">当前实例</string>
+    <string name="backup_diff_close">关闭</string>
+
+</resources>

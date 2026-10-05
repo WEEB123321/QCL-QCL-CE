@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL download speed-limit strings (community edition). -->
+<resources>
+
+    <string name="setting_download_speed_limit">Download speed limit</string>
+    <string name="setting_download_speed_title">Download speed limit</string>
+
+    <string-array name="download_speed_options">
+        <item>Unlimited</item>
+        <item>256 KB/s</item>
+        <item>512 KB/s</item>
+        <item>1 MB/s</item>
+        <item>2 MB/s</item>
+        <item>5 MB/s</item>
+    </string-array>
+
+</resources>

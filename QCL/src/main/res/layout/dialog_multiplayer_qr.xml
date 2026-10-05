@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  联机二维码弹窗。
+  注意：ImageView 用 wrap_content —— 二维码位图是整数倍模块渲染出来的，
+  一旦被 ImageView 二次缩放就会产生灰边、破坏二值性，扫码率会掉。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/game_input_dialog"
+    android:padding="16dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/qr_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/colorPureBlack"
+        android:textStyle="bold"
+        android:text="@string/multiplayer_qr_title_host"/>
+
+    <ImageView
+        android:id="@+id/qr_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:background="#FFFFFF"
+        android:padding="4dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/multiplayer_qr_title_host"/>
+
+    <TextView
+        android:id="@+id/qr_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/colorPureBlack"
+        android:textIsSelectable="true"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/qr_hint"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:textSize="11sp"
+        android:textColor="@color/colorPureBlack"
+        android:alpha="0.65"
+        android:gravity="center"
+        android:text="@string/multiplayer_qr_hint_host"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/qr_copy"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:background="@drawable/launcher_button_transparent_blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_middle"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/multiplayer_qr_copy"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/qr_close"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/launcher_button_transparent_blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size_middle"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/multiplayer_qr_close"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

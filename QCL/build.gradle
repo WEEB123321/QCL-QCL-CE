@@ -1,0 +1,176 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 34
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+	
+    lintOptions {
+        abortOnError false
+    }
+	
+    signingConfigs {
+        release {
+            // QCL is its own product: dedicated key, so it can be installed next to HMCL-PE
+            // instead of replacing it.
+            storeFile file("../qcl.keystore")
+            storePassword "qcl123456"
+            keyAlias "qcl"
+            keyPassword "qcl123456"
+        }
+    }
+    
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+     
+    // ★★★ 对齐 FCL：ABI 按 -Darch 属性切换，默认 all（全 ABI 正式包）。
+    //   调试单架构示例：./gradlew :QCL:assembleRelease -Darch=x86_64
+    //   注意：AGP 禁止 splits.abi 与 ndk.abiFilters 共存，QCL 单 APK 方案只走 abiFilters。
+    def qclArch = System.getProperty("arch", "all")
+
+    defaultConfig {
+        if (qclArch != "all") {
+            ndk {
+                switch (qclArch) {
+                    case "arm":    abiFilters 'armeabi-v7a'; break
+                    case "arm64":  abiFilters 'arm64-v8a';   break
+                    case "x86":    abiFilters 'x86';          break
+                    case "x86_64": abiFilters 'x86_64';       break
+                }
+            }
+        }
+        // 默认（-Darch=all）不写 abiFilters = 全 ABI 正式包
+
+
+
+
+
+        // ★★★ 社区版（CE）：改成独立 applicationId，好与官方版「共存」而不是互相覆盖。
+        //   官方版占用 com.qcl.launcher，若沿用同一个包名，安装时会直接冲突（覆盖/失败）。
+        //   注意：这里只改 applicationId，**不动 Java 包名**（namespace 仍由清单 package 决定），
+        //   所以 R 类、JNI 的 FindClass("com/qcl/...")、getPackageName() 全部无需改动。
+        applicationId "com.qcl.launcher.ce"
+        minSdk 26
+        targetSdk 34
+        // ★★★ 社区版（CE）**独立版本线**：从 v1.1.0 起，与上游 QCL 的 1.4.x 脱钩。
+        //
+        //   编号规则（用户 2026-10-04 定）：
+        //     每次更新把**最后一位 +1**；满十向前进位。
+        //       v1.1.0 → v1.1.1 → … → v1.1.9 → v1.2.0 → v1.2.1 → …
+        //   ⇒ 版本号本身就是「第几次更新」，不再借用上游的版本号。
+        //
+        //   versionCode 必须**严格单调递增**，否则 Android 会拒绝覆盖安装
+        //   （INSTALL_FAILED_VERSION_DOWNGRADE）。所以用：
+        //     versionCode = major*1000 + minor*100 + patch
+        //   v1.1.0 → 1100，v1.1.9 → 1109，v1.2.0 → 1200（进位后仍递增）。
+        //   ★ 1100 > 上一版 CE 的 343 → 可直接覆盖升级，**不用卸载**。
+        //
+        //   ⚠️ 以后每次发版：versionName 末位 +1，versionCode 按同一公式重算，
+        //      两者必须一起改（只改 versionName 会导致装不上）。
+        versionCode 1504
+        versionName "1.5.4"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // ★★★ 对齐 FCL：输出 APK 名带架构标签（FCL 命名 FCL-<type>-<ver>-<abi>.apk），杜绝放错架构。
+    //   -Darch=x86_64 → QCL-release-1.1.2-x86_64.apk；-Darch=arm64 → QCL-release-1.1.2-arm64.apk。
+    //   all → -universal：★仅限本地测试，禁止发布！模拟器 ROM（MuMu 等）会把 universal 包强装成
+    //   arm64 转译（primaryCpuAbi=arm64-v8a），而 JRE 运行时按物理 CPU 选 x86_64，进程与 JRE 不匹配
+    //   → 游戏进不去（09-19 实锤）。发布一律分架构：模拟器用户拿 x86_64 包，真机用户拿 arm64/arm 包。
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def abiTag = (qclArch == "all") ? "universal" : qclArch
+            outputFileName = "QCL-${variant.buildType.name}-${variant.versionName}-${abiTag}.apk"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        pickFirst 'META-INF/LICENSE.md' // picks the JavaMail license file
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE.md'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ':FilePicker')
+    implementation project(path: ':Terracotta')
+    implementation project(path: ':ZipTools')
+    implementation project(path: ':PojavLauncher')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.github.naman14:app-theme-engine:0.5.2@aar'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'cat.ereza:customactivityoncrash:2.3.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+    implementation 'org.apache.commons:commons-compress:1.20'
+    // ★ ZipFileSystem：自带一份 OpenJDK zipfs（com.sun.nio.zipfs）。
+    //   Android 不带 zipfs，而commons-compress 的 ZipFile 在真机上会抛
+    //   NoClassDefFoundError: ZipFile$Builder（导致导入整合包直接崩）。
+    //   有了它就能用 java.nio.file.FileSystems.newFileSystem("jar:...") 把 zip 挂成 FileSystem。
+    //   模块来源见 ZipFileSystem/build.gradle 顶部说明。
+    implementation project(':ZipFileSystem')
+    // 参照 FCL（libs.versions.toml: commonsCompress=1.26.0 / xz=1.9）：
+    // JRE 运行时改以 universal.tar.xz + bin-<abi>.tar.xz 内置，解压需要 XZ 解码器。
+    implementation('org.tukaani:xz:1.9')
+    // commons-compress 1.26.0 会传递引入 commons-io 2.15.1，而 FilePicker 模块
+    // 仍在使用 libs/commons-io-2.11.0.jar。两者同时进 classpath 会让
+    // checkReleaseDuplicateClasses 直接失败（org.apache.commons.io.* 全量重复）。
+    // 这里只把**传递副本**排掉，FilePicker 那份原样保留，不影响其它模块。
+    configurations.configureEach {
+        exclude group: 'commons-io', module: 'commons-io'
+    }
+    // ★ 锁 commons-lang3 回 3.13.0：
+    //   commons-compress 1.26.0 会把下面 L108 显式声明的 commons-lang3:3.13.0
+    //   顶到 3.14.0，而 3.14.0 这个 jar 在 D8 dex 阶段会**稳定**抛 NPE：
+    //     ERROR: jetified-commons-lang3-3.14.0.jar: D8: java.lang.NullPointerException:
+    //            Cannot invoke "String.length()" because "<parameter1>" is null
+    //   → Task :QCL:mergeExtDexRelease FAILED
+    //   3.13.0 无此问题（工程原本就在用），且 commons-lang3 并非解压 tar.xz 的
+    //   必需依赖 —— 用 force 精确锁定版本，不影响任何显式声明。
+    configurations.configureEach {
+        resolutionStrategy.force 'org.apache.commons:commons-lang3:3.13.0'
+    }
+    implementation 'com.github.steveice10:opennbt:1.5'
+    implementation 'com.jaredrummler:colorpicker:1.1.0'
+    implementation 'com.jaredrummler:android-device-names:2.1.0'
+    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'org.jenkins-ci:constant-pool-scanner:1.2'
+    implementation 'com.github.gzu-liyujiang:Android_CN_OAID:4.2.4'
+    implementation 'com.github.nedimf:maildroid:v0.1.0-release'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

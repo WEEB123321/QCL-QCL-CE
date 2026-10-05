@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ★★★ 社区版：主界面入口按钮 / 通用卡片 —— 改成「磨砂玻璃」。
+
+  参考 OCL（用户上一个项目）的 GlassStyle：
+    · Panel   tint=White  tintAlpha=0.10  blur=10
+    · Subtle  tint=White  tintAlpha=0.08  thickness=14
+  那边是**深色**主题 + 浅色文字，透明度可以压得很低；
+  本工程是**浅色**主题 + 深色文字（colorPureBlack），玻璃下面还是照片，
+  0.10 会让黑字压在亮照片上糊掉。所以这里把白底提到 0.22 ——
+  既保住「能看到背景在动」的玻璃感，又保证图标和文字读得清。
+
+  ★ 圆角 12dp → 16dp：OCL 的玻璃面板观感更圆，
+    小圆角在照片背景上会显得「像贴上去的方块」。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#47FFFFFF"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#38FFFFFF"/>
+            <corners android:radius="16dp"/>
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 编辑式页眉左侧的方形印记（参考图里那个「N」框）。细边框、无填充。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#0F000000" />
+    <stroke android:width="1.5dp" android:color="#CC1B1B1B" />
+    <corners android:radius="2dp" />
+</shape>

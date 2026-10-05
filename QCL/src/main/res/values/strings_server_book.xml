@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Server favourites / room history strings (community edition). -->
+<resources>
+
+    <string name="menu_local_version_servers">Server favourites…</string>
+
+    <string name="server_book_title">Server favourites</string>
+    <string name="server_book_add">Add</string>
+    <string name="server_book_close">Close</string>
+    <string name="server_book_empty">No servers saved yet.\n\nTap Add to save one — or just join a server once and it will show up here automatically.</string>
+    <string name="server_book_no_group">Ungrouped</string>
+    <!-- %1$d count -->
+    <string name="server_book_joined_times">joined %1$d×</string>
+    <string name="server_book_hint">Tap a server to join it with this instance. Long-press for favourite / edit / delete.</string>
+
+    <string name="server_book_fav">Favourite</string>
+    <string name="server_book_edit">Edit</string>
+    <string name="server_book_delete">Delete</string>
+
+    <string name="server_book_field_name">Name (optional)</string>
+    <string name="server_book_field_address">Address (host or host:port)</string>
+    <string name="server_book_field_note">Note (optional)</string>
+    <string name="server_book_field_group">Group (optional)</string>
+    <string name="server_book_need_address">Address cannot be empty.</string>
+
+    <!-- %1$s address -->
+    <string name="server_book_joining">Joining %1$s…</string>
+    <!-- %1$s error -->
+    <string name="server_book_failed">Could not join: %1$s</string>
+
+</resources>

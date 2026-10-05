@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- World info panel / seed sharing strings (community edition). -->
+<resources>
+
+    <string name="world_menu_info">World info &amp; seed</string>
+
+    <string name="world_info_title">World info</string>
+    <string name="world_info_name">World</string>
+    <string name="world_info_dir">Folder</string>
+    <string name="world_info_version">Version</string>
+    <string name="world_info_last_played">Last played</string>
+    <string name="world_info_mode">Mode</string>
+    <string name="world_info_difficulty">Difficulty</string>
+    <string name="world_info_hardcore">Hardcore</string>
+    <string name="world_info_cheats">Cheats</string>
+    <string name="world_info_seed">Seed</string>
+    <string name="world_info_size">Size</string>
+
+    <string name="world_info_mode_survival">Survival</string>
+    <string name="world_info_mode_creative">Creative</string>
+    <string name="world_info_mode_adventure">Adventure</string>
+    <string name="world_info_mode_spectator">Spectator</string>
+    <string name="world_info_diff_peaceful">Peaceful</string>
+    <string name="world_info_diff_easy">Easy</string>
+    <string name="world_info_diff_normal">Normal</string>
+    <string name="world_info_diff_hard">Hard</string>
+
+    <string name="world_info_yes">Yes</string>
+    <string name="world_info_no">No</string>
+    <string name="world_info_unknown">Unknown</string>
+    <string name="world_info_no_seed">This world has no seed recorded</string>
+    <string name="world_info_calculating">Calculating…</string>
+    <!-- %1$s size, %2$d file count -->
+    <string name="world_info_size_value">%1$s · %2$d files</string>
+
+    <string name="world_info_close">Close</string>
+    <string name="world_info_copy_seed">Copy seed</string>
+    <string name="world_info_share_save">Share world</string>
+    <string name="world_info_copied">Copied to clipboard</string>
+    <string name="world_info_share_header">QCL world share</string>
+    <string name="world_info_packing">Packing the world…</string>
+    <!-- %1$s error -->
+    <string name="world_info_share_failed">Packaging failed: %1$s</string>
+    <!-- %1$s saved path -->
+    <string name="world_info_share_path">Saved to:\n%1$s</string>
+
+</resources>

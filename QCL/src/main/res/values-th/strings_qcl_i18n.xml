@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（th）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">บันทึก</string>
+    <string name="auto_task_before_launch">สำรองก่อนเปิดเกม</string>
+    <string name="auto_task_run_done">สร้างข้อมูลสำรองแล้ว</string>
+    <string name="backup_create_none">ยังไม่ได้เลือกอินสแตนซ์</string>
+    <string name="backup_delete">ลบ</string>
+    <string name="compat_add">เพิ่ม</string>
+    <string name="compat_export">ส่งออก</string>
+    <string name="compat_import">นำเข้า</string>
+    <string name="dialog_add_verify_server_cancel">ยกเลิก</string>
+    <string name="dialog_add_verify_server_next">ถัดไป &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">เลือก</string>
+    <string name="dialog_add_view_positive">เพิ่ม</string>
+    <string name="dialog_create_control_pattern_positive">สร้าง</string>
+    <string name="dialog_delete_mod_negative">ไม่</string>
+    <string name="dialog_delete_mod_positive">ใช่</string>
+    <string name="dialog_delete_version_positive">ลบ</string>
+    <string name="dialog_download_retry">ลองใหม่</string>
+    <string name="dialog_offline_skin_confirm">ตกลง</string>
+    <string name="dialog_positive">เสร็จ</string>
+    <string name="dialog_rename_version_confirm">ตกลง</string>
+    <string name="dialog_verify_cancel">ยกเลิก</string>
+    <string name="download_minecraft_ui_refresh">รีเฟรช</string>
+    <string name="download_mod_ui_search">ค้นหา</string>
+    <string name="download_setting_ui_download">ดาวน์โหลด</string>
+    <string name="download_setting_ui_select">แหล่งดาวน์โหลด</string>
+    <string name="drawer_custom_menu_edit_info">แก้ไข</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">เปิด</string>
+    <string name="export_world_ui_export">ส่งออก</string>
+    <string name="exterior_theme_export">ส่งออกธีม</string>
+    <string name="exterior_theme_import">นำเข้าธีม</string>
+    <string name="exterior_theme_import_done">ใช้ธีมแล้ว</string>
+    <string name="game_setting_ui_advance_setting">ตั้งค่าขั้นสูง</string>
+    <string name="game_setting_ui_control_setting">ตัวเลือกการควบคุม</string>
+    <string name="game_setting_ui_debug_setting">วิธีแก้ชั่วคราว</string>
+    <string name="game_setting_ui_jvm_setting">ตัวเลือก Java Virtual Machine</string>
+    <string name="game_setting_ui_launch_setting">ตัวเลือกการเปิดเกม</string>
+    <string name="install_game_ui_install">ติดตั้ง</string>
+    <string name="install_game_ui_none">ยังไม่เลือก</string>
+    <string name="install_package_ui_install">ติดตั้ง</string>
+    <string name="launcher_button_current_version">ไม่มีอินสแตนซ์</string>
+    <string name="launcher_button_launch">เปิดเกม  →</string>
+    <string name="launcher_scroll_account_name">ไม่มีบัญชี</string>
+    <string name="launcher_scroll_account_state">แตะที่นี่เพื่อเพิ่ม</string>
+    <string name="launcher_scroll_download">ดาวน์โหลด</string>
+    <string name="launcher_scroll_game_manager">ไม่มีอินสแตนซ์</string>
+    <string name="launcher_scroll_game_none">เพิ่มอินสแตนซ์</string>
+    <string name="launcher_scroll_lab">ห้องทดลอง</string>
+    <string name="launcher_scroll_lobby">ล็อบบี้</string>
+    <string name="launcher_scroll_multi_player">ผู้เล่นหลายคน</string>
+    <string name="launcher_scroll_setting">ตั้งค่า</string>
+    <string name="launcher_scroll_version_list">อินสแตนซ์ทั้งหมด</string>
+    <string name="log_center_share">แชร์</string>
+    <string name="mod_manager_ui_delete">นำออก</string>
+    <string name="mod_manager_ui_refresh">รีเฟรช</string>
+    <string name="multi_player_ui_help">ช่วยเหลือ</string>
+    <string name="multiplayer_qr_close">ปิด</string>
+    <string name="multiplayer_qr_copy">คัดลอก</string>
+    <string name="skin_library_apply">ใช้งาน</string>
+    <string name="stats_reset">รีเซ็ต</string>
+    <string name="transfer_next">ถัดไป</string>
+</resources>

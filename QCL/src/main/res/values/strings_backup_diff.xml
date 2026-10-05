@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL snapshot-diff strings (community edition). -->
+<resources>
+
+    <string name="backup_diff">Compare</string>
+    <string name="backup_diff_working">Comparing…</string>
+    <string name="backup_diff_current">current instance</string>
+    <string name="backup_diff_close">Close</string>
+
+</resources>

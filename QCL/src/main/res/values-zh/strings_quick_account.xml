@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 快速切换账号文案（社区版新增）。 -->
+<resources>
+
+    <string name="quick_account_title">切换账号</string>
+    <string name="quick_account_empty">还没有保存的账号 —— 先去账户页添加一个。</string>
+    <string name="quick_account_same">当前已经在用这个账号了</string>
+    <!-- %1$s 玩家名 -->
+    <string name="quick_account_switched">已切换到 %1$s</string>
+    <!-- %1$s 错误信息 -->
+    <string name="quick_account_failed">切换失败：%1$s</string>
+
+</resources>

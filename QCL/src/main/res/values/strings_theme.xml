@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL theme preset / share strings (community edition). -->
+<resources>
+
+    <string name="exterior_theme_preset_title">Theme presets</string>
+    <string name="exterior_theme_preset_default">Default</string>
+    <string name="exterior_theme_preset_dark">Dark</string>
+    <string name="exterior_theme_preset_amoled">AMOLED</string>
+
+    <string name="exterior_theme_export">Export theme</string>
+    <string name="exterior_theme_import">Import theme</string>
+
+    <string name="exterior_theme_applied">Applied preset: %1$s</string>
+    <string name="exterior_theme_export_copied">Theme copied to clipboard — paste it to a friend</string>
+    <string name="exterior_theme_import_hint">Paste an exported theme here</string>
+    <string name="exterior_theme_import_failed">That does not look like a QCL theme.</string>
+    <string name="exterior_theme_import_done">Theme applied</string>
+
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 桌面小部件 / 快捷方式文案（社区版新增）。 -->
+<resources>
+
+    <string name="widget_title">QCL-CE</string>
+    <string name="widget_hint">点这里一键启动</string>
+    <string name="widget_no_instance">未选中实例</string>
+    <!-- %1$s 游戏时长，%2$d 启动次数 -->
+    <string name="widget_stats">%1$s · 启动 %2$d 次</string>
+    <!-- %1$d 备份份数 -->
+    <string name="widget_backups">备份 %1$d 份</string>
+
+    <string name="shortcut_row_title">桌面快捷方式</string>
+    <string name="shortcut_row_hint">创建一个「一键启动当前实例」的桌面图标。</string>
+    <string name="shortcut_pin">创建</string>
+    <string name="shortcut_created">快捷方式已添加到桌面</string>
+    <string name="shortcut_unsupported">你的桌面不支持自动添加快捷方式，可以从桌面小部件列表里添加。</string>
+    <string name="shortcut_no_instance">当前没有选中实例，请先选一个版本。</string>
+
+</resources>

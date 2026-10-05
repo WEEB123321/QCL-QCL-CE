@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 本地统计文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_ui_stats">本地统计</string>
+
+    <string name="stats_title">本地统计</string>
+    <string name="stats_subtitle">全部只存在本机，不会上传。游戏时长从启动游戏算到退出游戏。</string>
+
+    <string name="stats_label_time">总游戏时长</string>
+    <string name="stats_label_launch">启动次数</string>
+    <string name="stats_label_crash">Java 崩溃次数</string>
+
+    <string name="stats_section_instance">各实例启动次数</string>
+    <string name="stats_section_session">最近会话</string>
+    <string name="stats_empty">还没有记录</string>
+    <string name="stats_unknown_instance">（未知实例）</string>
+    <string name="stats_instance_launch_times">%1$d 次</string>
+
+    <string name="stats_duration_hm">%1$d 小时 %2$d 分</string>
+    <string name="stats_duration_min">%1$d 分</string>
+
+    <string name="stats_first_launch">首次启动</string>
+    <string name="stats_last_launch">最近启动</string>
+
+    <string name="stats_share">分享</string>
+    <string name="stats_reset">重置</string>
+    <string name="stats_share_chooser">分享统计数据</string>
+    <string name="stats_share_subject">QCL 统计数据</string>
+    <string name="stats_reset_confirm">确定重置全部统计？此操作不可撤销。</string>
+    <string name="stats_reset_done">统计已重置</string>
+
+</resources>

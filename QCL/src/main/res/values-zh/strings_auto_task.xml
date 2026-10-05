@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 自动任务文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_ui_auto_task">自动任务</string>
+
+    <string name="auto_task_title">自动任务</string>
+    <string name="auto_task_subtitle">让它自己跑的备份与清理。全部数据只存在本机。</string>
+
+    <string name="auto_task_scheduled_backup">定时备份</string>
+    <string name="auto_task_scheduled_hint">按周期给当前实例做一次快照。</string>
+
+    <string name="auto_task_before_launch">启动游戏前备份</string>
+    <string name="auto_task_before_launch_hint">在游戏开始前给实例做一次快照。</string>
+
+    <string name="auto_task_after_crash">崩溃后备份</string>
+    <string name="auto_task_after_crash_hint">上次启动异常结束时，本次打开补做一次快照。</string>
+
+    <string name="auto_task_clean_cache">定时清理缓存</string>
+    <string name="auto_task_clean_cache_hint">只清临时安装文件，绝不碰游戏数据。</string>
+
+    <string name="auto_task_keep">保留备份份数</string>
+    <string name="auto_task_keep_hint">超出份数时自动删除最旧的备份。</string>
+
+    <string name="auto_task_on">开</string>
+    <string name="auto_task_off">关</string>
+    <string name="auto_task_every_day">每天</string>
+    <string name="auto_task_every_week">每周</string>
+    <string name="auto_task_every_month">每月</string>
+    <string name="auto_task_keep_unlimited">不限</string>
+
+    <string name="auto_task_world_backup">退出后自动备份存档</string>
+    <string name="auto_task_world_backup_hint">每次退出游戏后，自动把当前游戏目录里的所有存档各备份一份。默认关 —— 存档可能有几百 MB，请按需开启。</string>
+    <string name="auto_task_world_keep">存档备份保留份数</string>
+    <string name="auto_task_world_keep_hint">每个世界各保留几份，超出的自动删最旧的。仅在开启「退出后自动备份存档」时生效。</string>
+    <!-- %1$d 份数 -->
+    <string name="auto_task_world_keep_value">%1$d 份 / 世界</string>
+
+    <string name="auto_task_run_now">立即备份当前实例</string>
+    <string name="auto_task_run_done">备份完成</string>
+    <string name="auto_task_run_failed">备份失败</string>
+
+    <string name="auto_task_last_run">上次定时执行</string>
+    <string name="auto_task_never">从未</string>
+    <string name="auto_task_backup_count">共 %1$d 份备份，占用 %2$s</string>
+    <string name="auto_task_timing_note">说明：定时任务在「每次打开启动器」时检查是否到期，不在后台常驻。</string>
+
+    <string name="auto_task_pre_script">启动前脚本</string>
+    <string name="auto_task_post_script">退出后脚本</string>
+    <string name="auto_task_script_hint">用 sh 执行，工作目录是实例目录。</string>
+    <string name="auto_task_script_empty">未设置</string>
+    <string name="auto_task_script_placeholder">例如：cp ./config/options.txt ./backup/</string>
+    <string name="auto_task_script_ok">保存</string>
+
+</resources>

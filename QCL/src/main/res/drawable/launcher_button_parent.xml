@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ★★★ 社区版：设置页/列表里成排的条目背景 —— 同样改成磨砂玻璃。
+
+  ★ 比 qcl_button_gray 更淡（0.14 / 0.30）：它是「成片铺开的行」，
+    用同样的 0.22 会让整页看起来是一块白板，背景图就彻底看不见了。
+    单行淡、卡片浓，层次才出来。
+
+  ★ 加 12dp 圆角：原来是直角，在照片背景上会显得很生硬。
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#4DFFFFFF"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#24FFFFFF"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+</selector>

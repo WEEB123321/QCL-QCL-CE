@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 安全区（刘海 / 挖孔 / 大圆角）文案，社区版新增。 -->
+<resources>
+
+    <string name="exterior_setting_ui_safe_area">安全区避让</string>
+    <string name="exterior_setting_ui_safe_area_hint">启动器是满屏铺开的。在有刘海、挖孔摄像头或大圆角的手机上，顶部那排按钮和底部导航条会被屏幕边缘切掉。选「自动」会读取窗口真实的系统栏 / 刘海 / 圆角数据，只有确实需要时才避让 —— 圆角小的机型保持原来的满屏观感。</string>
+
+    <string name="safe_area_mode_auto">自动（推荐）</string>
+    <string name="safe_area_mode_on">始终留边</string>
+    <string name="safe_area_mode_off">关闭（满屏）</string>
+    <string name="safe_area_dialog_title">安全区避让</string>
+
+    <string name="safe_area_detected">检测结果：%1$s</string>
+    <string name="safe_area_not_yet">检测结果：等待窗口完成布局…</string>
+    <string name="safe_area_no_cutout">未检测到刘海 / 挖孔</string>
+
+</resources>

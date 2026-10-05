@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（ru）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">Сохранить</string>
+    <string name="auto_task_before_launch">Резервная копия перед запуском</string>
+    <string name="auto_task_run_done">Копия создана</string>
+    <string name="backup_create_none">Сборка не выбрана</string>
+    <string name="backup_delete">Удалить</string>
+    <string name="compat_add">Добавить</string>
+    <string name="compat_export">Экспорт</string>
+    <string name="compat_import">Импорт</string>
+    <string name="dialog_add_verify_server_cancel">Отмена</string>
+    <string name="dialog_add_verify_server_next">Далее &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">Выбрать</string>
+    <string name="dialog_add_view_positive">Добавить</string>
+    <string name="dialog_create_control_pattern_positive">Создать</string>
+    <string name="dialog_delete_mod_negative">Нет</string>
+    <string name="dialog_delete_mod_positive">Да</string>
+    <string name="dialog_delete_version_positive">Удалить</string>
+    <string name="dialog_download_retry">Повторить</string>
+    <string name="dialog_offline_skin_confirm">ОК</string>
+    <string name="dialog_positive">Готово</string>
+    <string name="dialog_rename_version_confirm">ОК</string>
+    <string name="dialog_verify_cancel">Отмена</string>
+    <string name="download_minecraft_ui_refresh">Обновить</string>
+    <string name="download_mod_ui_search">Поиск</string>
+    <string name="download_setting_ui_download">Скачать</string>
+    <string name="download_setting_ui_select">Источник загрузки</string>
+    <string name="drawer_custom_menu_edit_info">Изменить</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">Открыть</string>
+    <string name="export_world_ui_export">Экспорт</string>
+    <string name="exterior_theme_export">Экспорт темы</string>
+    <string name="exterior_theme_import">Импорт темы</string>
+    <string name="exterior_theme_import_done">Тема применена</string>
+    <string name="game_setting_ui_advance_setting">Дополнительные настройки</string>
+    <string name="game_setting_ui_control_setting">Настройки управления</string>
+    <string name="game_setting_ui_debug_setting">Обходные пути</string>
+    <string name="game_setting_ui_jvm_setting">Параметры виртуальной машины Java</string>
+    <string name="game_setting_ui_launch_setting">Параметры запуска</string>
+    <string name="install_game_ui_install">Установить</string>
+    <string name="install_game_ui_none">Не выбрано</string>
+    <string name="install_package_ui_install">Установить</string>
+    <string name="launcher_button_current_version">Нет сборок</string>
+    <string name="launcher_button_launch">Запустить игру  →</string>
+    <string name="launcher_scroll_account_name">Нет аккаунтов</string>
+    <string name="launcher_scroll_account_state">Нажмите, чтобы добавить</string>
+    <string name="launcher_scroll_download">Скачать</string>
+    <string name="launcher_scroll_game_manager">Нет сборок</string>
+    <string name="launcher_scroll_game_none">Добавить сборку</string>
+    <string name="launcher_scroll_lab">Лаборатория</string>
+    <string name="launcher_scroll_lobby">Хаб</string>
+    <string name="launcher_scroll_multi_player">Сетевая игра</string>
+    <string name="launcher_scroll_setting">Настройки</string>
+    <string name="launcher_scroll_version_list">Все сборки</string>
+    <string name="log_center_share">Поделиться</string>
+    <string name="mod_manager_ui_delete">Удалить</string>
+    <string name="mod_manager_ui_refresh">Обновить</string>
+    <string name="multi_player_ui_help">Справка</string>
+    <string name="multiplayer_qr_close">Закрыть</string>
+    <string name="multiplayer_qr_copy">Копировать</string>
+    <string name="skin_library_apply">Применить</string>
+    <string name="stats_reset">Сбросить</string>
+    <string name="transfer_next">Далее</string>
+</resources>

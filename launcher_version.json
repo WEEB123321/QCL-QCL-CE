@@ -1,0 +1,13 @@
+{
+  "_note": "★ 注意：这个文件不是更新检查的真源。App 实际读取的是 main 分支上的同名文件（raw.githubusercontent.com/ALLEN201123/Quanta-Craft-Launcher/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
+  "latestRelease": {
+    "versionCode": 321,
+    "versionName": "1.2.1",
+    "date": "2026-09-21",
+    "url": [
+      "https://github.com/ALLEN201123/Quanta-Craft-Launcher/releases/download/v1.2.1/QCL-release-1.2.1-all.apk"
+    ],
+    "updateLog": "<b>Quanta Craft Launcher 1.2.1</b><br/>· gradle-wrapper 改回官方地址（原来指向作者本机路径，别人 clone 后根本构建不了）<br/>· 修掉微软账号令牌被明文写进日志的问题（5 处）<br/>· 清理已删除功能的残留：manifest 里 3 个不存在的组件、拷贝不存在的 boat 资源<br/>· 统一「关于」页与更新检测的版本号；修好必挂的 CI（JDK 11→17）"
+  },
+  "latestPrerelease": null
+}

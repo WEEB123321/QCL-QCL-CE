@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 全局搜索面板背景：白玻璃。不透明度比导航条更高（0.94）——
+     它是**压在内容之上**的面板，底下可能是 3D 人物或下载列表，必须读得清。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F0FFFFFF" />
+    <corners android:radius="18dp" />
+</shape>

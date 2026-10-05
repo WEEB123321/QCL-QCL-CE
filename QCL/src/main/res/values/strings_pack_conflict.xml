@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL resource-conflict strings (community edition). -->
+<resources>
+
+    <string name="setting_ui_pack_conflict">Resource conflicts</string>
+
+    <string name="pack_conflict_title">Resource conflicts</string>
+    <string name="pack_conflict_subtitle">Scans the resource packs of the current instance for duplicates, broken packs, and files that override each other. Read-only — nothing is changed.</string>
+
+    <string name="pack_conflict_summary">%1$d packs scanned, %2$d issue(s) found</string>
+    <string name="pack_conflict_scanning">Scanning…</string>
+    <string name="pack_conflict_clean">No conflicts found. Your packs look consistent.</string>
+    <string name="pack_conflict_no_instance">No instance selected — pick a version first.</string>
+
+    <string name="pack_conflict_section_duplicate">Duplicate packs</string>
+    <string name="pack_conflict_section_invalid">Broken / unreadable packs</string>
+    <string name="pack_conflict_section_overlap">Files provided by more than one pack</string>
+
+    <string name="pack_conflict_more">… and %1$d more</string>
+    <string name="pack_conflict_truncated">Some packs are very large; their override check is sampled, not exhaustive.</string>
+
+    <string name="pack_conflict_refresh">Rescan</string>
+    <string name="pack_conflict_share">Share report</string>
+
+</resources>

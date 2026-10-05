@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 桌面小部件（社区版新增）。
+     ★ 只能用 RemoteViews 支持的控件（LinearLayout / TextView / ImageView），
+       不能用自定义 View、不能有 ScrollView。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/qcl_button_gray">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPureBlack"
+        android:text="@string/widget_title" />
+
+    <TextView
+        android:id="@+id/widget_instance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:textSize="10sp"
+        android:textColor="@color/colorPureBlack" />
+
+    <TextView
+        android:id="@+id/widget_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:singleLine="true"
+        android:textSize="10sp"
+        android:textColor="#99000000" />
+
+    <TextView
+        android:id="@+id/widget_backups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:singleLine="true"
+        android:textSize="10sp"
+        android:textColor="#99000000" />
+
+    <TextView
+        android:id="@+id/widget_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:singleLine="true"
+        android:textSize="9sp"
+        android:textColor="#FF185FA5"
+        android:text="@string/widget_hint" />
+
+</LinearLayout>

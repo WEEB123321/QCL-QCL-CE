@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Instance quick actions / space analysis strings (community edition). -->
+<resources>
+
+    <string name="menu_local_version_backup">Back up now</string>
+    <string name="menu_local_version_backup_start">Backing up…</string>
+    <string name="menu_local_version_backup_ok">Backup created</string>
+    <string name="menu_local_version_backup_fail">Backup failed — see the log centre</string>
+
+    <string name="menu_local_version_pin">Pin to home screen</string>
+    <string name="menu_local_version_pin_ok">Shortcut added — it opens this instance</string>
+
+    <string name="menu_local_version_space">Storage breakdown</string>
+
+    <string name="space_title">Storage breakdown</string>
+    <string name="space_instance">Instance</string>
+    <string name="space_total">Total</string>
+    <string name="space_junk">Reclaimable</string>
+    <string name="space_junk_note">Only logs, crash reports and leftover download fragments (.tmp / .part) are counted as reclaimable. Mods, worlds and resource packs are never touched.</string>
+    <string name="space_calculating">Calculating… (large instances take a few seconds)</string>
+    <string name="space_close">Close</string>
+    <string name="space_clean">Clean</string>
+    <string name="space_clean_confirm">Delete logs, crash reports and leftover download fragments inside this instance?\n\nYour mods, worlds and resource packs are NOT touched.</string>
+    <!-- %1$d deleted, %2$d failed -->
+    <string name="space_clean_done">Cleaned (%1$d deleted, %2$d failed)</string>
+
+</resources>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 插件页（社区版新增，底部导航第 4 个 Tab）。
+     ★★★ 内容诚实原则：插件运行时（加载器 / 沙箱 / 权限 / 签名）属于第三阶段工程，
+       本页**不放假按钮、不做假市场**，只展示两类真实存在的东西：
+         ① 当前真正生效的「插件」能力 —— 外部渲染器插件（MobileGlues / VGPU 等，
+            经 RendererCompat 从已安装应用或 <实例>/renderer 目录加载）；
+         ② 插件运行时与插件市场的真实进度（明确标注「开发中」）。
+       列表内容由 PluginUI 在运行时填充，避免把会变的文案写死在 XML 里。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/ui_plugin"
+    android:background="@color/launcher_ui_background"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_centerInParent="true"
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="10dp"
+                    android:singleLine="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"
+                    android:text="@string/plugin_ui_subtitle" />
+
+                <!-- ★★★ 社区版：插件列表容器。内容由 PluginUI 按 PluginRegistry 动态填充 ——
+                     加插件只需改 PluginRegistry，不用动布局。 -->
+                <LinearLayout
+                    android:id="@+id/plugin_list_container"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"/>
+
+                <!-- 运行时状态（PluginUI 运行时填充，标注真实进度） -->
+                <LinearLayout
+                    android:id="@+id/plugin_runtime_card"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/qcl_button_gray"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"
+                        android:text="@string/plugin_runtime_title" />
+
+                    <TextView
+                        android:id="@+id/plugin_runtime_state"
+                        android:layout_marginTop="4dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_small"
+                        android:textColor="#99000000"
+                        android:text="@string/plugin_runtime_loading" />
+
+                </LinearLayout>
+
+                <!-- 真实生效的外部渲染器插件列表 -->
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginTop="16dp"
+                    android:singleLine="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"
+                    android:text="@string/plugin_renderer_section" />
+
+                <LinearLayout
+                    android:id="@+id/plugin_renderer_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical" />
+
+                <!-- 插件目录：给玩家一个真实可用的出口（本地导入的落点） -->
+                <LinearLayout
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:id="@+id/plugin_open_dir_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/qcl_button_gray"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_baseline_folder_black" />
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/text_size_middle"
+                            android:textColor="@color/colorPureBlack"
+                            android:text="@string/plugin_open_dir_title" />
+
+                        <TextView
+                            android:id="@+id/plugin_dir_path"
+                            android:ellipsize="middle"
+                            android:singleLine="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/text_size_small"
+                            android:textColor="#99000000" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </RelativeLayout>
+
+</LinearLayout>

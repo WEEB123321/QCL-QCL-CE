@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（es）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">Guardar</string>
+    <string name="auto_task_before_launch">Copia antes de iniciar</string>
+    <string name="auto_task_run_done">Copia creada</string>
+    <string name="backup_create_none">Ninguna instancia seleccionada</string>
+    <string name="backup_delete">Eliminar</string>
+    <string name="compat_add">Añadir</string>
+    <string name="compat_export">Exportar</string>
+    <string name="compat_import">Importar</string>
+    <string name="dialog_add_verify_server_cancel">Cancelar</string>
+    <string name="dialog_add_verify_server_next">Siguiente &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">Seleccionar</string>
+    <string name="dialog_add_view_positive">Añadir</string>
+    <string name="dialog_create_control_pattern_positive">Crear</string>
+    <string name="dialog_delete_mod_negative">No</string>
+    <string name="dialog_delete_mod_positive">Sí</string>
+    <string name="dialog_delete_version_positive">Eliminar</string>
+    <string name="dialog_download_retry">Reintentar</string>
+    <string name="dialog_offline_skin_confirm">Aceptar</string>
+    <string name="dialog_positive">Hecho</string>
+    <string name="dialog_rename_version_confirm">Aceptar</string>
+    <string name="dialog_verify_cancel">Cancelar</string>
+    <string name="download_minecraft_ui_refresh">Actualizar</string>
+    <string name="download_mod_ui_search">Buscar</string>
+    <string name="download_setting_ui_download">Descargar</string>
+    <string name="download_setting_ui_select">Fuente de descarga</string>
+    <string name="drawer_custom_menu_edit_info">Editar</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">Abrir</string>
+    <string name="export_world_ui_export">Exportar</string>
+    <string name="exterior_theme_export">Exportar tema</string>
+    <string name="exterior_theme_import">Importar tema</string>
+    <string name="exterior_theme_import_done">Tema aplicado</string>
+    <string name="game_setting_ui_advance_setting">Ajustes avanzados</string>
+    <string name="game_setting_ui_control_setting">Opciones de control</string>
+    <string name="game_setting_ui_debug_setting">Soluciones alternativas</string>
+    <string name="game_setting_ui_jvm_setting">Opciones de la máquina virtual Java</string>
+    <string name="game_setting_ui_launch_setting">Opciones de inicio</string>
+    <string name="install_game_ui_install">Instalar</string>
+    <string name="install_game_ui_none">No seleccionado</string>
+    <string name="install_package_ui_install">Instalar</string>
+    <string name="launcher_button_current_version">Sin instancias</string>
+    <string name="launcher_button_launch">Iniciar juego  →</string>
+    <string name="launcher_scroll_account_name">Sin cuentas</string>
+    <string name="launcher_scroll_account_state">Haz clic aquí para añadir</string>
+    <string name="launcher_scroll_download">Descargar</string>
+    <string name="launcher_scroll_game_manager">Sin instancias</string>
+    <string name="launcher_scroll_game_none">Añadir instancia</string>
+    <string name="launcher_scroll_lab">Laboratorio</string>
+    <string name="launcher_scroll_lobby">Sala</string>
+    <string name="launcher_scroll_multi_player">Multijugador</string>
+    <string name="launcher_scroll_setting">Ajustes</string>
+    <string name="launcher_scroll_version_list">Todas las instancias</string>
+    <string name="log_center_share">Compartir</string>
+    <string name="mod_manager_ui_delete">Quitar</string>
+    <string name="mod_manager_ui_refresh">Actualizar</string>
+    <string name="multi_player_ui_help">Ayuda</string>
+    <string name="multiplayer_qr_close">Cerrar</string>
+    <string name="multiplayer_qr_copy">Copiar</string>
+    <string name="skin_library_apply">Aplicar</string>
+    <string name="stats_reset">Restablecer</string>
+    <string name="transfer_next">Siguiente</string>
+</resources>

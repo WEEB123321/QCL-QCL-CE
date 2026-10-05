@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件名（ko）。说明未翻译时回退到英文（Android 资源回退）。 -->
+<resources>
+    <string name="plugin_instance_icon_name">인스턴스 아이콘 생성</string>
+    <string name="plugin_instance_diff_name">인스턴스 설정 비교</string>
+    <string name="plugin_instance_health_name">인스턴스 건강 점수</string>
+    <string name="plugin_instance_history_name">실행 기록</string>
+    <string name="plugin_mod_tag_name">모드 자동 태그</string>
+    <string name="plugin_mod_lock_name">모드 잠금 목록</string>
+    <string name="plugin_mod_dep_name">모드 의존성 트리</string>
+    <string name="plugin_mod_downgrade_name">모드 다운그레이드</string>
+    <string name="plugin_changelog_name">변경 로그 모음</string>
+    <string name="plugin_pack_preview_name">리소스팩 미리보기</string>
+    <string name="plugin_shader_compat_name">셰이더 호환성 검사</string>
+    <string name="plugin_batch_rename_name">일괄 이름 변경</string>
+    <string name="plugin_perf_bench_name">성능 기준</string>
+    <string name="plugin_dl_speed_name">다운로드 소스 속도 측정</string>
+    <string name="plugin_dl_autoswitch_name">다운로드 소스 자동 전환</string>
+    <string name="plugin_dl_template_name">다운로드 템플릿</string>
+    <string name="plugin_hash_verify_name">파일 무결성 검사</string>
+    <string name="plugin_vault_name">비밀번호 금고</string>
+    <string name="plugin_action_log_name">작업 로그</string>
+    <string name="plugin_pack_merge_name">리소스팩 병합</string>
+    <string name="plugin_theme_editor_name">테마 편집기</string>
+    <string name="plugin_server_ping_name">서버 지연 측정</string>
+    <string name="plugin_glossary_name">용어집</string>
+    <string name="plugin_tutorials_name">튜토리얼 모음</string>
+    <string name="plugin_server_wizard_name">서버 구축 마법사</string>
+    <string name="plugin_instance_import_name">인스턴스 가져오기</string>
+    <string name="plugin_launch_splash_name">실행 스플래시</string>
+    <string name="plugin_launch_queue_name">실행 대기열</string>
+    <string name="plugin_mod_update_name">모드 업데이트 사전 점검</string>
+    <string name="plugin_shader_preset_name">셰이더 프리셋</string>
+    <string name="plugin_java_match_name">Java 자동 매칭</string>
+    <string name="plugin_java_args_name">JVM 인수 프리셋</string>
+    <string name="plugin_world_map_name">월드 지도 미리보기</string>
+    <string name="plugin_world_guard_name">월드 편집 보호</string>
+    <string name="plugin_whitelist_name">서버 화이트리스트</string>
+    <string name="plugin_wiki_name">오프라인 백과</string>
+    <string name="plugin_migration_name">데이터 이전</string>
+    <string name="plugin_gamerule_name">게임 규칙 프리셋</string>
+    <string name="plugin_world_version_name">월드 버전 경고</string>
+    <string name="plugin_world_players_name">월드 플레이어</string>
+    <string name="plugin_notes_name">빠른 메모</string>
+    <string name="plugin_factory_reset_name">초기화</string>
+    <string name="plugin_locale_name">언어 / Language</string>
+</resources>

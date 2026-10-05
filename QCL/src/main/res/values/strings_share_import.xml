@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL share-import strings (community edition). -->
+<resources>
+
+    <string name="share_import_title">Import into QCL</string>
+    <string name="share_import_no_file">Nothing to import — the shared item contained no file.</string>
+    <string name="share_import_failed">Import failed. Try saving the file first, then open it from the launcher.</string>
+
+    <string name="share_import_as_background">Set as launcher background</string>
+    <string name="share_import_as_resourcepack">Put into resourcepacks</string>
+    <string name="share_import_as_shaderpack">Put into shaderpacks</string>
+    <string name="share_import_as_modpack">Save as modpack (install later)</string>
+
+    <string name="share_import_background_done">Background updated</string>
+    <string name="share_import_done">Saved to %1$s</string>
+
+</resources>

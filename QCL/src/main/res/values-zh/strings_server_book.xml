@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 服务器收藏夹 / 房间历史文案（社区版新增）。 -->
+<resources>
+
+    <string name="menu_local_version_servers">服务器收藏夹…</string>
+
+    <string name="server_book_title">服务器收藏夹</string>
+    <string name="server_book_add">添加</string>
+    <string name="server_book_close">关闭</string>
+    <string name="server_book_empty">还没有保存的服务器。\n\n点「添加」手动存一个 —— 或者直接进一次服务器，它会自动出现在这里。</string>
+    <string name="server_book_no_group">未分组</string>
+    <!-- %1$d 次数 -->
+    <string name="server_book_joined_times">进过 %1$d 次</string>
+    <string name="server_book_hint">点一行 = 用当前实例加入这个服务器；长按 = 收藏 / 编辑 / 删除。</string>
+
+    <string name="server_book_fav">收藏 / 取消收藏</string>
+    <string name="server_book_edit">编辑</string>
+    <string name="server_book_delete">删除</string>
+
+    <string name="server_book_field_name">名字（可留空）</string>
+    <string name="server_book_field_address">地址（host 或 host:port）</string>
+    <string name="server_book_field_note">备注（可留空）</string>
+    <string name="server_book_field_group">分组（可留空）</string>
+    <string name="server_book_need_address">地址不能为空。</string>
+
+    <!-- %1$s 地址 -->
+    <string name="server_book_joining">正在加入 %1$s…</string>
+    <!-- %1$s 错误 -->
+    <string name="server_book_failed">加入失败：%1$s</string>
+
+</resources>

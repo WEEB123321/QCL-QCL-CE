@@ -1,0 +1,61 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 34
+    ndkVersion "27.3.13750724"
+
+    // ★★★ 对齐 FCL：ABI 按 -Darch 属性切换，默认 all（全 ABI 正式包）。
+    //   调试单架构示例：./gradlew :PojavLauncher:assembleRelease -Darch=x86_64
+    //   （此前先后遗留过 armeabi-v7a / x86_64 两代 TEST-ONLY 配置，现统一为本机制）
+    def qclArch = System.getProperty("arch", "all")
+
+    defaultConfig {
+        if (qclArch != "all") {
+            ndk {
+                switch (qclArch) {
+                    case "arm":    abiFilters 'armeabi-v7a'; break
+                    case "arm64":  abiFilters 'arm64-v8a';   break
+                    case "x86":    abiFilters 'x86';          break
+                    case "x86_64": abiFilters 'x86_64';       break
+                }
+            }
+        }
+        minSdk 26
+        targetSdk 34
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
+    }
+}
+
+dependencies {
+    // 1.1.0：kopper-zink 的渲染库（libEGL_mesa/libzink_dri 等）已直接解压到
+    // src/main/jniLibs/*/ 随 APK 打包（library 模块不能直接依赖本地 aar，Gradle 会报
+    // "Direct local .aar file dependencies are not supported"）。
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'commons-codec:commons-codec:1.16.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

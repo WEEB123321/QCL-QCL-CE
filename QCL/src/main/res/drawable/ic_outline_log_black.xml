@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★ 社区版新增：日志中心图标（文档 + 多行文本）。
+     自绘而非复用其它图标，避免语义误导（script / web_asset 都不是「日志」的意思）。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M6,2h9l5,5v15H6V2zM14.5,3.6V7.5h3.9L14.5,3.6zM8,11h8v1.8H8V11zM8,14.6h8v1.8H8V14.6zM8,18.2h5v1.8H8V18.2z" />
+</vector>

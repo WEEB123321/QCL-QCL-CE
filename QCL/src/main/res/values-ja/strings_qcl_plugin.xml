@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件名（ja）。说明未翻译时回退到英文（Android 资源回退）。 -->
+<resources>
+    <string name="plugin_instance_icon_name">インスタンスアイコン生成</string>
+    <string name="plugin_instance_diff_name">インスタンス差分比較</string>
+    <string name="plugin_instance_health_name">インスタンス健康スコア</string>
+    <string name="plugin_instance_history_name">起動履歴</string>
+    <string name="plugin_mod_tag_name">MOD 自動タグ付け</string>
+    <string name="plugin_mod_lock_name">MOD ロック一覧</string>
+    <string name="plugin_mod_dep_name">MOD 依存ツリー</string>
+    <string name="plugin_mod_downgrade_name">MOD ダウングレード</string>
+    <string name="plugin_changelog_name">更新履歴の集約</string>
+    <string name="plugin_pack_preview_name">リソースパック プレビュー</string>
+    <string name="plugin_shader_compat_name">シェーダー互換性チェック</string>
+    <string name="plugin_batch_rename_name">一括リネーム</string>
+    <string name="plugin_perf_bench_name">パフォーマンス基準</string>
+    <string name="plugin_dl_speed_name">ダウンロード元 速度テスト</string>
+    <string name="plugin_dl_autoswitch_name">ダウンロード元 自動切替</string>
+    <string name="plugin_dl_template_name">ダウンロード テンプレート</string>
+    <string name="plugin_hash_verify_name">ファイル整合性チェック</string>
+    <string name="plugin_vault_name">パスワード保管庫</string>
+    <string name="plugin_action_log_name">操作ログ</string>
+    <string name="plugin_pack_merge_name">リソースパック結合</string>
+    <string name="plugin_theme_editor_name">テーマエディタ</string>
+    <string name="plugin_server_ping_name">サーバー遅延チェック</string>
+    <string name="plugin_glossary_name">用語集</string>
+    <string name="plugin_tutorials_name">チュートリアル集</string>
+    <string name="plugin_server_wizard_name">サーバー構築ウィザード</string>
+    <string name="plugin_instance_import_name">インスタンス取り込み</string>
+    <string name="plugin_launch_splash_name">起動スプラッシュ</string>
+    <string name="plugin_launch_queue_name">起動キュー</string>
+    <string name="plugin_mod_update_name">MOD 更新事前チェック</string>
+    <string name="plugin_shader_preset_name">シェーダープリセット</string>
+    <string name="plugin_java_match_name">Java 自動照合</string>
+    <string name="plugin_java_args_name">JVM 引数プリセット</string>
+    <string name="plugin_world_map_name">ワールドマップ プレビュー</string>
+    <string name="plugin_world_guard_name">ワールド編集ガード</string>
+    <string name="plugin_whitelist_name">サーバー ホワイトリスト</string>
+    <string name="plugin_wiki_name">オフライン百科</string>
+    <string name="plugin_migration_name">データ移行</string>
+    <string name="plugin_gamerule_name">ゲームルール プリセット</string>
+    <string name="plugin_world_version_name">ワールドバージョン警告</string>
+    <string name="plugin_world_players_name">ワールドのプレイヤー</string>
+    <string name="plugin_notes_name">クイックメモ</string>
+    <string name="plugin_factory_reset_name">初期化</string>
+    <string name="plugin_locale_name">言語 / Language</string>
+</resources>

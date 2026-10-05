@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL compatibility-notes strings (community edition). -->
+<resources>
+
+    <string name="setting_ui_compat">Compatibility notes</string>
+
+    <string name="compat_title">Compatibility notes</string>
+    <string name="compat_subtitle">A local, editable list of which version + loader combinations work. Built-in entries are common knowledge; the rest is yours. Nothing is uploaded.</string>
+
+    <string name="compat_instance_fmt">Current instance: %1$s\nVersion %2$s · Loader %3$s (inferred from the version name)</string>
+    <string name="compat_no_instance">No instance selected.</string>
+    <string name="compat_loader_unknown">unknown</string>
+    <string name="compat_search_hint">Search version, loader or text…</string>
+
+    <string name="compat_add">Add</string>
+    <string name="compat_export">Export</string>
+    <string name="compat_import">Import</string>
+
+    <string name="compat_tag_builtin">built-in</string>
+    <string name="compat_tag_user">yours</string>
+    <string name="compat_empty">Nothing matches. Try a different keyword.</string>
+    <string name="compat_delete">Delete this entry</string>
+
+    <string name="compat_hint_version">MC version (e.g. 1.12.2, or * for any)</string>
+    <string name="compat_hint_loader">Loader (Forge / Fabric / NeoForge / *, etc.)</string>
+    <string name="compat_hint_note">What did you find out?</string>
+    <string name="compat_note_required">Please write a note first.</string>
+
+    <string name="compat_export_copied">Copied to clipboard</string>
+    <string name="compat_import_hint">Paste exported JSON here</string>
+    <string name="compat_import_failed">Import failed — the text is not valid JSON.</string>
+    <string name="compat_import_done">Imported %1$d entrie(s)</string>
+
+</resources>

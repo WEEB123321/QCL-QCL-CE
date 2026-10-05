@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 实例快捷菜单 / 空间分析文案（社区版新增）。 -->
+<resources>
+
+    <string name="menu_local_version_backup">立即备份</string>
+    <string name="menu_local_version_backup_start">正在备份…</string>
+    <string name="menu_local_version_backup_ok">备份已创建</string>
+    <string name="menu_local_version_backup_fail">备份失败 —— 详情见日志中心</string>
+
+    <string name="menu_local_version_pin">固定到桌面</string>
+    <string name="menu_local_version_pin_ok">快捷方式已添加 —— 点它会直接打开这个实例</string>
+
+    <string name="menu_local_version_space">占用空间分析</string>
+
+    <string name="space_title">占用空间分析</string>
+    <string name="space_instance">实例</string>
+    <string name="space_total">合计</string>
+    <string name="space_junk">可清理</string>
+    <string name="space_junk_note">只有日志、崩溃报告和下载残留（.tmp / .part）算「可清理」。模组、存档、资源包一律不动。</string>
+    <string name="space_calculating">正在计算…（大实例要几秒）</string>
+    <string name="space_close">关闭</string>
+    <string name="space_clean">清理</string>
+    <string name="space_clean_confirm">删除这个实例里的日志、崩溃报告和下载残留？\n\n你的模组、存档、资源包都不会被碰。</string>
+    <!-- %1$d 已删除，%2$d 失败 -->
+    <string name="space_clean_done">清理完成（删除 %1$d 项，失败 %2$d 项）</string>
+
+</resources>

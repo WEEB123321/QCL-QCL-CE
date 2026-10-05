@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL mod-checkup strings (community edition). -->
+<resources>
+
+    <string name="setting_ui_mod_check">Mod checkup</string>
+
+    <string name="mod_check_title">Mod checkup</string>
+    <string name="mod_check_subtitle">Reads what each mod jar declares about itself (loader, supported Minecraft version, mod id) and compares it with the current instance. Read-only — nothing is disabled or deleted.</string>
+
+    <string name="mod_check_summary">%1$d mods · instance %2$s · loader %3$s (inferred)</string>
+    <string name="mod_check_scanning">Scanning…</string>
+    <string name="mod_check_no_instance">No instance selected — pick a version first.</string>
+    <string name="mod_check_section_list">Mod list</string>
+    <string name="mod_check_more">… and %1$d more</string>
+
+    <string name="mod_check_refresh">Rescan</string>
+    <string name="mod_check_share">Share report</string>
+
+</resources>

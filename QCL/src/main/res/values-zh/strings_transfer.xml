@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 实例间搬运文案（社区版新增）。 -->
+<resources>
+
+    <string name="menu_local_version_transfer">搬运到其它实例…</string>
+
+    <string name="transfer_no_instance">没有找到任何实例。</string>
+    <string name="transfer_need_two">至少要有两个实例才能在它们之间搬运。</string>
+    <string name="transfer_missing_dir">其中一个实例目录不存在。</string>
+
+    <!-- %1$s 源实例 -->
+    <string name="transfer_pick_dst">从「%1$s」搬到…</string>
+    <!-- %1$s 源，%2$s 目标 -->
+    <string name="transfer_pick_kinds">从「%1$s」搬到「%2$s」—— 要带哪些？</string>
+    <string name="transfer_kind_mods">模组</string>
+    <string name="transfer_kind_saves">存档</string>
+    <string name="transfer_kind_resourcepacks">资源包</string>
+    <string name="transfer_kind_shaderpacks">光影</string>
+    <string name="transfer_kind_config">设置（options.txt / config）</string>
+    <string name="transfer_next">下一步</string>
+    <string name="transfer_nothing_picked">一项都没选。</string>
+    <string name="transfer_scanning">正在计算会发生什么…</string>
+    <string name="transfer_nothing_found">没有可搬的内容 —— 这些目录是空的或不存在。</string>
+
+    <string name="transfer_plan_title">将要发生什么</string>
+    <!-- %1$d 条目数，%2$s 大小，%3$d 会被覆盖，%4$d 条警告 -->
+    <string name="transfer_summary">共 %1$d 项 · %2$s · 会覆盖 %3$d 项 · %4$d 条警告</string>
+    <!-- %1$d 剩余条数 -->
+    <string name="transfer_more">… 其余 %1$d 项未列出</string>
+    <string name="transfer_copy">复制（保留源文件）</string>
+    <string name="transfer_move">移动（从源删除）</string>
+    <!-- %1$s 源实例 -->
+    <string name="transfer_move_confirm">这会在复制完成后从「%1$s」删除所选内容。\n\n请再确认目标实例没选错。此操作不可撤销。</string>
+    <!-- %1$d 成功，%2$d 失败，%3$s 错误 -->
+    <string name="transfer_done">完成：成功 %1$d 项，失败 %2$d 项。%3$s</string>
+
+</resources>

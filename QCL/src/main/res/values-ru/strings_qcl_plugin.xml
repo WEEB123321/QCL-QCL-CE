@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件名（ru）。说明未翻译时回退到英文（Android 资源回退）。 -->
+<resources>
+    <string name="plugin_instance_icon_name">Генератор значков</string>
+    <string name="plugin_instance_diff_name">Сравнение сборок</string>
+    <string name="plugin_instance_health_name">Оценка здоровья</string>
+    <string name="plugin_instance_history_name">История запусков</string>
+    <string name="plugin_mod_tag_name">Автотеги модов</string>
+    <string name="plugin_mod_lock_name">Заблокированные моды</string>
+    <string name="plugin_mod_dep_name">Дерево зависимостей</string>
+    <string name="plugin_mod_downgrade_name">Откат мода</string>
+    <string name="plugin_changelog_name">Сборщик журналов</string>
+    <string name="plugin_pack_preview_name">Предпросмотр пака</string>
+    <string name="plugin_shader_compat_name">Совместимость шейдеров</string>
+    <string name="plugin_batch_rename_name">Массовое переименование</string>
+    <string name="plugin_perf_bench_name">Эталон производительности</string>
+    <string name="plugin_dl_speed_name">Тест скорости источников</string>
+    <string name="plugin_dl_autoswitch_name">Автосмена источника</string>
+    <string name="plugin_dl_template_name">Шаблоны загрузок</string>
+    <string name="plugin_hash_verify_name">Проверка целостности</string>
+    <string name="plugin_vault_name">Хранилище паролей</string>
+    <string name="plugin_action_log_name">Журнал действий</string>
+    <string name="plugin_pack_merge_name">Объединение паков</string>
+    <string name="plugin_theme_editor_name">Редактор темы</string>
+    <string name="plugin_server_ping_name">Пинг серверов</string>
+    <string name="plugin_glossary_name">Глоссарий</string>
+    <string name="plugin_tutorials_name">Сборник руководств</string>
+    <string name="plugin_server_wizard_name">Мастер сервера</string>
+    <string name="plugin_instance_import_name">Импорт сборок</string>
+    <string name="plugin_launch_splash_name">Экран запуска</string>
+    <string name="plugin_launch_queue_name">Очередь запуска</string>
+    <string name="plugin_mod_update_name">Предпроверка обновлений</string>
+    <string name="plugin_shader_preset_name">Пресеты шейдеров</string>
+    <string name="plugin_java_match_name">Подбор Java</string>
+    <string name="plugin_java_args_name">Пресеты JVM</string>
+    <string name="plugin_world_map_name">Предпросмотр карты</string>
+    <string name="plugin_world_guard_name">Защита от правки</string>
+    <string name="plugin_whitelist_name">Белый список</string>
+    <string name="plugin_wiki_name">Офлайн-вики</string>
+    <string name="plugin_migration_name">Перенос данных</string>
+    <string name="plugin_gamerule_name">Пресеты правил</string>
+    <string name="plugin_world_version_name">Предупреждение о версии</string>
+    <string name="plugin_world_players_name">Игроки мира</string>
+    <string name="plugin_notes_name">Быстрые заметки</string>
+    <string name="plugin_factory_reset_name">Сброс</string>
+    <string name="plugin_locale_name">Язык / Language</string>
+</resources>

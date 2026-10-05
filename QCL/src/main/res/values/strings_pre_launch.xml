@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pre-launch check strings (community edition). -->
+<resources>
+
+    <string name="pre_launch_title">Before we launch…</string>
+    <string name="pre_launch_continue">Launch anyway</string>
+    <string name="pre_launch_cancel">Cancel</string>
+    <string name="pre_launch_fix">Fix what I can</string>
+    <!-- %1$d MB -->
+    <string name="pre_launch_fixed_ram">Memory allocation changed to %1$d MB</string>
+    <!-- %1$s error -->
+    <string name="pre_launch_fix_failed">Could not apply a fix: %1$s</string>
+    <string name="pre_launch_go_runtime">Open "Install runtime" from the home screen and tap Install / Update.</string>
+
+    <string name="auto_task_pre_launch_check">Check before launching</string>
+    <string name="auto_task_pre_launch_check_hint">Runs a quick check (Java runtime, memory, version files, mod count) before launch. Only shows up when something actually looks wrong.</string>
+
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 二级页返回栏背景：白色磨砂玻璃，与底部导航 / 内容卡片同一套配方。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#D9FFFFFF" />
+    <corners android:radius="18dp" />
+</shape>

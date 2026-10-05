@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 兼容性备忘文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_ui_compat">兼容性备忘</string>
+
+    <string name="compat_title">兼容性备忘</string>
+    <string name="compat_subtitle">一份存在本机、可自己增删的「哪个版本配哪个加载器能用」清单。内置的是公认常识，其余由你自己积累。不会上传任何东西。</string>
+
+    <string name="compat_instance_fmt">当前实例：%1$s\n版本 %2$s · 加载器 %3$s（由版本名推测）</string>
+    <string name="compat_no_instance">当前没有选中实例。</string>
+    <string name="compat_loader_unknown">未知</string>
+    <string name="compat_search_hint">搜索版本 / 加载器 / 说明…</string>
+
+    <string name="compat_add">添加</string>
+    <string name="compat_export">导出</string>
+    <string name="compat_import">导入</string>
+
+    <string name="compat_tag_builtin">内置</string>
+    <string name="compat_tag_user">自建</string>
+    <string name="compat_empty">没有匹配的条目，换个关键词试试。</string>
+    <string name="compat_delete">删除这条</string>
+
+    <string name="compat_hint_version">MC 版本（如 1.12.2，或 * 表示任意）</string>
+    <string name="compat_hint_loader">加载器（Forge / Fabric / NeoForge / * 等）</string>
+    <string name="compat_hint_note">你发现了什么？</string>
+    <string name="compat_note_required">请先写一句说明。</string>
+
+    <string name="compat_export_copied">已复制到剪贴板</string>
+    <string name="compat_import_hint">把导出的 JSON 粘贴到这里</string>
+    <string name="compat_import_failed">导入失败 —— 这段文本不是合法的 JSON。</string>
+    <string name="compat_import_done">已导入 %1$d 条</string>
+
+</resources>

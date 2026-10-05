@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 大厅：屋顶 + 门洞（门用「挖空」实现 —— 单色矢量不能做减法，
+     所以门是一条与背景同色的窄条，视觉上就是开着的门）。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FF1B1B1B" android:pathData="M12,2 L22.5,11.2 L20.8,13.2 L12,5.6 L3.2,13.2 L1.5,11.2 Z"/>
+    <path android:fillColor="#FF1B1B1B" android:pathData="M4.5,12 L19.5,12 L19.5,21.5 L4.5,21.5 Z"/>
+    <path android:fillColor="#00000000" android:pathData="M10,14.5 L14,14.5 L14,21.5 L10,21.5 Z"/>
+</vector>

@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ui_setting_exterior"
+    android:visibility="gone"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:singleLine="true"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exterior_setting_ui_theme_title"
+                android:textSize="@dimen/text_size_middle"
+                android:textColor="@color/colorPureBlack"/>
+            
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/launcher_view_light_gray">
+
+                <LinearLayout
+                    android:padding="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_theme"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <LinearLayout
+                        android:id="@+id/select_theme"
+                        android:padding="6dp"
+                        android:layout_width="120dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_marginStart="6dp"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:id="@+id/theme_color_view"/>
+
+                        <TextView
+                            android:singleLine="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="16dp"
+                            android:id="@+id/theme_color_text"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_small"
+                            android:gravity="center"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:padding="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_panel_color"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <LinearLayout
+                        android:id="@+id/select_panel_color"
+                        android:padding="6dp"
+                        android:layout_width="120dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_marginStart="6dp"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:id="@+id/panel_color_view"/>
+
+                        <TextView
+                            android:singleLine="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="16dp"
+                            android:id="@+id/panel_color_text"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_small"
+                            android:gravity="center"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ★ 社区版新增：主题方案（一键预设 + 导出/导入）。
+                     配色本身早就能任选（上面两行），这里补的是「一键套用一套配色」与「分享给别人」。
+                     预设只是把 theme/panel 两个色值 + 半透明背景开关一起设好，不是新机制。 -->
+                <LinearLayout
+                    android:padding="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_theme_preset_title"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/theme_preset_default"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_small"
+                        android:text="@string/exterior_theme_preset_default"/>
+
+                    <TextView
+                        android:id="@+id/theme_preset_dark"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_small"
+                        android:text="@string/exterior_theme_preset_dark"/>
+
+                    <TextView
+                        android:id="@+id/theme_preset_amoled"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_small"
+                        android:text="@string/exterior_theme_preset_amoled"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:paddingBottom="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/theme_export"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="32dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_small"
+                        android:text="@string/exterior_theme_export"/>
+
+                    <TextView
+                        android:id="@+id/theme_import"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_height="32dp"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/launcher_button_gray"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_small"
+                        android:text="@string/exterior_theme_import"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/colorDarkGray"/>
+
+                <!-- 1.0.5 新增：UI 风格开关（默认 UI ↔ 草方块 UI） -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_style"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/switch_grass_ui"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/colorDarkGray"/>
+
+                <!-- 1.3.7 新增：主界面是否显示账号人物（默认开） -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_show_account_model"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/switch_show_account_model"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/colorDarkGray"/>
+
+                <!-- ★★★ 社区版删除：「标题栏透明」开关。
+                     它早就没用了 —— 顶部标题栏在本社区版里已被移除（见 activity_main.xml
+                     的注释），开关的处理函数里只剩一个空 if 块，拨动它什么都不会发生。
+                     按「不做假选项」的原则直接删掉，而不是留一个骗人的开关。
+                     字段 LauncherSetting.transBar 保留：老配置文件里还有这个键，
+                     删字段会让 Gson 反序列化出来的对象与老文件不一致。 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_transparent_bg"
+                        android:textColor="@color/colorPureBlack"
+                        android:textSize="@dimen/text_size_middle"
+                        android:layout_gravity="center"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/switch_transparent_bg"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/fullscreen_layout">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/colorDarkGray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="15dp">
+
+                        <TextView
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/exterior_setting_ui_full_screen"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_middle"
+                            android:layout_gravity="center"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:tag="tint_accent_color"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/switch_full_screen"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ★★★ 社区版新增：安全区（刘海 / 挖孔 / 大圆角）避让。
+                     圆角大的手机上，沉浸式全屏会把顶部入口和底部导航条画进 R 角里。 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/safe_area_layout">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:background="@color/colorDarkGray"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="15dp">
+
+                        <TextView
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/exterior_setting_ui_safe_area"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_middle"
+                            android:layout_gravity="center"/>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:id="@+id/safe_area_value"
+                            android:singleLine="true"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/text_size_small"
+                            android:textColor="@color/colorPureBlack"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/safe_area_hint"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="#99000000"
+                        android:text="@string/exterior_setting_ui_safe_area_hint"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exterior_setting_ui_bg_title"
+                android:textSize="@dimen/text_size_middle"
+                android:textColor="@color/colorPureBlack"/>
+
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/launcher_view_light_gray">
+
+                <RadioButton
+                    android:singleLine="true"
+                    android:tag="tint_accent_color"
+                    android:layout_margin="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exterior_setting_ui_bg_default"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"
+                    android:id="@+id/select_bg_default"/>
+
+                <RadioButton
+                    android:singleLine="true"
+                    android:tag="tint_accent_color"
+                    android:layout_margin="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/exterior_setting_ui_bg_classic"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"
+                    android:id="@+id/select_bg_classic"/>
+
+                <LinearLayout
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_bg_custom"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"
+                        android:id="@+id/select_bg_custom"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <EditText
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        android:layout_width="140dp"
+                        android:layout_height="32dp"
+                        android:id="@+id/edit_bg_path"
+                        android:background="@color/colorLightGray"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="@dimen/text_size_middle"/>
+
+                    <ImageButton
+                        android:layout_marginStart="15dp"
+                        android:layout_gravity="center"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/ic_baseline_folder_black"
+                        android:id="@+id/select_bg_path"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_margin="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/exterior_setting_ui_bg_online"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"
+                        android:id="@+id/select_bg_online"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <EditText
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        android:layout_width="140dp"
+                        android:layout_height="32dp"
+                        android:id="@+id/edit_bg_url"
+                        android:background="@color/colorLightGray"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="@dimen/text_size_middle"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

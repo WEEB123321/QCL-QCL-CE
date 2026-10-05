@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 底部导航条背景（社区版）。
+     ★ 统一成「白色磨砂玻璃」—— 和内容卡片同一套配方。
+     原来这里是深灰 #C2545454，导致「我加的组件是深色、原版继承的是浅色」两套风格并存。
+     只圆上方两角：底边贴屏幕底，圆下角会露出背景。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#D9FFFFFF" />
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp" />
+</shape>

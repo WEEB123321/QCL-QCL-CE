@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 全局搜索面板（社区版新增）。
+     ★★★ 需求书要的「全局搜索兜底」：一级入口只有五个，低频功能都收在二级页里，
+       找不到东西时用这个面板统一搜。所以它必须**在任何页面都能唤起**
+       （见 activity_main.xml 的 qcl_search_fab）。
+     ★ 结果分三段：页面 / 操作 / 已安装版本 —— 段内条目由 GlobalSearchDialog 运行时填充。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/qcl_search_dialog_bg"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:singleLine="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_middle"
+        android:textColor="@color/colorPureWhite"
+        android:text="@string/search_title" />
+
+    <EditText
+        android:id="@+id/dialog_search_input"
+        android:layout_marginTop="8dp"
+        android:background="#22FFFFFF"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:textColor="@color/colorPureWhite"
+        android:textColorHint="#80FFFFFF"
+        android:textSize="@dimen/text_size_middle"
+        android:hint="@string/search_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/dialog_search_results"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
+
+</LinearLayout>

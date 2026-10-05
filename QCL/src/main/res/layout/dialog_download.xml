@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="15dp"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:singleLine="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_download_title"
+        android:textColor="@color/colorPureBlack"
+        android:textStyle="bold"
+        android:textSize="@dimen/text_size_middle"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:id="@+id/download_task_list"/>
+
+    <!-- ★ 1.4.3：失败清单 / 暂停提示。默认隐藏，出错或暂停时才显示，
+         避免给「一切正常」的下载平白加一行噪音。 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="4"
+        android:ellipsize="end"
+        android:textColor="@color/colorPureBlack"
+        android:textSize="@dimen/text_size_small"
+        android:visibility="gone"
+        android:id="@+id/download_status_text"/>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:singleLine="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/colorPureBlack"
+            android:textSize="@dimen/text_size_middle"
+            android:id="@+id/download_speed_text"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- 仅在「有文件下载失败」时出现 -->
+        <Button
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="50dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:text="@string/dialog_download_retry"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorPureBlack"
+            android:background="@drawable/launcher_button_parent"
+            android:visibility="gone"
+            android:id="@+id/retry"/>
+
+        <Button
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="50dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:text="@string/dialog_download_pause"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorPureBlack"
+            android:background="@drawable/launcher_button_parent"
+            android:id="@+id/pause"/>
+
+        <Button
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="50dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:gravity="center"
+            android:text="@string/dialog_download_negative"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorPureBlack"
+            android:background="@drawable/launcher_button_parent"
+            android:id="@+id/cancel"/>
+
+    </LinearLayout>
+
+</LinearLayout>

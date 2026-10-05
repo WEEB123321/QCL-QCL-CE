@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Instance-to-instance transfer strings (community edition). -->
+<resources>
+
+    <string name="menu_local_version_transfer">Move to another instance…</string>
+
+    <string name="transfer_no_instance">No instances found.</string>
+    <string name="transfer_need_two">You need at least two instances to move things between them.</string>
+    <string name="transfer_missing_dir">One of the instance folders is missing.</string>
+
+    <!-- %1$s source instance -->
+    <string name="transfer_pick_dst">Copy from “%1$s” to…</string>
+    <!-- %1$s source, %2$s destination -->
+    <string name="transfer_pick_kinds">From “%1$s” to “%2$s” — what to bring?</string>
+    <string name="transfer_kind_mods">Mods</string>
+    <string name="transfer_kind_saves">Worlds</string>
+    <string name="transfer_kind_resourcepacks">Resource packs</string>
+    <string name="transfer_kind_shaderpacks">Shaders</string>
+    <string name="transfer_kind_config">Settings (options.txt / config)</string>
+    <string name="transfer_next">Next</string>
+    <string name="transfer_nothing_picked">Nothing selected.</string>
+    <string name="transfer_scanning">Working out what would happen…</string>
+    <string name="transfer_nothing_found">Nothing to move — those folders are empty or missing.</string>
+
+    <string name="transfer_plan_title">What will happen</string>
+    <!-- %1$d count, %2$s size, %3$d conflicts, %4$d warnings -->
+    <string name="transfer_summary">%1$d items · %2$s · %3$d will overwrite · %4$d warning(s)</string>
+    <!-- %1$d remaining -->
+    <string name="transfer_more">… and %1$d more</string>
+    <string name="transfer_copy">Copy (keeps the originals)</string>
+    <string name="transfer_move">Move (deletes from source)</string>
+    <!-- %1$s source instance -->
+    <string name="transfer_move_confirm">This DELETES the selected items from “%1$s” after they are copied.\n\nMake sure the destination is the right instance. This cannot be undone.</string>
+    <!-- %1$d copied, %2$d failed, %3$s error -->
+    <string name="transfer_done">Done: %1$d copied, %2$d failed. %3$s</string>
+
+</resources>

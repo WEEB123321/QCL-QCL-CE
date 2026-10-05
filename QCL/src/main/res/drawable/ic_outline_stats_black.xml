@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★ 社区版新增：统计图标（柱状图）。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M4,20h16v2H4V20zM5,11h3v7H5V11zM10.5,6h3v12h-3V6zM16,9h3v9h-3V9z" />
+</vector>

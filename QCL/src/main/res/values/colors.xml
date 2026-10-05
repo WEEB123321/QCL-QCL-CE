@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#B0552F</color>
+    <color name="colorSecondary">#283593</color>
+    <color name="colorThird">#43A047</color>
+    <color name="colorForth">#E67E22</color>
+    <color name="colorFifth">#9C27B0</color>
+    <color name="colorSixth">#B71C1C</color>
+    <color name="colorPrimaryDark">#CB4A4A4A</color>
+    <color name="colorAccent">#B0552F</color>
+
+    <color name="colorTransparent">#00FFFFFF</color>
+    <color name="colorPureWhite">#FFFFFF</color>
+    <color name="colorPureBlack">#000000</color>
+    <color name="colorLightWhite">#99FFFFFF</color>
+    <color name="colorShallowWhite">#40FFFFFF</color>
+    <color name="colorDarkGray">#40000000</color>
+    <color name="colorGray">#1A000000</color>
+    <!-- QCL：柔和的灰（面板为不透明） -->
+    <!-- 1.0.6：原来 #B8CFCFCF 偏暗（中灰 + 72% 不透明），大块面板压上去整屏发灰。
+         现提亮到接近白的高亮灰，并降低不透明度，让动态背景的亮色透上来。 -->
+    <color name="qcl_panel_gray">#B8FFFFFF</color>
+    <color name="qcl_panel_gray_alt">#9EFFFFFF</color>
+    <color name="qcl_gray_translucent">#00000000</color>
+    <color name="qcl_gray_translucent_bar">#00000000</color>
+    <color name="colorLightGray">#0D000000</color>
+    <color name="colorWhiteGray">#E3E3E3</color>
+    <color name="colorLightBlue">#655C6BC0</color>
+    <color name="colorGreen">#3DFF2C</color>
+    <color name="colorYellow">#F0FF00</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorLinkBlue">#0E9384</color>
+    <color name="colorLinkBlueDark">#0A5F55</color>
+    <color name="colorTextBlue">#D5F1FF</color>
+    <color name="colorStartRockerBlue">#1A00C4FF</color>
+    <color name="colorEndRockerBlue">#3300C4FF</color>
+    <color name="colorBrown">#835300</color>
+
+    <!-- 1.0.6：同步提亮，与 qcl_panel_gray 保持一致 -->
+    <color name="launcher_ui_background">#00000000</color>
+    <color name="launcher_ui_background_light">#BCE6E6E6</color>
+    <color name="colorPressed">#BDBDBD</color>
+    <!-- 参考图里的米白（按钮文字 / 米色底），比纯白柔和 -->
+    <color name="qcl_cream">#FFF6EFE6</color>
+</resources>

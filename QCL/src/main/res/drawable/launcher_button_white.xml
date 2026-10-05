@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 原版「白色按钮」：统一到玻璃配方（加 14dp 圆角，和 qcl_button_gray 一致）。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#4DFFFFFF"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#38FFFFFF"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+</selector>

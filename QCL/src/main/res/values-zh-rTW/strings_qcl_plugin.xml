@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件名（zh-rTW）。说明未翻译时回退到英文（Android 资源回退）。 -->
+<resources>
+    <string name="plugin_instance_icon_name">實例圖示產生器</string>
+    <string name="plugin_instance_diff_name">實例設定差異對比</string>
+    <string name="plugin_instance_health_name">實例健康評分</string>
+    <string name="plugin_instance_history_name">實例啟動歷史</string>
+    <string name="plugin_mod_tag_name">模組標籤自動分類</string>
+    <string name="plugin_mod_lock_name">模組鎖定清單</string>
+    <string name="plugin_mod_dep_name">模組相依樹</string>
+    <string name="plugin_mod_downgrade_name">模組降級工具</string>
+    <string name="plugin_changelog_name">更新日誌彙總</string>
+    <string name="plugin_pack_preview_name">資源包預覽圖</string>
+    <string name="plugin_shader_compat_name">光影相容檢測</string>
+    <string name="plugin_batch_rename_name">批次重新命名</string>
+    <string name="plugin_perf_bench_name">啟動器效能基準</string>
+    <string name="plugin_dl_speed_name">下載來源測速</string>
+    <string name="plugin_dl_autoswitch_name">下載失敗自動換源</string>
+    <string name="plugin_dl_template_name">下載組合範本</string>
+    <string name="plugin_hash_verify_name">檔案完整性校驗</string>
+    <string name="plugin_vault_name">密碼保險箱</string>
+    <string name="plugin_action_log_name">操作日誌</string>
+    <string name="plugin_pack_merge_name">資源包合併</string>
+    <string name="plugin_theme_editor_name">主題編輯器</string>
+    <string name="plugin_server_ping_name">伺服器延遲預檢</string>
+    <string name="plugin_glossary_name">在地化詞庫</string>
+    <string name="plugin_tutorials_name">教學庫</string>
+    <string name="plugin_server_wizard_name">一鍵開服精靈</string>
+    <string name="plugin_instance_import_name">實例匯入精靈</string>
+    <string name="plugin_launch_splash_name">實例啟動畫面</string>
+    <string name="plugin_launch_queue_name">啟動佇列</string>
+    <string name="plugin_mod_update_name">模組更新預檢</string>
+    <string name="plugin_shader_preset_name">光影預設管理</string>
+    <string name="plugin_java_match_name">Java 自動比對</string>
+    <string name="plugin_java_args_name">Java 參數預設</string>
+    <string name="plugin_world_map_name">存檔地圖預覽</string>
+    <string name="plugin_world_guard_name">存檔編輯警告</string>
+    <string name="plugin_whitelist_name">伺服器白名單管理</string>
+    <string name="plugin_wiki_name">離線百科</string>
+    <string name="plugin_migration_name">資料移轉精靈</string>
+    <string name="plugin_gamerule_name">遊戲規則預設</string>
+    <string name="plugin_world_version_name">存檔版本轉換提醒</string>
+    <string name="plugin_world_players_name">存檔玩家清單</string>
+    <string name="plugin_notes_name">快速筆記</string>
+    <string name="plugin_factory_reset_name">一鍵恢復出廠</string>
+    <string name="plugin_locale_name">語言 / Language</string>
+</resources>

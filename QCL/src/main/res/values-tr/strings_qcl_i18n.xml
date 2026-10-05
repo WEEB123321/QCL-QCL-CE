@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（tr）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">Kaydet</string>
+    <string name="auto_task_before_launch">Başlatmadan önce yedekle</string>
+    <string name="auto_task_run_done">Yedek oluşturuldu</string>
+    <string name="backup_create_none">Örnek seçilmedi</string>
+    <string name="backup_delete">Sil</string>
+    <string name="compat_add">Ekle</string>
+    <string name="compat_export">Dışa aktar</string>
+    <string name="compat_import">İçe aktar</string>
+    <string name="dialog_add_verify_server_cancel">İptal</string>
+    <string name="dialog_add_verify_server_next">İleri &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">Seç</string>
+    <string name="dialog_add_view_positive">Ekle</string>
+    <string name="dialog_create_control_pattern_positive">Oluştur</string>
+    <string name="dialog_delete_mod_negative">Hayır</string>
+    <string name="dialog_delete_mod_positive">Evet</string>
+    <string name="dialog_delete_version_positive">Sil</string>
+    <string name="dialog_download_retry">Yeniden dene</string>
+    <string name="dialog_offline_skin_confirm">Tamam</string>
+    <string name="dialog_positive">Bitti</string>
+    <string name="dialog_rename_version_confirm">Tamam</string>
+    <string name="dialog_verify_cancel">İptal</string>
+    <string name="download_minecraft_ui_refresh">Yenile</string>
+    <string name="download_mod_ui_search">Ara</string>
+    <string name="download_setting_ui_download">İndir</string>
+    <string name="download_setting_ui_select">İndirme kaynağı</string>
+    <string name="drawer_custom_menu_edit_info">Düzenle</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">Aç</string>
+    <string name="export_world_ui_export">Dışa aktar</string>
+    <string name="exterior_theme_export">Temayı dışa aktar</string>
+    <string name="exterior_theme_import">Tema içe aktar</string>
+    <string name="exterior_theme_import_done">Tema uygulandı</string>
+    <string name="game_setting_ui_advance_setting">Gelişmiş ayarlar</string>
+    <string name="game_setting_ui_control_setting">Kontrol seçenekleri</string>
+    <string name="game_setting_ui_debug_setting">Geçici çözümler</string>
+    <string name="game_setting_ui_jvm_setting">Java Sanal Makinesi seçenekleri</string>
+    <string name="game_setting_ui_launch_setting">Başlatma seçenekleri</string>
+    <string name="install_game_ui_install">Kur</string>
+    <string name="install_game_ui_none">Seçilmedi</string>
+    <string name="install_package_ui_install">Kur</string>
+    <string name="launcher_button_current_version">Örnek yok</string>
+    <string name="launcher_button_launch">Oyunu Başlat  →</string>
+    <string name="launcher_scroll_account_name">Hesap yok</string>
+    <string name="launcher_scroll_account_state">Eklemek için buraya dokunun</string>
+    <string name="launcher_scroll_download">İndir</string>
+    <string name="launcher_scroll_game_manager">Örnek yok</string>
+    <string name="launcher_scroll_game_none">Örnek ekle</string>
+    <string name="launcher_scroll_lab">Laboratuvar</string>
+    <string name="launcher_scroll_lobby">Lobi</string>
+    <string name="launcher_scroll_multi_player">Çok oyunculu</string>
+    <string name="launcher_scroll_setting">Ayarlar</string>
+    <string name="launcher_scroll_version_list">Tüm örnekler</string>
+    <string name="log_center_share">Paylaş</string>
+    <string name="mod_manager_ui_delete">Kaldır</string>
+    <string name="mod_manager_ui_refresh">Yenile</string>
+    <string name="multi_player_ui_help">Yardım</string>
+    <string name="multiplayer_qr_close">Kapat</string>
+    <string name="multiplayer_qr_copy">Kopyala</string>
+    <string name="skin_library_apply">Uygula</string>
+    <string name="stats_reset">Sıfırla</string>
+    <string name="transfer_next">İleri</string>
+</resources>

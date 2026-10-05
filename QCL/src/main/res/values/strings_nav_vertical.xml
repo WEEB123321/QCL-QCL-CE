@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左侧导航的**竖排**标签（社区版）。
+     参考图里每个导航项是「罗马数字 + 中文竖排」，所以用 \n 把字拆开。
+     ★ 不用 icons —— 参考图的导航本来就没有图标。 -->
+<resources>
+    <string name="nav_v_home" translatable="false">首\n页</string>
+    <string name="nav_v_instance" translatable="false">实\n例</string>
+    <string name="nav_v_download" translatable="false">下\n载</string>
+    <string name="nav_v_plugin" translatable="false">插\n件</string>
+    <string name="nav_v_mine" translatable="false">我\n的</string>
+</resources>

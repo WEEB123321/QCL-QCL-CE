@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the re-enabled "General" settings page (community edition). -->
+<resources>
+
+    <string name="qcl_lang_system">Follow system</string>
+    <string name="qcl_lang_en">English</string>
+    <string name="qcl_lang_zh_cn">简体中文</string>
+    <string name="qcl_lang_zh_tw">繁體中文</string>
+    <string name="qcl_lang_need_restart">Language saved — restart the launcher to apply.</string>
+
+    <!-- %1$s current launcher version -->
+    <string name="qcl_update_current">Current version: %1$s</string>
+    <string name="qcl_update_channel_rec">Switched to the stable channel</string>
+    <string name="qcl_update_channel_beta">Switched to the beta channel</string>
+
+    <string name="qcl_cache_unknown">Cache directory unavailable</string>
+    <string name="qcl_cache_calculating">Calculating…</string>
+    <!-- %1$s size, %2$d file count -->
+    <string name="qcl_cache_usage">%1$s · %2$d files</string>
+    <!-- %1$d deleted, %2$d failed -->
+    <string name="qcl_cache_cleared">Cache cleared (%1$d deleted, %2$d failed)</string>
+
+    <string name="qcl_clean_title">One-tap cleanup</string>
+    <string name="qcl_clean_cache">Cache</string>
+    <string name="qcl_clean_log">Logs</string>
+    <string name="qcl_clean_backup">Backups</string>
+    <string name="qcl_clean_button">Choose what to clean…</string>
+    <string name="qcl_clean_warning">Cache and logs are safe to remove — they only cost you a slightly slower next launch.\n\nBackups are created by you and CANNOT be recovered once deleted. It is off by default — only tick it if you really mean it.</string>
+    <string name="qcl_clean_confirm">Clean</string>
+    <!-- %1$d deleted, %2$d failed -->
+    <string name="qcl_clean_done">Cleanup finished (%1$d deleted, %2$d failed)</string>
+
+    <string name="qcl_export_log_none">No log files found to export.</string>
+    <!-- %1$s saved path -->
+    <string name="qcl_export_log_done">Logs exported to:\n%1$s</string>
+    <!-- %1$s error -->
+    <string name="qcl_export_log_failed">Export failed: %1$s</string>
+
+</resources>

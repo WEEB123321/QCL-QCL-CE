@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 主题方案 / 分享文案（社区版新增）。 -->
+<resources>
+
+    <string name="exterior_theme_preset_title">主题方案</string>
+    <string name="exterior_theme_preset_default">默认</string>
+    <string name="exterior_theme_preset_dark">深色</string>
+    <string name="exterior_theme_preset_amoled">纯黑</string>
+
+    <string name="exterior_theme_export">导出主题</string>
+    <string name="exterior_theme_import">导入主题</string>
+
+    <string name="exterior_theme_applied">已套用方案：%1$s</string>
+    <string name="exterior_theme_export_copied">主题已复制到剪贴板，可以发给别人</string>
+    <string name="exterior_theme_import_hint">把导出的主题粘贴到这里</string>
+    <string name="exterior_theme_import_failed">这段文本不像是一个 QCL 主题。</string>
+    <string name="exterior_theme_import_done">主题已套用</string>
+
+</resources>

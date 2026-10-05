@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 启动诊断页文案（社区版新增）。
+     为什么单独一个文件：项目约定把新功能的字符串集中放，避免继续把
+     strings.xml 撑大（已有 strings.xml / strings_lab.xml / strings_main_extra.xml 三处）。 -->
+<resources>
+
+    <!-- 「我的」里的入口卡片 -->
+    <string name="setting_ui_diagnostic">启动诊断</string>
+
+    <!-- 诊断页 -->
+    <string name="diagnostic_ui_title">启动诊断</string>
+    <string name="diagnostic_ui_subtitle">闪退、卡住、进不去游戏时，先来这里。\n下面就是启动器「走到哪一步」的完整记录 —— 最后一行就是它停下的位置。</string>
+
+    <string name="diagnostic_btn_refresh">刷新</string>
+    <string name="diagnostic_btn_copy">复制全部</string>
+    <string name="diagnostic_btn_share">分享给作者</string>
+
+    <string name="diagnostic_section_last">上次启动没有走完</string>
+    <string name="diagnostic_last_hint">上次启动中途结束了。最后一行 = 它停下的位置。\n（如果上次是你自己退出的，忽略这一段即可。）</string>
+
+    <string name="diagnostic_section_trace">本次启动路标</string>
+    <string name="diagnostic_trace_hint">最后一行 = 本次启动走到的最远处。启动正常时最后一行会是「启动成功」。</string>
+    <string name="diagnostic_trace_empty">路标为空或读不到 —— 说明连 Application.attachBaseContext 都没走完，或三个落盘位置全部不可写。这本身就是一条重要线索，请把它连同下面的设备信息一起发给作者。</string>
+
+    <!-- ★ 社区版新增：自动排查（诊断向导） -->
+    <string name="diagnostic_section_wizard">自动排查</string>
+    <string name="diagnostic_wizard_hint">逐项检查运行环境、内存、实例、模组与上次启动结果。红点就是问题所在，下面一行是怎么办。</string>
+
+    <string name="diagnostic_section_device">设备信息</string>
+
+    <string name="diagnostic_tip">怎么把信息给作者：点「分享给作者」选微信 / QQ 发出去，比截图更完整（截图可能截不全）。</string>
+
+    <string name="diagnostic_toast_copied">已复制完整诊断信息</string>
+    <string name="diagnostic_toast_copy_failed">复制失败，请改用「分享给作者」</string>
+    <string name="diagnostic_toast_share_failed">没有可用的分享应用</string>
+    <string name="diagnostic_toast_refreshed">已刷新</string>
+    <string name="diagnostic_share_chooser">分享启动诊断信息</string>
+    <string name="diagnostic_share_subject">QCL 启动诊断</string>
+    <string name="diagnostic_report_header">===== QCL 启动诊断报告 =====</string>
+
+</resources>

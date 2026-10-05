@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL local stats strings (community edition). -->
+<resources>
+
+    <string name="setting_ui_stats">Statistics</string>
+
+    <string name="stats_title">Statistics</string>
+    <string name="stats_subtitle">Local only — nothing is uploaded. Play time is measured from launch until you leave the game.</string>
+
+    <string name="stats_label_time">Total play time</string>
+    <string name="stats_label_launch">Game launches</string>
+    <string name="stats_label_crash">Java crashes</string>
+
+    <string name="stats_section_instance">Launches per instance</string>
+    <string name="stats_section_session">Recent sessions</string>
+    <string name="stats_empty">No records yet</string>
+    <string name="stats_unknown_instance">(unknown instance)</string>
+    <string name="stats_instance_launch_times">%1$d×</string>
+
+    <string name="stats_duration_hm">%1$d h %2$d min</string>
+    <string name="stats_duration_min">%1$d min</string>
+
+    <string name="stats_first_launch">First launch</string>
+    <string name="stats_last_launch">Last launch</string>
+
+    <string name="stats_share">Share</string>
+    <string name="stats_reset">Reset</string>
+    <string name="stats_share_chooser">Share statistics</string>
+    <string name="stats_share_subject">QCL statistics</string>
+    <string name="stats_reset_confirm">Reset all statistics? This cannot be undone.</string>
+    <string name="stats_reset_done">Statistics reset</string>
+
+</resources>

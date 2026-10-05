@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/launcher_root"
+    android:animateLayoutChanges="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/launcher_layout"
+        android:background="@drawable/ic_background_classic"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        android:paddingStart="76dp">
+
+        <!-- 顶部标题栏已按用户要求移除（合成台图标 + 「量子方块启动器」标题 + 右侧窗口按钮）。
+             下方 ui_main 的六个入口按钮因此整体上移到原位置。 -->
+        <RelativeLayout
+            android:id="@+id/main_ui_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/ui_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_account"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_game_manager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_version_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_download"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_multiplayer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_setting"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 1.4.1 新增：大厅 / 实验室 -->
+            <include
+                layout="@layout/ui_lobby"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_lab"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_mod_update"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_manage_datapack"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_export_world"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_add_game_directory"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_package"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_export_package_type"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_export_package_info"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_export_package_file"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_game"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_forge_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 1.4.2：NeoForge 版本选择页（与 Forge 同级） -->
+            <include
+                layout="@layout/ui_install_neoforge_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_fabric_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_fabric_api_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_lite_loader_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_optifine_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_quilt_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <include
+                layout="@layout/ui_install_quilt_api_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：插件页（底部导航第 4 个 Tab） -->
+            <include
+                layout="@layout/ui_plugin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：备份与恢复（收在「我的」里，不占底部导航） -->
+            <include
+                layout="@layout/ui_backup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：启动诊断（同样收在「我的」里） -->
+            <include
+                layout="@layout/ui_diagnostic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：日志中心（收在「我的」里；与启动诊断互补：
+                 诊断看启动路标，日志中心看运行期日志） -->
+            <include
+                layout="@layout/ui_log_center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：本地统计（收在「我的」里） -->
+            <include
+                layout="@layout/ui_stats"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：新手上路 + 常见问题（收在「我的」里） -->
+            <include
+                layout="@layout/ui_tutorial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：自动任务（定时备份 / 清理；收在「我的」里） -->
+            <include
+                layout="@layout/ui_auto_task"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：资源冲突检测（收在「我的」里） -->
+            <include
+                layout="@layout/ui_resource_conflict"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：兼容性备忘（收在「我的」里） -->
+            <include
+                layout="@layout/ui_compat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- ★ 社区版新增：模组体检（收在「我的」里） -->
+            <include
+                layout="@layout/ui_mod_check"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- 二级页面返回栏（1.0.6 新增）。
+         顶部标题栏已整体移除，但二级页面（下载 / 版本列表 / 账户 / 设置 / 游戏管理等）
+         仍需返回入口。这里用一层**悬浮**控件实现，不占布局空间、不引入标题栏：
+         只在进入二级页面时由 showBarTitle() 点亮，主界面保持隐藏。
+         放在 launcher_layout 之外，避免被 LinearLayout 垂直排版影响。 -->
+    <LinearLayout
+        android:id="@+id/qcl_back_bar"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        android:background="@drawable/qcl_back_bar_bg"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/back_to_last_ui"
+            android:background="@drawable/ic_baseline_arrow_dark"/>
+
+        <ImageButton
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="10dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/back_to_home"
+            android:background="@drawable/ic_baseline_home_dark"/>
+
+        <TextView
+            android:singleLine="true"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_middle"
+            android:layout_marginStart="10dp"
+            android:layout_gravity="center"
+            android:id="@+id/text_current_ui"
+            android:textColor="@color/colorPureBlack"/>
+
+        <ImageButton
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginStart="10dp"
+            android:scaleType="fitCenter"
+            android:id="@+id/close_current_ui"
+            android:background="@drawable/ic_baseline_close_dark"/>
+
+    </LinearLayout>
+
+    <!-- ★ 社区版新增：底部导航条（固定五个一级入口：首页 / 实例 / 下载 / 插件 / 我的）。
+         放在根 RelativeLayout 里、launcher_layout 之外 —— 与上面的返回栏同样走「悬浮」做法，
+         不会被 LinearLayout 垂直排版影响，也不占任何现有页面的布局空间。
+         ★ 不在这里写 android:id：让被 include 的根节点自带 @id/qcl_bottom_nav 生效，
+           否则 include 上的 id 会覆盖掉它，findViewById 就找不到了。
+         显隐与选中态由 BottomNavHelper 控制，点击路由在 MainActivity。 -->
+    <include
+        layout="@layout/view_bottom_nav"
+        android:layout_alignParentStart="true"
+        android:layout_width="76dp"
+        android:layout_height="match_parent"/>
+
+    <!-- ★ 社区版新增：全局搜索悬浮按钮（右下角，拇指最容易够到的位置）。
+         只在五个一级页面显示；进二级页面时和导航条一起隐藏，避免遮挡。 -->
+    <ImageButton
+        android:id="@+id/qcl_search_fab"
+        android:visibility="gone"
+        android:scaleType="fitCenter"
+        android:padding="11dp"
+        android:background="@drawable/qcl_search_fab_bg"
+        android:src="@drawable/ic_qcl_search_white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="66dp"
+        android:layout_marginEnd="14dp"
+        android:layout_width="46dp"
+        android:layout_height="46dp"/>
+
+    <Button
+        android:id="@+id/fake_dialog_background"
+        android:stateListAnimator="@null"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#73252525"/>
+
+    <include
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        layout="@layout/dialog_offline_skin"
+        android:layout_centerHorizontal="true"
+        android:layout_width="600dp"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

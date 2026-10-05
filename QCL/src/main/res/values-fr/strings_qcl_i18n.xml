@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（fr）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">Enregistrer</string>
+    <string name="auto_task_before_launch">Sauvegarder avant le lancement</string>
+    <string name="auto_task_run_done">Sauvegarde créée</string>
+    <string name="backup_create_none">Aucune instance sélectionnée</string>
+    <string name="backup_delete">Supprimer</string>
+    <string name="compat_add">Ajouter</string>
+    <string name="compat_export">Exporter</string>
+    <string name="compat_import">Importer</string>
+    <string name="dialog_add_verify_server_cancel">Annuler</string>
+    <string name="dialog_add_verify_server_next">Suivant &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">Sélectionner</string>
+    <string name="dialog_add_view_positive">Ajouter</string>
+    <string name="dialog_create_control_pattern_positive">Créer</string>
+    <string name="dialog_delete_mod_negative">Non</string>
+    <string name="dialog_delete_mod_positive">Oui</string>
+    <string name="dialog_delete_version_positive">Supprimer</string>
+    <string name="dialog_download_retry">Réessayer</string>
+    <string name="dialog_offline_skin_confirm">OK</string>
+    <string name="dialog_positive">Terminé</string>
+    <string name="dialog_rename_version_confirm">OK</string>
+    <string name="dialog_verify_cancel">Annuler</string>
+    <string name="download_minecraft_ui_refresh">Actualiser</string>
+    <string name="download_mod_ui_search">Rechercher</string>
+    <string name="download_setting_ui_download">Télécharger</string>
+    <string name="download_setting_ui_select">Source de téléchargement</string>
+    <string name="drawer_custom_menu_edit_info">Modifier</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">Ouvrir</string>
+    <string name="export_world_ui_export">Exporter</string>
+    <string name="exterior_theme_export">Exporter le thème</string>
+    <string name="exterior_theme_import">Importer un thème</string>
+    <string name="exterior_theme_import_done">Thème appliqué</string>
+    <string name="game_setting_ui_advance_setting">Paramètres avancés</string>
+    <string name="game_setting_ui_control_setting">Options de contrôle</string>
+    <string name="game_setting_ui_debug_setting">Contournements</string>
+    <string name="game_setting_ui_jvm_setting">Options de la machine virtuelle Java</string>
+    <string name="game_setting_ui_launch_setting">Options de lancement</string>
+    <string name="install_game_ui_install">Installer</string>
+    <string name="install_game_ui_none">Non sélectionné</string>
+    <string name="install_package_ui_install">Installer</string>
+    <string name="launcher_button_current_version">Aucune instance</string>
+    <string name="launcher_button_launch">Lancer le jeu  →</string>
+    <string name="launcher_scroll_account_name">Aucun compte</string>
+    <string name="launcher_scroll_account_state">Cliquez ici pour en ajouter</string>
+    <string name="launcher_scroll_download">Télécharger</string>
+    <string name="launcher_scroll_game_manager">Aucune instance</string>
+    <string name="launcher_scroll_game_none">Ajouter une instance</string>
+    <string name="launcher_scroll_lab">Laboratoire</string>
+    <string name="launcher_scroll_lobby">Salon</string>
+    <string name="launcher_scroll_multi_player">Multijoueur</string>
+    <string name="launcher_scroll_setting">Paramètres</string>
+    <string name="launcher_scroll_version_list">Toutes les instances</string>
+    <string name="log_center_share">Partager</string>
+    <string name="mod_manager_ui_delete">Retirer</string>
+    <string name="mod_manager_ui_refresh">Actualiser</string>
+    <string name="multi_player_ui_help">Aide</string>
+    <string name="multiplayer_qr_close">Fermer</string>
+    <string name="multiplayer_qr_copy">Copier</string>
+    <string name="skin_library_apply">Appliquer</string>
+    <string name="stats_reset">Réinitialiser</string>
+    <string name="transfer_next">Suivant</string>
+</resources>

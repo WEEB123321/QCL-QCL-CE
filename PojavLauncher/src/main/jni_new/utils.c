@@ -1,0 +1,240 @@
+#include <jni.h>
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include "log.h"
+
+#include "utils.h"
+#include "environ/environ.h"
+
+typedef int (*Main_Function_t)(int, char**);
+typedef void (*android_update_LD_LIBRARY_PATH_t)(char*);
+
+long shared_awt_surface;
+
+char** convert_to_char_array(JNIEnv *env, jobjectArray jstringArray) {
+	int num_rows = (*env)->GetArrayLength(env, jstringArray);
+	char **cArray = (char **) malloc(num_rows * sizeof(char*));
+	jstring row;
+	
+	for (int i = 0; i < num_rows; i++) {
+		row = (jstring) (*env)->GetObjectArrayElement(env, jstringArray, i);
+		cArray[i] = (char*)(*env)->GetStringUTFChars(env, row, 0);
+    }
+	
+    return cArray;
+}
+
+jobjectArray convert_from_char_array(JNIEnv *env, char **charArray, int num_rows) {
+	jobjectArray resultArr = (*env)->NewObjectArray(env, num_rows, (*env)->FindClass(env, "java/lang/String"), NULL);
+	jstring row;
+	
+	for (int i = 0; i < num_rows; i++) {
+		row = (jstring) (*env)->NewStringUTF(env, charArray[i]);
+		(*env)->SetObjectArrayElement(env, resultArr, i, row);
+    }
+
+	return resultArr;
+}
+
+void free_char_array(JNIEnv *env, jobjectArray jstringArray, const char **charArray) {
+	int num_rows = (*env)->GetArrayLength(env, jstringArray);
+	jstring row;
+	
+	for (int i = 0; i < num_rows; i++) {
+		row = (jstring) (*env)->GetObjectArrayElement(env, jstringArray, i);
+		(*env)->ReleaseStringUTFChars(env, row, charArray[i]);
+	}
+}
+
+jstring convertStringJVM(JNIEnv* srcEnv, JNIEnv* dstEnv, jstring srcStr) {
+    if (srcStr == NULL) {
+        return NULL;
+    }
+    
+    const char* srcStrC = (*srcEnv)->GetStringUTFChars(srcEnv, srcStr, 0);
+    jstring dstStr = (*dstEnv)->NewStringUTF(dstEnv, srcStrC);
+	(*srcEnv)->ReleaseStringUTFChars(srcEnv, srcStr, srcStrC);
+    return dstStr;
+}
+
+JNIEXPORT void JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_setupBridgeSurfaceAWT(JNIEnv *env, jclass clazz, jlong surface) {
+	shared_awt_surface = surface;
+}
+
+JNIEXPORT jlong JNICALL Java_android_view_Surface_nativeGetBridgeSurfaceAWT(JNIEnv *env, jclass clazz) {
+	return (jlong) shared_awt_surface;
+}
+
+JNIEXPORT jint JNICALL Java_android_os_OpenJDKNativeRegister_nativeRegisterNatives(JNIEnv *env, jclass clazz, jstring registerSymbol) {
+	const char *register_symbol_c = (*env)->GetStringUTFChars(env, registerSymbol, 0);
+	void *symbol = dlsym(RTLD_DEFAULT, register_symbol_c);
+	if (symbol == NULL) {
+		printf("dlsym %s failed: %s\n", register_symbol_c, dlerror());
+		return -1;
+	}
+	
+	int (*registerNativesForClass)(JNIEnv*) = symbol;
+	int result = registerNativesForClass(env);
+	(*env)->ReleaseStringUTFChars(env, registerSymbol, register_symbol_c);
+	
+	return (jint) result;
+}
+
+JNIEXPORT void JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_setLdLibraryPath(JNIEnv *env, jclass clazz, jstring ldLibraryPath) {
+	// jclass exception_cls = (*env)->FindClass(env, "java/lang/UnsatisfiedLinkError");
+	
+	android_update_LD_LIBRARY_PATH_t android_update_LD_LIBRARY_PATH;
+	
+	void *libdl_handle = dlopen("libdl.so", RTLD_LAZY);
+	void *updateLdLibPath = dlsym(libdl_handle, "android_update_LD_LIBRARY_PATH");
+	if (updateLdLibPath == NULL) {
+		updateLdLibPath = dlsym(libdl_handle, "__loader_android_update_LD_LIBRARY_PATH");
+		if (updateLdLibPath == NULL) {
+			char *dl_error_c = dlerror();
+			LOGE("Error getting symbol android_update_LD_LIBRARY_PATH: %s", dl_error_c);
+			// (*env)->ThrowNew(env, exception_cls, dl_error_c);
+		}
+	}
+	
+	android_update_LD_LIBRARY_PATH = (android_update_LD_LIBRARY_PATH_t) updateLdLibPath;
+	const char* ldLibPathUtf = (*env)->GetStringUTFChars(env, ldLibraryPath, 0);
+	android_update_LD_LIBRARY_PATH(ldLibPathUtf);
+	(*env)->ReleaseStringUTFChars(env, ldLibraryPath, ldLibPathUtf);
+}
+
+JNIEXPORT jboolean JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_dlopen(JNIEnv *env, jclass clazz, jstring name) {
+	const char *nameUtf = (*env)->GetStringUTFChars(env, name, 0);
+	void* handle = dlopen(nameUtf, RTLD_GLOBAL | RTLD_LAZY);
+	if (!handle) {
+		LOGE("dlopen %s failed: %s", nameUtf, dlerror());
+	} else {
+		LOGD("dlopen %s success", nameUtf);
+	}
+	(*env)->ReleaseStringUTFChars(env, name, nameUtf);
+	return handle != NULL;
+}
+
+JNIEXPORT jint JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_chdir(JNIEnv *env, jclass clazz, jstring nameStr) {
+	const char *name = (*env)->GetStringUTFChars(env, nameStr, NULL);
+	int retval = chdir(name);
+	(*env)->ReleaseStringUTFChars(env, nameStr, name);
+	return retval;
+}
+
+JNIEXPORT jint JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_executeBinary(JNIEnv *env, jclass clazz, jobjectArray cmdArgs) {
+	jclass exception_cls = (*env)->FindClass(env, "java/lang/UnsatisfiedLinkError");
+	jstring execFile = (*env)->GetObjectArrayElement(env, cmdArgs, 0);
+	
+	char *exec_file_c = (char*) (*env)->GetStringUTFChars(env, execFile, 0);
+	void *exec_binary_handle = dlopen(exec_file_c, RTLD_LAZY);
+	
+	// (*env)->ReleaseStringUTFChars(env, ldLibraryPath, ld_library_path_c);
+	(*env)->ReleaseStringUTFChars(env, execFile, exec_file_c);
+	
+	char *exec_error_c = dlerror();
+	if (exec_error_c != NULL) {
+		LOGE("Error: %s", exec_error_c);
+		(*env)->ThrowNew(env, exception_cls, exec_error_c);
+		return -1;
+	}
+	
+	Main_Function_t Main_Function;
+	Main_Function = (Main_Function_t) dlsym(exec_binary_handle, "main");
+	
+	exec_error_c = dlerror();
+	if (exec_error_c != NULL) {
+		LOGE("Error: %s", exec_error_c);
+		(*env)->ThrowNew(env, exception_cls, exec_error_c);
+		return -1;
+	}
+	
+	int cmd_argv = (*env)->GetArrayLength(env, cmdArgs);
+	char **cmd_args_c = convert_to_char_array(env, cmdArgs);
+	int result = Main_Function(cmd_argv, cmd_args_c);
+	free_char_array(env, cmdArgs, cmd_args_c);
+	return result;
+}
+
+// METHOD 2
+/*
+JNIEXPORT jint JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_executeForkedBinary(JNIEnv *env, jclass clazz, jobjectArray cmdArgs) {
+	int x, status;
+	x = fork();
+	if (x > 0) {
+		wait(&status);
+	} else {
+		execvpe();
+	}
+	return status;
+}
+*/
+JNIEnv* get_attached_env(JavaVM* jvm) {
+    JNIEnv *jvm_env = NULL;
+    jint env_result = (*jvm)->GetEnv(jvm, (void**)&jvm_env, JNI_VERSION_1_4);
+    if(env_result == JNI_EDETACHED) {
+        env_result = (*jvm)->AttachCurrentThread(jvm, &jvm_env, NULL);
+    }
+    if(env_result != JNI_OK) {
+        printf("get_attached_env failed: %i\n", env_result);
+        return NULL;
+    }
+    return jvm_env;
+}
+// ★ 1.1.3 热修：把 dalvik 侧 CallbackBridge.notifyLauncher 的解析做成「按需自愈」。
+// 原实现只在 JNI_OnLoad 里解析一次；若那时 bridgeClazz / method_notifyLauncher 解析失败
+// （时机过早、FindClass 未就绪等），就会永久为 NULL → SDL 集成被静默跳过 →
+// 游戏侧 SDL 拿不到 JNI（日志：Request to get environment variables before JNI is ready）
+// → 在 SDL_Init 里跳到 NULL（SIGSEGV rip=0）。这里每次调用都可补解析。
+// 注意：必须传「当前线程 attach 后」的 env（dvm_env），不能用缓存的 dalvikJNIEnvPtr_ANDROID。
+bool ensureNotifyLauncher(JNIEnv *dvm_env) {
+    if (pojav_environ->bridgeClazz != NULL && pojav_environ->method_notifyLauncher != NULL) return true;
+    if (dvm_env == NULL) return false;
+    if (pojav_environ->bridgeClazz == NULL) {
+        jclass local = (*dvm_env)->FindClass(dvm_env, "org/lwjgl/glfw/CallbackBridge");
+        if (local != NULL) pojav_environ->bridgeClazz = (*dvm_env)->NewGlobalRef(dvm_env, local);
+    }
+    if (pojav_environ->bridgeClazz != NULL) {
+        pojav_environ->method_notifyLauncher = (*dvm_env)->GetStaticMethodID(
+                dvm_env, pojav_environ->bridgeClazz, "notifyLauncher", "(I[I)Z");
+    }
+    if ((*dvm_env)->ExceptionCheck(dvm_env)) {
+                (*dvm_env)->ExceptionDescribe(dvm_env);
+        (*dvm_env)->ExceptionClear(dvm_env);
+    }
+        return pojav_environ->bridgeClazz != NULL && pojav_environ->method_notifyLauncher != NULL;
+}
+
+// 1.1.1：由 sdl_hook.c 的 sdlInitSubSystemPrepare 调用，转发给 Java 侧
+// CallbackBridge.notifyLauncher(int,int[])（真正加载 SDL3 并绑定 surface）。
+bool notifyLauncher(JNIEnv *dvm_env, int type, int actions[], int len) {
+    // ★ 对齐 FCL：不做 NULL 防御 —— 该防御只会把真实问题（方法未找到）掩盖成静默失败；
+    //   method_notifyLauncher 在 input_bridge_v3.c 的 JNI_OnLoad 里已解析。
+    //   （1.1.3：改为「按需自愈」，解析不到就现场重解析一次，仍失败则如实记日志）
+    if (!ensureNotifyLauncher(dvm_env)) {
+                return false;
+    }
+    jintArray actionArray = (*dvm_env)->NewIntArray(dvm_env, len);
+    (*dvm_env)->SetIntArrayRegion(dvm_env, actionArray, 0, len, actions);
+    jboolean r = (*dvm_env)->CallStaticBooleanMethod(dvm_env, pojav_environ->bridgeClazz,
+            pojav_environ->method_notifyLauncher, type, actionArray);
+    if ((*dvm_env)->ExceptionCheck(dvm_env)) {
+        (*dvm_env)->ExceptionDescribe(dvm_env);
+        (*dvm_env)->ExceptionClear(dvm_env);
+        return false;
+    }
+        return r;
+}
+jintArray convertIntArrayJVM(JNIEnv* srcEnv, JNIEnv* dstEnv, jintArray srcIntArray) {
+    if (srcIntArray == NULL) {
+        return NULL;
+    }
+    jsize len = (*srcEnv)->GetArrayLength(srcEnv, srcIntArray);
+    jint* srcPtr = (*srcEnv)->GetIntArrayElements(srcEnv, srcIntArray, NULL);
+    jintArray dstIntArray = (*dstEnv)->NewIntArray(dstEnv, len);
+    (*dstEnv)->SetIntArrayRegion(dstEnv, dstIntArray, 0, len, srcPtr);
+    (*srcEnv)->ReleaseIntArrayElements(srcEnv, srcIntArray, srcPtr, JNI_ABORT);
+    return dstIntArray;
+}

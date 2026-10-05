@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件名（pt-rBR）。说明未翻译时回退到英文（Android 资源回退）。 -->
+<resources>
+    <string name="plugin_instance_icon_name">Gerador de ícones</string>
+    <string name="plugin_instance_diff_name">Comparar instâncias</string>
+    <string name="plugin_instance_health_name">Pontuação de saúde</string>
+    <string name="plugin_instance_history_name">Histórico de execução</string>
+    <string name="plugin_mod_tag_name">Marcação automática de mods</string>
+    <string name="plugin_mod_lock_name">Mods bloqueados</string>
+    <string name="plugin_mod_dep_name">Árvore de dependências</string>
+    <string name="plugin_mod_downgrade_name">Rebaixar mod</string>
+    <string name="plugin_changelog_name">Agregador de changelogs</string>
+    <string name="plugin_pack_preview_name">Prévia de pacote de recursos</string>
+    <string name="plugin_shader_compat_name">Compatibilidade de shaders</string>
+    <string name="plugin_batch_rename_name">Renomeação em lote</string>
+    <string name="plugin_perf_bench_name">Referência de desempenho</string>
+    <string name="plugin_dl_speed_name">Teste de velocidade das fontes</string>
+    <string name="plugin_dl_autoswitch_name">Troca automática de fonte</string>
+    <string name="plugin_dl_template_name">Modelos de download</string>
+    <string name="plugin_hash_verify_name">Verificação de integridade</string>
+    <string name="plugin_vault_name">Cofre de senhas</string>
+    <string name="plugin_action_log_name">Registro de ações</string>
+    <string name="plugin_pack_merge_name">Mesclar pacotes</string>
+    <string name="plugin_theme_editor_name">Editor de tema</string>
+    <string name="plugin_server_ping_name">Ping de servidor</string>
+    <string name="plugin_glossary_name">Glossário</string>
+    <string name="plugin_tutorials_name">Biblioteca de tutoriais</string>
+    <string name="plugin_server_wizard_name">Assistente de servidor</string>
+    <string name="plugin_instance_import_name">Importar instâncias</string>
+    <string name="plugin_launch_splash_name">Tela de inicialização</string>
+    <string name="plugin_launch_queue_name">Fila de execução</string>
+    <string name="plugin_mod_update_name">Pré-verificação de mods</string>
+    <string name="plugin_shader_preset_name">Predefinições de shaders</string>
+    <string name="plugin_java_match_name">Correspondência de Java</string>
+    <string name="plugin_java_args_name">Argumentos da JVM</string>
+    <string name="plugin_world_map_name">Prévia do mapa</string>
+    <string name="plugin_world_guard_name">Proteção de edição</string>
+    <string name="plugin_whitelist_name">Lista de permissões</string>
+    <string name="plugin_wiki_name">Wiki offline</string>
+    <string name="plugin_migration_name">Migração de dados</string>
+    <string name="plugin_gamerule_name">Predefinições de regras</string>
+    <string name="plugin_world_version_name">Aviso de versão do mundo</string>
+    <string name="plugin_world_players_name">Jogadores do mundo</string>
+    <string name="plugin_notes_name">Notas rápidas</string>
+    <string name="plugin_factory_reset_name">Redefinir</string>
+    <string name="plugin_locale_name">Idioma / Language</string>
+</resources>

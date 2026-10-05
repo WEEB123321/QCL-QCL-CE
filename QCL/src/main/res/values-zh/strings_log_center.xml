@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 日志中心文案（社区版新增）。 -->
+<resources>
+
+    <!-- 「我的」里的入口卡片 -->
+    <string name="setting_ui_log_center">日志中心</string>
+
+    <!-- 日志中心页 -->
+    <string name="log_center_title">日志中心</string>
+    <string name="log_center_level_all">全部</string>
+    <string name="log_center_level_warn">警告+</string>
+    <string name="log_center_level_error">错误+</string>
+    <string name="log_center_keyword_hint">关键词过滤…</string>
+
+    <string name="log_center_refresh">刷新</string>
+    <string name="log_center_clear">清空</string>
+    <string name="log_center_copy">复制</string>
+    <string name="log_center_share">分享</string>
+
+    <!-- %1$d 显示行数 / %2$d 总行数 / %3$s 采集状态 -->
+    <string name="log_center_status">显示 %1$d / 共 %2$d 行 · %3$s</string>
+    <string name="log_center_live_on">实时采集中</string>
+    <string name="log_center_live_off">已暂停</string>
+    <string name="log_center_unavailable">本机不支持日志采集（%1$s）。仍可使用「启动诊断」查看启动路标。</string>
+
+    <string name="log_center_toast_refreshed">已刷新</string>
+    <string name="log_center_toast_copied">已复制日志</string>
+    <string name="log_center_toast_copy_failed">复制失败，请改用「分享」</string>
+    <string name="log_center_toast_share_failed">没有可用的分享应用</string>
+    <string name="log_center_share_chooser">分享日志</string>
+    <string name="log_center_share_subject">QCL 日志</string>
+
+</resources>

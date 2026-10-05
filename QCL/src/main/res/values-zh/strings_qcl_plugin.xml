@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：插件页文案（zh）。
+     ★ 名字/说明原来写死在 PluginRegistry.java 里（中文）—— 英文用户看到的也是中文。
+     现在改成**按插件 id 查资源**（PluginUI 用 getIdentifier 查 plugin_<id>_name/_desc），
+     查不到才回退到 Java 里的原文。所以这里**只补翻了的**，没补的不会出错。 -->
+<resources>
+    <string name="plugin_instance_icon_name">实例图标生成器</string>
+    <string name="plugin_instance_icon_desc">按版本 / 加载器 / 模组数量自动给个底色和文字，也可以自己填。一键写进实例。</string>
+    <string name="plugin_instance_diff_name">实例配置差异对比</string>
+    <string name="plugin_instance_diff_desc">选两个实例，比模组 / 资源包 / 光影 / 配置的差异 —— 回答「为什么 A 能进 B 不能」。</string>
+    <string name="plugin_instance_health_name">实例健康评分</string>
+    <string name="plugin_instance_health_desc">扫版本文件、内存分配、模组数量、崩溃报告，给出 0–100 分和问题清单。</string>
+    <string name="plugin_instance_history_name">实例启动历史</string>
+    <string name="plugin_instance_history_desc">每次启动的时间、时长、按实例的启动次数，以及最近 20 次会话。</string>
+    <string name="plugin_mod_tag_name">模组标签自动分类</string>
+    <string name="plugin_mod_tag_desc">按文件名关键词把模组归成优化 / 建筑 / 科技 / 魔法 / 冒险 等，一眼看清装了什么。</string>
+    <string name="plugin_mod_lock_name">模组锁定列表</string>
+    <string name="plugin_mod_lock_desc">锁定不想被更新的模组（🔒 标记），存在本地，按实例分开记。</string>
+    <string name="plugin_mod_dep_name">模组依赖树</string>
+    <string name="plugin_mod_dep_desc">读每个模组自己声明的依赖，列出「谁依赖谁」并标出缺失的前置。</string>
+    <string name="plugin_mod_downgrade_name">模组降级工具</string>
+    <string name="plugin_mod_downgrade_desc">把某个模组换成你手动放进 mods 目录的指定版本。★ 替换前自动备份原文件。</string>
+    <string name="plugin_changelog_name">更新日志聚合</string>
+    <string name="plugin_changelog_desc">把 mods 里各 jar 自带的 CHANGELOG 读出来汇总。</string>
+    <string name="plugin_pack_preview_name">资源包预览图</string>
+    <string name="plugin_pack_preview_desc">直接看资源包里的方块/物品/界面贴图，不用进游戏。</string>
+    <string name="plugin_shader_compat_name">光影兼容检测</string>
+    <string name="plugin_shader_compat_desc">读光影包的 shaders/ 目录和 GLSL 版本号，判断它需要多新的渲染器。</string>
+    <string name="plugin_batch_rename_name">批量重命名工具</string>
+    <string name="plugin_batch_rename_desc">替换 / 前后缀 / 编号，改模组、资源包、光影、存档。★ 先预览再执行。</string>
+    <string name="plugin_perf_bench_name">启动器性能基准</string>
+    <string name="plugin_perf_bench_desc">累计启动次数、总时长、崩溃率、各实例对比。</string>
+    <string name="plugin_dl_speed_name">下载源测速</string>
+    <string name="plugin_dl_speed_desc">测官方源和 BMCLAPI 镜像能不能连、连得多快，推荐更快的那个。</string>
+    <string name="plugin_dl_autoswitch_name">下载失败自动换源</string>
+    <string name="plugin_dl_autoswitch_desc">某个源失败自动切下一个，可设重试次数。</string>
+    <string name="plugin_dl_template_name">下载组合模板</string>
+    <string name="plugin_dl_template_desc">把「这个整合包要下哪几样」存成模板，下次照单下。</string>
+    <string name="plugin_hash_verify_name">文件完整性校验</string>
+    <string name="plugin_hash_verify_desc">扫实例里的 jar，查 0 字节 / 打不开 / 条目读不出来的损坏文件。只读。</string>
+    <string name="plugin_vault_name">密码保险箱</string>
+    <string name="plugin_vault_desc">记服务器密码、房间口令。★ 存在应用私有目录，不是加密存储（界面里写明了）。</string>
+    <string name="plugin_action_log_name">操作日志</string>
+    <string name="plugin_action_log_desc">记录插件做过的写操作（改名、替换、合并、改色…），可回溯。</string>
+    <string name="plugin_pack_merge_name">资源包合并</string>
+    <string name="plugin_pack_merge_desc">把两个资源包 zip 合成一个，同名文件以上层为准。不删原包。</string>
+    <string name="plugin_theme_editor_name">主题编辑器</string>
+    <string name="plugin_theme_editor_desc">一键切换启动器主色（8 种），改完立刻生效。</string>
+    <string name="plugin_server_ping_name">服务器延迟预检</string>
+    <string name="plugin_server_ping_desc">对一批服务器地址测 TCP 连接延迟，进服前先知道哪个能连。</string>
+    <string name="plugin_glossary_name">本地化词库</string>
+    <string name="plugin_glossary_desc">维护「英文 → 统一译名」对照表，做汉化/写教程时用词统一。</string>
+    <string name="plugin_tutorials_name">教程库</string>
+    <string name="plugin_tutorials_desc">6 篇本地教程：装版本、装模组、联机、开服、做整合包、排查起不来。全离线。</string>
+    <string name="plugin_server_wizard_name">一键开服向导</string>
+    <string name="plugin_server_wizard_desc">生成 server.properties 和启动脚本。★ 手机上开服性能差，更适合生成配置给电脑用。</string>
+    <string name="plugin_instance_import_name">实例导入向导</string>
+    <string name="plugin_instance_import_desc">从 HMCL / PCL2 / 官方启动器 / MultiMC 的目录导入实例，只复制不动原文件。</string>
+    <string name="plugin_launch_splash_name">实例启动画面</string>
+    <string name="plugin_launch_splash_desc">启动游戏时盖一层纯色 / 进度条画面，不用盯着黑屏。</string>
+    <string name="plugin_launch_queue_name">启动队列</string>
+    <string name="plugin_launch_queue_desc">把实例排个顺序记下来，依次启动时照单来。</string>
+    <string name="plugin_mod_update_name">模组更新预检</string>
+    <string name="plugin_mod_update_desc">本地预检：找出重复安装、已锁定的模组。★ 查新版本要联网，本项目不做。</string>
+    <string name="plugin_shader_preset_name">光影预设管理</string>
+    <string name="plugin_shader_preset_desc">列出光影包并记住你用哪个。★ 真正启用要在游戏内选。</string>
+    <string name="plugin_java_match_name">Java 自动匹配</string>
+    <string name="plugin_java_match_desc">读版本 json 的 javaVersion，比对已装的运行时，缺了会告诉你。</string>
+    <string name="plugin_java_args_name">Java 参数预设</string>
+    <string name="plugin_java_args_desc">低配 / 流畅 / 大内存 / 调试 四套 JVM 参数，一键记住。</string>
+    <string name="plugin_world_map_name">存档地图预览</string>
+    <string name="plugin_world_map_desc">读 region 文件的区块表，画出**已探索范围**（每格 = 1 个 region）。</string>
+    <string name="plugin_world_guard_name">存档编辑警告</string>
+    <string name="plugin_world_guard_desc">动存档前的检查清单 + 各存档体积一览。</string>
+    <string name="plugin_whitelist_name">服务器白名单管理</string>
+    <string name="plugin_whitelist_desc">查看 whitelist / ops / banned 四个文件的内容。</string>
+    <string name="plugin_wiki_name">本地百科</string>
+    <string name="plugin_wiki_desc">15 条原版速查：钻石、下界合金、末影珍珠、村民交易、刷怪塔…全离线。</string>
+    <string name="plugin_migration_name">数据迁移向导</string>
+    <string name="plugin_migration_desc">把设置 / 统计 / 笔记 / 词库打成一个 zip，换手机时带走。</string>
+    <string name="plugin_gamerule_name">游戏规则预设</string>
+    <string name="plugin_gamerule_desc">生存 / 创造 / PVP / 红石 / 建筑 / 空岛，生成数据包写进存档。</string>
+    <string name="plugin_world_version_name">存档版本转换提醒</string>
+    <string name="plugin_world_version_desc">比对每个存档的 MC 版本和当前实例版本，不一致时提醒（升级不可逆，建议先备份）。</string>
+    <string name="plugin_world_players_name">存档玩家列表</string>
+    <string name="plugin_world_players_desc">列出存档里的玩家数据文件：UUID、最后修改时间、大小。只读。</string>
+    <string name="plugin_notes_name">快速笔记</string>
+    <string name="plugin_notes_desc">记服务器 IP / 坐标 / 待办，支持置顶、删除。存在本地，不上传。</string>
+    <string name="plugin_factory_reset_name">一键恢复出厂</string>
+    <string name="plugin_factory_reset_desc">重置启动器设置。★ 不删实例、不删存档、不删账号，重置前会二次确认。</string>
+    <string name="plugin_locale_name">语言 / Language</string>
+    <string name="plugin_locale_desc">切换启动器界面语言（17 种，含繁體中文·日本語·한국어·Français·Deutsch· + Español·Italiano·Русский·العربية·ไทย·Tiếng Việt·Bahasa Indonesia·Türkçe·Polski）。</string>
+</resources>

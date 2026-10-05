@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（zh-rTW）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="auto_task_before_launch">啟動前備份</string>
+    <string name="auto_task_run_done">備份已建立</string>
+    <string name="backup_create_none">未選擇實例</string>
+    <string name="backup_delete">刪除</string>
+    <string name="compat_add">新增</string>
+    <string name="compat_export">匯出</string>
+    <string name="compat_import">匯入</string>
+    <string name="dialog_download_retry">重試</string>
+    <string name="exterior_theme_export">匯出主題</string>
+    <string name="exterior_theme_import">匯入主題</string>
+    <string name="exterior_theme_import_done">主題已套用</string>
+    <string name="launcher_scroll_lab">實驗室</string>
+    <string name="launcher_scroll_lobby">大廳</string>
+    <string name="log_center_share">分享</string>
+    <string name="multiplayer_qr_close">關閉</string>
+    <string name="multiplayer_qr_copy">複製</string>
+    <string name="skin_library_apply">套用</string>
+    <string name="stats_reset">重設</string>
+    <string name="transfer_next">下一步</string>
+</resources>

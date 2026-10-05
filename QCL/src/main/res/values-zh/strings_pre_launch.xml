@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动前检查文案（社区版新增）。 -->
+<resources>
+
+    <string name="pre_launch_title">启动前检查</string>
+    <string name="pre_launch_continue">仍然启动</string>
+    <string name="pre_launch_cancel">取消</string>
+    <string name="pre_launch_fix">一键修复</string>
+    <!-- %1$d MB -->
+    <string name="pre_launch_fixed_ram">内存分配已改为 %1$d MB</string>
+    <!-- %1$s 错误信息 -->
+    <string name="pre_launch_fix_failed">有一项没能自动修复：%1$s</string>
+    <string name="pre_launch_go_runtime">请到首页的「安装运行环境」页点一次「安装 / 更新」。</string>
+
+    <string name="auto_task_pre_launch_check">启动前检查</string>
+    <string name="auto_task_pre_launch_check_hint">启动游戏前快速检查一遍（Java 运行时、内存分配、版本文件、模组数量）。只有查出问题时才会弹出来。</string>
+
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 模组体检文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_ui_mod_check">模组体检</string>
+
+    <string name="mod_check_title">模组体检</string>
+    <string name="mod_check_subtitle">读取每个模组 jar 自己声明的信息（加载器、支持的 MC 版本、mod id），再和当前实例对照。只读，不会禁用或删除任何模组。</string>
+
+    <string name="mod_check_summary">共 %1$d 个模组 · 实例 %2$s · 加载器 %3$s（推测）</string>
+    <string name="mod_check_scanning">正在扫描…</string>
+    <string name="mod_check_no_instance">当前没有选中实例，请先选一个版本。</string>
+    <string name="mod_check_section_list">模组清单</string>
+    <string name="mod_check_more">… 其余 %1$d 个未列出</string>
+
+    <string name="mod_check_refresh">重新扫描</string>
+    <string name="mod_check_share">分享报告</string>
+
+</resources>

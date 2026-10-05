@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:visibility="invisible"
+    android:id="@+id/ui_setting"
+    android:background="@color/launcher_ui_background"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_global_game_setting_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_game_pad_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_public_game_setting"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+
+            <!-- ★★★ 社区版新增：通用设置入口。
+                 这一页（启动器更新 / 缓存 / 语言 / 导出日志）在布局里一直存在，
+                 但既没有入口按钮、include 的高度还被写成 0dp —— 等于整页够不到。
+                 这里把入口补上，让里面那四项真正能用。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_universal_setting_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_settings_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_universal"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_exterior_setting_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_exterior_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_exterior"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_download_setting_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_download_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_download"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：备份与恢复入口。
+                 按需求书「低频功能收进更多」——备份页不占底部导航，收在「我的」里。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_backup_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_pack_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_backup"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：启动诊断入口。
+                 和备份页一样收在「我的」里 —— 它只在出问题时才用得上，不该占底部导航。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_diagnostic_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_diagnose_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                android:text="@string/setting_ui_diagnostic"
+                android:textSize="14sp"
+                android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：日志中心入口。
+                 与「启动诊断」互补：诊断看启动路标（Application 阶段），
+                 日志中心看运行期日志（启动之后的全部 Log.*）。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_log_center_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_log_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                android:text="@string/setting_ui_log_center"
+                android:textSize="14sp"
+                android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：本地统计入口。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_stats_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_stats_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_stats"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：新手上路 / 常见问题入口。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_tutorial_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_help_outline_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_tutorial"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：自动任务入口（定时备份 / 清理）。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_auto_task_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_clock_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_auto_task"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：资源冲突检测入口。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_resource_conflict_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_texture_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_pack_conflict"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：兼容性备忘入口。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_compat_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_extension_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_compat"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <!-- ★ 社区版新增：模组体检入口。 -->
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_mod_check_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_build_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_mod_check"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_feedback_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_feedback_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_feedback"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_donate_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_baseline_donate_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_donate"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="72dp"
+                android:minWidth="84dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/launcher_button_parent"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_about_ui"
+                android:layout_width="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@drawable/ic_outline_about_black"/>
+
+                <TextView
+                    android:layout_marginTop="6dp"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setting_ui_about"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPureBlack"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/ui_setting_global_game"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <!-- ★★★ 社区版修复：「通用」页原来被写成了 layout_height="0dp" 且没有 weight，
+             而且 android:layout_weight 那一行还落在 include 标签**外面**（变成一段无效文本）。
+             结果是这整页高度恒为 0，永远显示不出来 —— 里面「启动器更新 / 缓存 / 语言 / 导出日志」
+             四项设置因此全都够不到。这里按同级页面的写法改成 match_parent。 -->
+        <include
+            layout="@layout/ui_setting_universal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_exterior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_download"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_help"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_donate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/ui_setting_about"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

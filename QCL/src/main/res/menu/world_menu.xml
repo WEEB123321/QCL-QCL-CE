@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ★★★ 社区版新增：世界信息与种子。
+         放在最前面 —— 「这个世界的种子是多少」是玩家最常问的一件事，
+         而原版界面里根本看不到（只能进游戏按 F3 或者开文件管理器扒 level.dat）。 -->
+    <item
+        android:id="@+id/world_info"
+        android:title="@string/world_menu_info"
+        android:icon="@drawable/ic_baseline_earth_black"/>
+
+    <item
+        android:id="@+id/manage_assets"
+        android:title="@string/world_menu_manage"
+        android:icon="@drawable/ic_outline_settings_black"/>
+
+    <item
+        android:id="@+id/export_world"
+        android:title="@string/world_menu_export"
+        android:icon="@drawable/ic_outline_export_black"/>
+
+    <item
+        android:id="@+id/open_dir"
+        android:title="@string/world_menu_open_dir"
+        android:icon="@drawable/ic_outline_folder_open_black"/>
+
+    <!-- ★ 社区版新增：存档版本管理。刻意拆成两个菜单项而不是合成一个「版本管理」入口 ——
+         玩家在崩溃后想要的是「快点回到上一个版本」，直接点「从版本恢复」少一层。
+         备份动作也同理，多数人点进来就是想立刻存一份。 -->
+    <item
+        android:id="@+id/backup_world"
+        android:title="@string/world_menu_backup"
+        android:icon="@drawable/ic_outline_save_black"/>
+
+    <item
+        android:id="@+id/restore_world"
+        android:title="@string/world_menu_restore"
+        android:icon="@drawable/ic_baseline_restore_black"/>
+
+</menu>

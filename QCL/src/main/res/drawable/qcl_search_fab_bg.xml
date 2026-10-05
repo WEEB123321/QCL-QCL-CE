@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 全局搜索悬浮按钮：**实心青色**（= OCL 的 AccentButton）。
+     ★ 悬浮按钮是页面上唯一的「主操作」，用强调色一眼就能找到；
+       而且它浮在照片上，半透明会糊掉 —— 实心才立得住。白色图标压青色是清晰的。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <solid android:color="#FF8A3F22" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#FFA94F2C" />
+        </shape>
+    </item>
+</selector>

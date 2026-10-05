@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 资源冲突检测文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_ui_pack_conflict">资源冲突检测</string>
+
+    <string name="pack_conflict_title">资源冲突检测</string>
+    <string name="pack_conflict_subtitle">扫描当前实例的资源包，找出重复、损坏、以及互相覆盖的文件。本页只读，不会改动任何东西。</string>
+
+    <string name="pack_conflict_summary">共扫描 %1$d 个资源包，发现 %2$d 处问题</string>
+    <string name="pack_conflict_scanning">正在扫描…</string>
+    <string name="pack_conflict_clean">没有发现冲突，资源包看起来是干净的。</string>
+    <string name="pack_conflict_no_instance">当前没有选中实例，请先选一个版本。</string>
+
+    <string name="pack_conflict_section_duplicate">重复的资源包</string>
+    <string name="pack_conflict_section_invalid">损坏 / 读不出的包</string>
+    <string name="pack_conflict_section_overlap">被多个包同时提供的文件</string>
+
+    <string name="pack_conflict_more">… 其余 %1$d 项未列出</string>
+    <string name="pack_conflict_truncated">部分资源包体积很大，它们的「覆盖」检测是抽样结果，不是全量。</string>
+
+    <string name="pack_conflict_refresh">重新扫描</string>
+    <string name="pack_conflict_share">分享报告</string>
+
+</resources>

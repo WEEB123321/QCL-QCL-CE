@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 新手上路 / 常见问题文案（社区版新增）。
+     数组每条格式为「标题|正文」，竖线是分隔符。 -->
+<resources>
+
+    <string name="setting_ui_tutorial">新手上路</string>
+
+    <string name="tutorial_title">新手上路</string>
+    <string name="tutorial_subtitle">第一次用看这一页就够了；下面还列了大家最常遇到的问题。全部内容都在本机，不联网。</string>
+
+    <string name="tutorial_section_steps">第一次用</string>
+    <string name="tutorial_section_faq">常见问题</string>
+
+    <string name="tutorial_done">我知道了</string>
+    <string name="tutorial_done_toast">以后可以在「我的」里随时打开这一页</string>
+
+    <string-array name="tutorial_steps">
+        <item>装运行环境|第一次打开会停在「安装运行环境」页 —— 这不是故障，启动器每次都是从这一页进来的。点「安装 / 更新」，它会把安装包自带的 Java 运行环境解压出来。不用联网，等几分钟即可。</item>
+        <item>下载一个游戏版本|底部「下载」→ 选一个版本 → 点安装。镜像源可以在「我的 → 下载设置」里切换。</item>
+        <item>登录账号|在「账户」里加一个离线账号（名字随便起）或微软正版账号。离线账号进不了正版服务器。</item>
+        <item>分配内存|在「我的 → 全局游戏设置」里调内存。建议不超过手机物理内存的一半 —— 给太多反而更容易崩。</item>
+        <item>启动游戏|回首页点「启动」。第一次进游戏会做额外初始化，耐心等一会儿。</item>
+        <item>出问题先看这两页|「我的 → 启动诊断」看启动走到了哪一步；「我的 → 日志中心」看运行日志。两页都能一键分享。</item>
+    </string-array>
+
+    <string-array name="tutorial_faq">
+        <item>打开就闪退怎么办|先看「我的 → 启动诊断」里的「上次启动没有走完」，最后一行就是它停下的位置。把它分享给作者，就能精确定位。</item>
+        <item>第一次打开停在「安装运行环境」页|这是正常流程：启动器的入口就是这一页。运行环境装好之后，以后打开会直接进主界面。</item>
+        <item>进游戏黑屏 / 花屏 / 闪退|多半是渲染器或内存的问题。换一个渲染器（GL4ES / VirGL / 原生），并把内存调小一点再试。</item>
+        <item>下载很慢或总是失败|在「我的 → 下载设置」里换镜像源。下载支持暂停与断点续传；失败时点「重试」只会重下失败的那几个文件。</item>
+        <item>模组 / 材质包 / 存档放哪里|模组放实例目录的 mods 文件夹，材质包放 resourcepacks，存档放 saves。也可以在「下载 → 模组」里直接装。</item>
+        <item>远古版本能玩吗|可以。本启动器支持下载全部已归档的远古版本，并且给它们都做了中文补丁。</item>
+        <item>重装启动器后数据还在吗|游戏目录在 /sdcard/QCL/.minecraft。只要这个目录还在，游戏版本和存档就不会丢。但启动器设置存在应用数据里，卸载会一并清掉。</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 日志中心（社区版新增）。
+     ★★★ 收纳位置：和备份/诊断一样收在「我的」里 —— 排障时才用得上，不占底部导航。
+     ★ 结构：顶部一行过滤/搜索，中间一块等宽字体日志，底部导出动作。
+       日志行数不固定，用 ScrollView 而不是写死的列表。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/ui_log_center"
+    android:background="@color/launcher_ui_background"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 级别过滤 + 关键词 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/log_level_all"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_level_all" />
+
+            <TextView
+                android:id="@+id/log_level_warn"
+                android:layout_marginStart="6dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_level_warn" />
+
+            <TextView
+                android:id="@+id/log_level_error"
+                android:layout_marginStart="6dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_level_error" />
+
+            <EditText
+                android:id="@+id/log_keyword"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:hint="@string/log_center_keyword_hint"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:textColorHint="#99000000"
+                android:inputType="text" />
+
+        </LinearLayout>
+
+        <!-- 状态行：显示行数 / 采集是否可用 -->
+        <TextView
+            android:id="@+id/log_status_text"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="2dp"
+            android:singleLine="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="#99000000" />
+
+        <!-- 日志正文：等宽字体，可选中复制 -->
+        <ScrollView
+            android:id="@+id/log_scroll"
+            android:layout_marginTop="6dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/qcl_button_gray"
+            android:scrollbars="vertical">
+
+            <TextView
+                android:id="@+id/log_text"
+                android:padding="8dp"
+                android:typeface="monospace"
+                android:textSize="9sp"
+                android:textColor="@color/colorPureBlack"
+                android:textIsSelectable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </ScrollView>
+
+        <!-- 动作行 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/log_refresh"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_refresh" />
+
+            <TextView
+                android:id="@+id/log_clear"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_clear" />
+
+            <TextView
+                android:id="@+id/log_copy"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_copy" />
+
+            <TextView
+                android:id="@+id/log_share"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/qcl_button_gray"
+                android:clickable="true"
+                android:focusable="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorPureBlack"
+                android:text="@string/log_center_share" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL log center strings (community edition).
+     Kept in its own file so strings.xml does not keep growing. -->
+<resources>
+
+    <!-- Entry card in "Me" -->
+    <string name="setting_ui_log_center">Log center</string>
+
+    <!-- Page -->
+    <string name="log_center_title">Log center</string>
+    <string name="log_center_level_all">All</string>
+    <string name="log_center_level_warn">Warn+</string>
+    <string name="log_center_level_error">Error+</string>
+    <string name="log_center_keyword_hint">Filter keyword…</string>
+
+    <string name="log_center_refresh">Refresh</string>
+    <string name="log_center_clear">Clear</string>
+    <string name="log_center_copy">Copy</string>
+    <string name="log_center_share">Share</string>
+
+    <!-- %1$d shown / %2$d total / %3$s live state -->
+    <string name="log_center_status">Showing %1$d / %2$d lines · %3$s</string>
+    <string name="log_center_live_on">capturing</string>
+    <string name="log_center_live_off">paused</string>
+    <string name="log_center_unavailable">Log capture unavailable on this device (%1$s). Startup diagnostics is still available.</string>
+
+    <string name="log_center_toast_refreshed">Refreshed</string>
+    <string name="log_center_toast_copied">Log copied</string>
+    <string name="log_center_toast_copy_failed">Copy failed, try Share instead</string>
+    <string name="log_center_toast_share_failed">No app available to share</string>
+    <string name="log_center_share_chooser">Share log</string>
+    <string name="log_center_share_subject">QCL log</string>
+
+</resources>

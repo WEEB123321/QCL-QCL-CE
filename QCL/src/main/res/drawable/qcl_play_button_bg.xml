@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：启动游戏按钮背景 —— 照参考图。
+
+     参考图里这个按钮是**铁锈红实心块 + 左侧一道更深的竖条**（像书脊/装订线）。
+     用 layer-list 叠：底层是整块铁锈红，上层是左边缘 5dp 的深色条。
+
+     ★ `<item android:width>` + `gravity` 才是画「固定宽度竖条」的正确写法 ——
+       用负的 right 内缩是不合法的（会直接渲染失败）。
+     ★ 主色也跟着参考图从青色改成了铁锈红（见 colors.xml 的 colorAccent）。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFA94F2C"/>
+            <corners android:radius="3dp"/>
+        </shape>
+    </item>
+    <item android:width="5dp" android:gravity="start">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF7A381E"/>
+        </shape>
+    </item>
+</layer-list>

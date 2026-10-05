@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 下载限速文案（社区版新增）。 -->
+<resources>
+
+    <string name="setting_download_speed_limit">下载限速</string>
+    <string name="setting_download_speed_title">下载限速</string>
+
+    <string-array name="download_speed_options">
+        <item>不限速</item>
+        <item>256 KB/s</item>
+        <item>512 KB/s</item>
+        <item>1 MB/s</item>
+        <item>2 MB/s</item>
+        <item>5 MB/s</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL 分享导入文案（社区版新增）。 -->
+<resources>
+
+    <string name="share_import_title">导入到 QCL</string>
+    <string name="share_import_no_file">没有可导入的文件 —— 分享过来的内容里不含文件。</string>
+    <string name="share_import_failed">导入失败。可以先把文件保存下来，再从启动器里打开它。</string>
+
+    <string name="share_import_as_background">设为启动器背景</string>
+    <string name="share_import_as_resourcepack">放进 resourcepacks</string>
+    <string name="share_import_as_shaderpack">放进 shaderpacks</string>
+    <string name="share_import_as_modpack">存为整合包（稍后安装）</string>
+
+    <string name="share_import_background_done">背景已更新</string>
+    <string name="share_import_done">已保存到 %1$s</string>
+
+</resources>

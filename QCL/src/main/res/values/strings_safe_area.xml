@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL safe-area (notch / punch-hole / big rounded corners) strings, community edition. -->
+<resources>
+
+    <string name="exterior_setting_ui_safe_area">Safe area</string>
+    <string name="exterior_setting_ui_safe_area_hint">The launcher runs edge-to-edge. On phones with a notch, a punch-hole camera, or large rounded corners, that makes the top row of buttons and the bottom bar get clipped by the screen edge. Auto mode reads the real window insets (system bars + cutout + corner radius) and only steps in when needed.</string>
+
+    <string name="safe_area_mode_auto">Auto (recommended)</string>
+    <string name="safe_area_mode_on">Always inset</string>
+    <string name="safe_area_mode_off">Off (edge-to-edge)</string>
+    <string name="safe_area_dialog_title">Safe area</string>
+
+    <string name="safe_area_detected">Detected: %1$s</string>
+    <string name="safe_area_not_yet">Detected: waiting for the window to settle…</string>
+    <string name="safe_area_no_cutout">no notch or punch-hole reported</string>
+
+</resources>

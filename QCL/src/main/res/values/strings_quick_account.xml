@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick account switch strings (community edition). -->
+<resources>
+
+    <string name="quick_account_title">Switch account</string>
+    <string name="quick_account_empty">No saved accounts yet — add one from the account page first.</string>
+    <string name="quick_account_same">That account is already in use</string>
+    <!-- %1$s player name -->
+    <string name="quick_account_switched">Switched to %1$s</string>
+    <!-- %1$s error -->
+    <string name="quick_account_failed">Switch failed: %1$s</string>
+
+</resources>

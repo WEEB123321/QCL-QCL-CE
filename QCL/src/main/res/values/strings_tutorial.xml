@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL getting-started / FAQ strings (community edition).
+     Each array entry is "Title|Body"; the pipe is the separator. -->
+<resources>
+
+    <string name="setting_ui_tutorial">Getting started</string>
+
+    <string name="tutorial_title">Getting started</string>
+    <string name="tutorial_subtitle">A short walkthrough for first-time users, plus answers to the problems people hit most often. Everything here is offline.</string>
+
+    <string name="tutorial_section_steps">First run</string>
+    <string name="tutorial_section_faq">FAQ</string>
+
+    <string name="tutorial_done">Got it</string>
+    <string name="tutorial_done_toast">You can reopen this page anytime from Me</string>
+
+    <string-array name="tutorial_steps">
+        <item>Install the runtime|The first launch stops on the Install runtime page — this is normal, the launcher always opens there. Tap Install and it unpacks the bundled Java runtime. No network needed; it takes a few minutes.</item>
+        <item>Download a game version|Open Download, pick a version, tap install. You can switch mirrors under Me → Download settings.</item>
+        <item>Sign in|Add an offline account (any name works) or a Microsoft account under Accounts. Offline accounts cannot join online-mode servers.</item>
+        <item>Allocate memory|Set memory under Me → Global game settings. Keep it under half of your phone RAM — more is not better, it makes crashes more likely.</item>
+        <item>Launch the game|Go back to Home and tap Launch. The first start does extra setup, so give it a moment.</item>
+        <item>If something goes wrong|Me → Startup diagnostics shows how far startup got. Me → Log center shows runtime logs. Both can be shared in one tap.</item>
+    </string-array>
+
+    <string-array name="tutorial_faq">
+        <item>It crashes right after opening|Open Me → Startup diagnostics and look at the last line of the previous run — that is where it stopped. Share it with the author to get a precise answer.</item>
+        <item>First launch stops on Install runtime|That is the normal flow — the launcher entry point is that page. Once the runtime is installed, later launches go straight to the main screen.</item>
+        <item>Black screen / glitches / crash in game|Usually the renderer or memory. Try a different renderer (GL4ES / VirGL / native) and lower the allocated memory.</item>
+        <item>Downloads are slow or fail|Switch mirrors under Me → Download settings. Downloads support pause and resume; on failure tap Retry to re-download only the failed files.</item>
+        <item>Where do mods go|Put them in the mods folder of the instance. Resource packs go in resourcepacks, worlds in saves. You can also install them from Download → Mods.</item>
+        <item>Can I play very old versions|Yes. This launcher can download every archived legacy version and ships Chinese patches for all of them.</item>
+        <item>Will my data survive a reinstall|Your game directory is /sdcard/QCL/.minecraft. As long as it exists, versions and worlds are safe. Launcher settings live in app data and are cleared on uninstall.</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Left sidebar roman numerals (community edition). -->
+<resources>
+    <string name="nav_numeral_1" translatable="false">I</string>
+    <string name="nav_numeral_2" translatable="false">II</string>
+    <string name="nav_numeral_3" translatable="false">III</string>
+    <string name="nav_numeral_4" translatable="false">IV</string>
+    <string name="nav_numeral_5" translatable="false">V</string>
+</resources>

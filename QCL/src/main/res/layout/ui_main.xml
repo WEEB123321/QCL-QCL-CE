@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ui_main"
+    android:visibility="invisible"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ★★★ 社区版：编辑式顶部页眉（照用户给的排版参考图）。
+         ★ 纯装饰，不承担任何功能 —— 功能性入口在下面那一排。
+         左：方形印记 + 启动器名；中：LAUNCHER —— MMXXVI 与 A Journal of Play；右：EST. 2019。
+         字距（letterSpacing）是这套排版的灵魂：不加就是普通小字，加了才像杂志页眉。 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+
+        <TextView
+            android:text="@string/main_header_left"
+            android:textSize="9sp"
+            android:letterSpacing="0.22"
+            android:textColor="@color/colorPureBlack"
+            android:alpha="0.7"
+            android:layout_marginStart="26dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/colorPureBlack"
+            android:alpha="0.16"/>
+
+        <TextView
+            android:text="@string/main_header_center"
+            android:textSize="9sp"
+            android:letterSpacing="0.18"
+            android:textStyle="italic"
+            android:textColor="@color/colorPureBlack"
+            android:alpha="0.55"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/colorPureBlack"
+            android:alpha="0.16"/>
+
+        <TextView
+            android:text="@string/main_header_right"
+            android:textSize="9sp"
+            android:letterSpacing="0.22"
+            android:textColor="@color/colorPureBlack"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <!-- 顶部：所有入口从左到右排列，可左右滑动，避免最左/最右看不到 -->
+    <HorizontalScrollView
+        android:background="@color/qcl_gray_translucent_bar"
+        android:scrollbars="none"
+        android:fillViewport="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <!-- 1. 玩家账户（含头像） -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:clickable="true"
+                android:id="@+id/start_ui_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <RelativeLayout
+                    android:layout_gravity="center"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp">
+
+                    <ImageView
+                        android:layout_width="26.6666dp"
+                        android:layout_height="26.6666dp"
+                        android:id="@+id/account_skin_face"
+                        android:src="@drawable/ic_steve"
+                        android:layout_centerInParent="true" />
+
+                    <ImageView
+                        android:id="@+id/account_skin_hat"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <!-- ★★★ 社区版：这里必须给文字**宽度上限 + 省略号**。
+                         原来只有 singleLine、宽度 wrap_content 且无上限 ——
+                         账号状态文案一长（如「点击此处添加账户」），按钮就被撑宽，
+                         视觉上直接压到右边那个入口上（v1.2.6 真机截图里就是这个现象）。
+                         maxWidth 96dp ≈ 头像(26dp) + 内边距(12dp) 之后还能放 6 个汉字。 -->
+                    <TextView
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:maxWidth="96dp"
+                        android:id="@+id/account_name_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/launcher_scroll_account_name"
+                        android:textColor="@color/colorPureWhite"
+                        android:textSize="@dimen/text_size_middle"/>
+
+                    <TextView
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:maxWidth="96dp"
+                        android:id="@+id/account_state_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/launcher_scroll_account_state"
+                        android:textColor="@color/colorLightWhite"
+                        android:textSize="@dimen/text_size_small"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 2. 当前版本 -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_game_manager"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:id="@+id/current_version_icon"
+                    android:background="@drawable/ic_entry_version"/>
+
+                <LinearLayout
+                    android:id="@+id/no_version_alert_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:singleLine="true"
+                        android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/launcher_scroll_game_manager"
+                        android:textColor="@color/colorPureWhite"
+                        android:textSize="@dimen/text_size_middle"/>
+
+                    <TextView
+                        android:singleLine="true"
+                        android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/launcher_scroll_game_none"
+                        android:textColor="@color/colorLightWhite"
+                        android:textSize="@dimen/text_size_small"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:singleLine="true"
+                    android:visibility="gone"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:id="@+id/current_version_name_text"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+            <!-- 3. 版本列表 -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_version_list"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/version_list_icon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_entry_list"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_version_list"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+            <!-- 4. 下载 -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_download"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/download_icon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_entry_download"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_download"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+
+            <!-- 5. 大厅（★1.4.1 新增：我的世界新闻 / 新发布模组 / 版本日历） -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_lobby"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/lobby_icon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_entry_lobby"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_lobby"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+            <!-- 6. 实验室（★1.4.1 新增：多彩文字 / 种子 / 配方 / 数据包 / 投影工坊） -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_lab"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/lab_icon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_entry_lab"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_lab"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+            <!-- 7. 多人游戏（沿用原有隐藏状态） -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_multi_player"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginEnd="6dp"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/multiplayer_icon"
+                    android:layout_gravity="center"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/ic_entry_multiplayer"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_multi_player"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+            <!-- 8. 设置 -->
+            <LinearLayout
+                android:background="@drawable/qcl_button_gray"
+                android:focusable="true"
+                android:id="@+id/start_ui_setting"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <ImageView
+                    android:id="@+id/setting_icon"
+                    android:layout_gravity="center"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/ic_entry_setting"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:maxWidth="88dp"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginStart="6dp"
+                    android:text="@string/launcher_scroll_setting"
+                    android:textColor="@color/colorPureWhite"
+                    android:textSize="@dimen/text_size_middle"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- ★★★ 3D 人物：**全宽居中**，放在入口行与两栏内容之间。
+         ★ 必须留在 ui_main 这一层（不能在左右栏里面）——
+           它内部是 GLSurfaceView，SurfaceView 是**独立图层**，
+           一旦和同级控件共处一个窄栏，就会把那些控件整块盖住
+           （v1.2.6 的截图里 3D 人物盖住了标题和页眉，就是这个原因）。
+         ★ layout_weight=1 → 吃掉上下两块之间的所有剩余高度，人物居中。 -->
+    <!-- ★★★ 头像行用 wrap_content，**不再和下面两栏平分高度**。
+         ★ 原因：原来这里和两栏容器各占 weight=1（各 50%）。
+           屏幕一矮（或系统栏占得多），左栏就装不下「档案块 + 启动按钮」，
+           **启动按钮会被挤出屏幕**（真机截图里只剩一条边）。
+         ★ 头像本身只有 150dp，给它固定高度就够；剩下的全部留给两栏。 -->
+    <FrameLayout
+        android:id="@+id/account_model_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- ★★★ 社区版：3D 人物已换成**大头像**（普通 ImageView）。
+             原来的 3D 人物是 `SkinGLSurfaceView`（SurfaceView），
+             还调过 `setZOrderOnTop(true)` —— 那是**独立窗口图层、永远在最上层**，
+             会把页眉、标题、一排入口按钮整块盖住（真机截图已证实）。
+             换成 ImageView 后这个层级问题从根上消失，还省掉一个 GL 上下文。
+             皮肤图由 MainUI.syncBigAvatar() 从左边那个小头像同步过来。 -->
+        <ImageView
+            android:id="@+id/account_avatar_big"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="24dp"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:visibility="invisible"/>
+
+    </FrameLayout>
+
+    <!-- ★★★ 社区版：主内容区改成**编辑式两栏**（左：当前档案 + 启动；右：最近游玩）。
+         左栏权重 1.6、右栏 1 —— 左栏是主体，右栏是索引，这个比例来自参考图。 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- ============ 左栏 ============ -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="10dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.6">
+
+            <!-- 栏目编号 + 名称（参考图的 "01 CURRENT PROFILE"） -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="@string/main_section_no"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.24"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="@string/main_section_title"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.24"
+                    android:textColor="@color/colorPureBlack"
+                    android:alpha="0.75"
+                    android:layout_marginStart="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@color/colorPureBlack"
+                    android:alpha="0.16"/>
+
+            </LinearLayout>
+
+            <!-- 大标题：当前实例名（运行时填充） -->
+            <TextView
+                android:id="@+id/main_profile_title"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                android:textColor="@color/colorPureBlack"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!-- 元数据行：Minecraft 1.20.1 · Fabric · 87 Mods（运行时填充） -->
+            <TextView
+                android:id="@+id/main_meta_text"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="11sp"
+                android:letterSpacing="0.06"
+                android:textColor="@color/colorPureBlack"
+                android:alpha="0.72"
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!-- 轮播指示点（运行时填充：▬▬▬ ▬▬ ·） -->
+            <!-- ★★★ 轮播指示器 —— 照参考图：**长线段 + 短线段 + 圆点**，
+                 不是文字。当前页用主色（铁锈红）标出。 -->
+            <LinearLayout
+                android:id="@+id/main_page_dots"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="14dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/main_dot_active"
+                    android:layout_width="52dp"
+                    android:layout_height="2dp"
+                    android:background="@color/colorAccent"/>
+
+                <View
+                    android:layout_width="26dp"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="6dp"
+                    android:background="#331B1B1B"/>
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/qcl_dot"
+                    android:alpha="0.35"/>
+            </LinearLayout>
+
+    <!-- ★ 3D 人物容器已上移到 ui_main 顶层（见入口行之后）——
+         它必须**全宽居中**，且不能和别的控件挤在一个栏里：
+         它内部是 GLSurfaceView（SurfaceView 是独立图层），
+         和同级控件抢位置时会把它们整块盖住。 -->
+
+    <!-- ★★★ 弹性垫片：吸收「档案块」与「启动按钮」之间的剩余高度。
+         ★ 为什么需要它：LinearLayout 会**先测量 wrap_content 的子项（含启动按钮）**，
+           再把剩余空间分给 weight 项。所以屏幕再矮，也是这个垫片先归零，
+           **启动按钮永远不会被挤出屏幕**。
+         ★ 真机症状（用户截图）：有些手机上按钮只剩屏幕底部一条边 ——
+           就是因为它原来是 wrap_content 排在最后，空间不够时被裁掉了。 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- 底部：启动游戏按钮 + 页码。
+         ★★★ 3.0 改成**自适应宽度**：按钮用 weight=1 吃满左栏，页码靠右固定宽度。
+           任何屏幕宽度下按钮都不会被挤窄或溢出（原来写死 210dp）。 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="18dp">
+
+        <LinearLayout
+            android:tag="tint_accent_color"
+            android:id="@+id/launcher_play_button"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="@drawable/qcl_play_button_bg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="58dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:weightSum="2"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:singleLine="true"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/launcher_button_launch"
+                    android:textSize="14sp"
+                    android:textColor="@color/qcl_cream"/>
+
+                <TextView
+                    android:paddingLeft="7dp"
+                    android:paddingRight="7dp"
+                    android:id="@+id/launch_version_text"
+                    android:ellipsize="end"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/launcher_button_current_version"
+                    android:textSize="@dimen/text_size_small"
+                    android:textColor="@color/qcl_cream"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorTransparent"/>
+
+            <!-- 版本下拉框（48dp，装得下版本名；不要缩回 20dp，会裁成「1」看起来像「01」） -->
+            <RelativeLayout
+                android:layout_width="48dp"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:overlapAnchor="false"
+                    android:popupBackground="@android:color/transparent"
+                    android:spinnerMode="dropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorTransparent"
+                    android:id="@+id/launcher_spinner_version"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- 页码（照参考图：按钮右侧「01 / 02」） -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginStart="14dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/main_page_no_now"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                android:textColor="@color/colorPureBlack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/main_page_no_total"
+                android:textSize="11sp"
+                android:textColor="@color/colorPureBlack"
+                android:alpha="0.55"
+                android:layout_marginStart="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+
+        </LinearLayout>
+        <!-- ============ /左栏 ============ -->
+
+        <!-- ============ 右栏：RECENT 最近游玩 ============ -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="10dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="@string/main_recent_title"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.24"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPureBlack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@color/colorPureBlack"
+                    android:alpha="0.16"/>
+
+                <TextView
+                    android:id="@+id/main_recent_count"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.14"
+                    android:textColor="@color/colorPureBlack"
+                    android:alpha="0.6"
+                    android:layout_marginStart="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!-- 列表在 MainUI 里按「最近玩过的实例」动态填充 -->
+            <LinearLayout
+                android:id="@+id/main_recent_list"
+                android:orientation="vertical"
+                android:layout_marginTop="6dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/main_sync_text"
+                    android:text="@string/main_sync_ok"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/colorPureBlack"
+                    android:alpha="0.55"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/main_footer_no"
+                    android:textSize="9sp"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/colorPureBlack"
+                    android:alpha="0.55"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- ============ /右栏 ============ -->
+
+    </LinearLayout>
+    <!-- ============ /主内容区两栏 ============ -->
+
+</LinearLayout>

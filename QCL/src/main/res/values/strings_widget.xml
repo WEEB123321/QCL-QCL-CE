@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QCL home-screen widget / shortcut strings (community edition). -->
+<resources>
+
+    <string name="widget_title">QCL-CE</string>
+    <string name="widget_hint">Tap here to launch</string>
+    <string name="widget_no_instance">No instance selected</string>
+    <!-- %1$s play time, %2$d launches -->
+    <string name="widget_stats">%1$s · %2$d launches</string>
+    <!-- %1$d backup count -->
+    <string name="widget_backups">%1$d backups</string>
+
+    <string name="shortcut_row_title">Home-screen shortcut</string>
+    <string name="shortcut_row_hint">Pins a shortcut that launches the current instance in one tap.</string>
+    <string name="shortcut_pin">Create</string>
+    <string name="shortcut_created">Shortcut added to your home screen</string>
+    <string name="shortcut_unsupported">Your launcher does not support pinning shortcuts. Add it from the widget list instead.</string>
+    <string name="shortcut_no_instance">No instance selected — pick a version first.</string>
+
+</resources>

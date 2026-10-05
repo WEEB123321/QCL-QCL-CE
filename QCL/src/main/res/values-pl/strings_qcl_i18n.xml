@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（pl）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">Zapisz</string>
+    <string name="auto_task_before_launch">Kopia przed uruchomieniem</string>
+    <string name="auto_task_run_done">Utworzono kopię</string>
+    <string name="backup_create_none">Nie wybrano instancji</string>
+    <string name="backup_delete">Usuń</string>
+    <string name="compat_add">Dodaj</string>
+    <string name="compat_export">Eksportuj</string>
+    <string name="compat_import">Importuj</string>
+    <string name="dialog_add_verify_server_cancel">Anuluj</string>
+    <string name="dialog_add_verify_server_next">Dalej &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">Wybierz</string>
+    <string name="dialog_add_view_positive">Dodaj</string>
+    <string name="dialog_create_control_pattern_positive">Utwórz</string>
+    <string name="dialog_delete_mod_negative">Nie</string>
+    <string name="dialog_delete_mod_positive">Tak</string>
+    <string name="dialog_delete_version_positive">Usuń</string>
+    <string name="dialog_download_retry">Ponów</string>
+    <string name="dialog_offline_skin_confirm">OK</string>
+    <string name="dialog_positive">Gotowe</string>
+    <string name="dialog_rename_version_confirm">OK</string>
+    <string name="dialog_verify_cancel">Anuluj</string>
+    <string name="download_minecraft_ui_refresh">Odśwież</string>
+    <string name="download_mod_ui_search">Szukaj</string>
+    <string name="download_setting_ui_download">Pobierz</string>
+    <string name="download_setting_ui_select">Źródło pobierania</string>
+    <string name="drawer_custom_menu_edit_info">Edytuj</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">Otwórz</string>
+    <string name="export_world_ui_export">Eksportuj</string>
+    <string name="exterior_theme_export">Eksportuj motyw</string>
+    <string name="exterior_theme_import">Importuj motyw</string>
+    <string name="exterior_theme_import_done">Motyw zastosowany</string>
+    <string name="game_setting_ui_advance_setting">Ustawienia zaawansowane</string>
+    <string name="game_setting_ui_control_setting">Opcje sterowania</string>
+    <string name="game_setting_ui_debug_setting">Obejścia</string>
+    <string name="game_setting_ui_jvm_setting">Opcje maszyny wirtualnej Java</string>
+    <string name="game_setting_ui_launch_setting">Opcje uruchamiania</string>
+    <string name="install_game_ui_install">Zainstaluj</string>
+    <string name="install_game_ui_none">Nie wybrano</string>
+    <string name="install_package_ui_install">Zainstaluj</string>
+    <string name="launcher_button_current_version">Brak instancji</string>
+    <string name="launcher_button_launch">Uruchom grę  →</string>
+    <string name="launcher_scroll_account_name">Brak kont</string>
+    <string name="launcher_scroll_account_state">Kliknij tutaj, aby dodać</string>
+    <string name="launcher_scroll_download">Pobierz</string>
+    <string name="launcher_scroll_game_manager">Brak instancji</string>
+    <string name="launcher_scroll_game_none">Dodaj instancję</string>
+    <string name="launcher_scroll_lab">Laboratorium</string>
+    <string name="launcher_scroll_lobby">Poczekalnia</string>
+    <string name="launcher_scroll_multi_player">Wieloosobowa</string>
+    <string name="launcher_scroll_setting">Ustawienia</string>
+    <string name="launcher_scroll_version_list">Wszystkie instancje</string>
+    <string name="log_center_share">Udostępnij</string>
+    <string name="mod_manager_ui_delete">Usuń</string>
+    <string name="mod_manager_ui_refresh">Odśwież</string>
+    <string name="multi_player_ui_help">Pomoc</string>
+    <string name="multiplayer_qr_close">Zamknij</string>
+    <string name="multiplayer_qr_copy">Kopiuj</string>
+    <string name="skin_library_apply">Zastosuj</string>
+    <string name="stats_reset">Resetuj</string>
+    <string name="transfer_next">Dalej</string>
+</resources>

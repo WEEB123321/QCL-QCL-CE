@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★ 社区版新增：QCL 状态小部件的元数据。
+     updatePeriodMillis=0：不让系统按周期唤醒（省电），改由 App 自己在需要时刷新。 -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="110dp"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_qcl_status"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

@@ -1,0 +1,48 @@
+# ===== 构建产物 =====
+build/
+.gradle/
+.cxx/
+.externalNativeBuild/
+captures/
+*.iml
+.idea/
+local.properties
+
+# ===== 签名密钥（千万不要公开，另外务必自行备份）=====
+qcl.keystore
+*.jks
+*.keystore
+
+# ===== 打包产物（APK 请放到 Release，不入源码仓库）=====
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# ===== 第三方预编译 Java 运行时 =====
+# 全部运行时均以 tar.xz 压缩包（universal.tar.xz + bin-<abi>.tar.xz）内置在
+# assets/app_runtime/java/jre{8,17,21,25}/，单文件均 <100MB，正常纳入 git 跟踪。
+# ★ 目录名必须全小写（jre8/jre17/jre21/jre25）—— APK 内 zip 路径大小写敏感，
+#   代码里读的是小写（与 FCL 一致）；曾因目录名写成大写 JRE25 导致安装页检测不到。
+# runtime-source/ 为构建中间产物。
+runtime-source/
+
+# ===== 其它 =====
+*.log
+*.hprof
+# 构建缓存残留与布局备份
+build_old*/
+*.bak
+ZipFileSystem/build/
+
+# ===== 社区版：验证脚本的临时产物 =====
+.qcl-qr-verify/node_modules/
+.qcl-verify/*.log
+
+# ===== 本地工作区（个人笔记与脚本，不入库）=====
+.*-ai/
+.notes/
+
+# ===== 本地验证脚本（含本机路径，不属于项目）=====
+.qcl-verify/
+.qcl-qr-verify/

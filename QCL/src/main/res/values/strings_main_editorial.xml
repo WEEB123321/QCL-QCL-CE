@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Editorial main-screen chrome (community edition). -->
+<resources>
+    <string name="main_brand_mark" translatable="false">Q</string>
+    <string name="main_brand_name" translatable="false">QUANTA</string>
+    <string name="main_header_left" translatable="false">LAUNCHER — MMXXVI</string>
+    <string name="main_header_center" translatable="false">— A Journal of Play —</string>
+    <string name="main_header_right" translatable="false">EST. 2019</string>
+    <string name="main_section_no" translatable="false">01</string>
+    <string name="main_section_title">CURRENT PROFILE</string>
+    <string name="main_recent_title">RECENT</string>
+    <string name="main_recent_empty">No recent sessions yet</string>
+    <!-- %1$d count -->
+    <string name="main_recent_unit">%1$d TOTAL</string>
+    <string name="main_sync_ok">● Saved</string>
+</resources>

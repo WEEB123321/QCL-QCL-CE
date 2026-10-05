@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 社区版：核心界面多语言（ko）。
+     只覆盖用户最常看到的 60 条（主界面 / 导航 / 常用动作 / 设置分类）。
+     ★ 没翻的字符串 Android 会**自动回退到 values/（英文）**，不会显示空白。 -->
+<resources>
+    <string name="add_game_dir_ui_save">저장</string>
+    <string name="auto_task_before_launch">실행 전 백업</string>
+    <string name="auto_task_run_done">백업 생성됨</string>
+    <string name="backup_create_none">인스턴스 미선택</string>
+    <string name="backup_delete">삭제</string>
+    <string name="compat_add">추가</string>
+    <string name="compat_export">내보내기</string>
+    <string name="compat_import">가져오기</string>
+    <string name="dialog_add_verify_server_cancel">취소</string>
+    <string name="dialog_add_verify_server_next">다음 &gt;</string>
+    <string name="dialog_add_view_button_function_output_keycode_button">선택</string>
+    <string name="dialog_add_view_positive">추가</string>
+    <string name="dialog_create_control_pattern_positive">만들기</string>
+    <string name="dialog_delete_mod_negative">아니요</string>
+    <string name="dialog_delete_mod_positive">예</string>
+    <string name="dialog_delete_version_positive">삭제</string>
+    <string name="dialog_download_retry">다시 시도</string>
+    <string name="dialog_offline_skin_confirm">확인</string>
+    <string name="dialog_positive">완료</string>
+    <string name="dialog_rename_version_confirm">확인</string>
+    <string name="dialog_verify_cancel">취소</string>
+    <string name="download_minecraft_ui_refresh">새로 고침</string>
+    <string name="download_mod_ui_search">검색</string>
+    <string name="download_setting_ui_download">다운로드</string>
+    <string name="download_setting_ui_select">다운로드 소스</string>
+    <string name="drawer_custom_menu_edit_info">편집</string>
+    <string name="drawer_game_menu_function_hin2n_menu_open">열기</string>
+    <string name="export_world_ui_export">내보내기</string>
+    <string name="exterior_theme_export">테마 내보내기</string>
+    <string name="exterior_theme_import">테마 가져오기</string>
+    <string name="exterior_theme_import_done">테마 적용됨</string>
+    <string name="game_setting_ui_advance_setting">고급 설정</string>
+    <string name="game_setting_ui_control_setting">조작 설정</string>
+    <string name="game_setting_ui_debug_setting">호환 설정</string>
+    <string name="game_setting_ui_jvm_setting">Java 가상 머신 옵션</string>
+    <string name="game_setting_ui_launch_setting">실행 옵션</string>
+    <string name="install_game_ui_install">설치</string>
+    <string name="install_game_ui_none">선택 안 함</string>
+    <string name="install_package_ui_install">설치</string>
+    <string name="launcher_button_current_version">인스턴스 없음</string>
+    <string name="launcher_button_launch">게임 실행  →</string>
+    <string name="launcher_scroll_account_name">계정 없음</string>
+    <string name="launcher_scroll_account_state">여기를 눌러 추가</string>
+    <string name="launcher_scroll_download">다운로드</string>
+    <string name="launcher_scroll_game_manager">인스턴스 없음</string>
+    <string name="launcher_scroll_game_none">인스턴스 추가</string>
+    <string name="launcher_scroll_lab">실험실</string>
+    <string name="launcher_scroll_lobby">로비</string>
+    <string name="launcher_scroll_multi_player">멀티플레이</string>
+    <string name="launcher_scroll_setting">설정</string>
+    <string name="launcher_scroll_version_list">모든 인스턴스</string>
+    <string name="log_center_share">공유</string>
+    <string name="mod_manager_ui_delete">제거</string>
+    <string name="mod_manager_ui_refresh">새로 고침</string>
+    <string name="multi_player_ui_help">도움말</string>
+    <string name="multiplayer_qr_close">닫기</string>
+    <string name="multiplayer_qr_copy">복사</string>
+    <string name="skin_library_apply">적용</string>
+    <string name="stats_reset">초기화</string>
+    <string name="transfer_next">다음</string>
+</resources>
