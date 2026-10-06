@@ -187,36 +187,102 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
                 return;
             }
             box.removeAllViews();
+
+            // ★★★ 按开关状态分成「开启」和「已关闭」两组。
+            //   关掉的收进底部「已关闭」区，随时可以再打开 —— 而不是直接消失，
+            //   否则用户找不到重新打开的入口。
             java.util.List<PluginSpec> all = PluginRegistry.all();
+            java.util.List<PluginSpec> on = new java.util.ArrayList<>();
+            java.util.List<PluginSpec> off = new java.util.ArrayList<>();
+            for (PluginSpec sp : all) {
+                if (PluginSwitch.enabled(sp.id)) {
+                    on.add(sp);
+                } else {
+                    off.add(sp);
+                }
+            }
+
+            // ---------- 开启的插件（按分类分组） ----------
             String cur = null;
-            for (final PluginSpec sp : all) {
+            for (final PluginSpec sp : on) {
                 if (!sp.category.equals(cur)) {
                     cur = sp.category;
                     box.addView(PluginUiKit.label(this.context, loc("plugin_cat_" + cur, cur)));
                 }
-                LinearLayout card = PluginUiKit.card(this.context);
-                // ★★★ 按插件 id 查多语言资源：plugin_<id>_name / plugin_<id>_desc。
-                //   查不到就回退到 PluginRegistry 里的原文 —— 所以**没翻译的不会出错**，
-                //   只是显示原文（中文）而已。这样加语言不用动 43 条注册代码。
-                card.addView(PluginUiKit.text(this.context, loc("plugin_" + sp.id + "_name", sp.name)));
-                card.addView(PluginUiKit.sub(this.context, loc("plugin_" + sp.id + "_desc", sp.desc)));
-                card.setOnClickListener(v -> {
-                    try {
-                        sp.action.run(this.activity);
-                    } catch (Throwable t) {
-                        PluginUiKit.toast(this.context, "插件出错：" + t);
-                    }
+                box.addView(buildPluginCard(sp, true));
+            }
+
+            // ---------- 已关闭的插件（收在底部，随时可再开） ----------
+            if (!off.isEmpty()) {
+                box.addView(PluginUiKit.label(this.context,
+                        "已关闭 " + off.size() + " 个（点开关重新打开）"));
+                for (final PluginSpec sp : off) {
+                    box.addView(buildPluginCard(sp, false));
+                }
+                TextView reset = PluginUiKit.row(this.context, "全部打开", null);
+                reset.setGravity(android.view.Gravity.CENTER);
+                reset.setOnClickListener(v -> {
+                    PluginSwitch.enableAll();
+                    PluginUiKit.toast(this.context, "已全部打开");
+                    renderPlugins();
                 });
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                lp.bottomMargin = px(8);
-                card.setLayoutParams(lp);
-                box.addView(card);
+                box.addView(reset);
+            }
+
+            if (on.isEmpty()) {
+                box.addView(PluginUiKit.sub(this.context,
+                        "所有插件都已关闭。在下面的「已关闭」区把开关打开即可恢复。"));
             }
         } catch (Throwable t) {
             // 插件列表渲染失败不能把整页带崩
         }
+    }
+
+    /**
+     * 生成一张插件卡片：名字 + 说明 + 开关。
+     *
+     * <p>★ 开关存到 {@link PluginSwitch}（本地文件），重启保持。
+     * 点卡片主体执行插件；点开关只改状态并重绘列表。
+     */
+    private View buildPluginCard(final PluginSpec sp, boolean on) {
+        LinearLayout card = PluginUiKit.card(this.context);
+
+        // 第一行：名字 + 开关
+        LinearLayout head = new LinearLayout(this.context);
+        head.setOrientation(LinearLayout.HORIZONTAL);
+        head.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        TextView name = PluginUiKit.text(this.context, loc("plugin_" + sp.id + "_name", sp.name));
+        name.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        head.addView(name);
+
+        android.widget.Switch sw = new android.widget.Switch(this.context);
+        sw.setChecked(on);
+        sw.setOnCheckedChangeListener((b, checked) -> {
+            PluginSwitch.setEnabled(sp.id, checked);
+            renderPlugins();   // 重绘：关掉的移到「已关闭」区
+        });
+        head.addView(sw);
+        card.addView(head);
+
+        // 说明（查多语言，查不到回退原文）
+        card.addView(PluginUiKit.sub(this.context, loc("plugin_" + sp.id + "_desc", sp.desc)));
+
+        // 点卡片主体 = 执行插件（关着的点了也会先执行一次，方便试用）
+        card.setOnClickListener(v -> {
+            try {
+                sp.action.run(this.activity);
+            } catch (Throwable t) {
+                PluginUiKit.toast(this.context, "插件出错：" + t);
+            }
+        });
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.bottomMargin = px(8);
+        card.setLayoutParams(lp);
+        return card;
     }
 
     /** 按名字查字符串资源；查不到返回 fallback。 */

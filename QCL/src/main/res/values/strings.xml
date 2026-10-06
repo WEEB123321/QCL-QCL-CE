@@ -1159,7 +1159,7 @@ Multiplayer is powered by Terracotta (by BurningTNT). The multiplayer feature is
     <string name="search_section_version">Installed versions</string>
 
     <!-- ★ 社区版新增：插件页 -->
-    <string name="plugin_ui_subtitle">External plugins actually in effect, and the real progress of the plugin runtime.</string>
+    <string name="plugin_ui_subtitle" translatable="false">内置插件页 —— 全部功能可单独开关</string>
     <string name="plugin_runtime_title">Plugin runtime</string>
     <string name="plugin_runtime_loading">Checking…</string>
     <string name="plugin_runtime_none">Not enabled yet. Plugin loading / permissions / sandbox are scheduled for phase 3 — this page will not show a fake marketplace before that.</string>
