@@ -3,7 +3,7 @@
 > 注意：**这份文件停留在 1.0.0，已不再逐版维护。**
 >
 > 每个版本实际改了什么，一律以 **GitHub Releases** 为准：
-> https://github.com/ALLEN201123/Quanta-Craft-Launcher/releases
+> https://github.com/WEEB123321/QCL-QCL-CE/releases
 >
 > 下面是首个公开版本（1.0.0）的说明，仅作历史留存。
 

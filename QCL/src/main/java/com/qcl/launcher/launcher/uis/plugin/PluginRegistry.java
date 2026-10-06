@@ -96,6 +96,11 @@ public final class PluginRegistry {
                 PluginActions2::perfBenchmark));
 
 
+        l.add(new PluginSpec("下载", "mirror_toggle",
+                "下载镜像开关",
+                "Mod / 整合包下载是否走 MCIM 镜像。★ 大陆保持开启，直连官方源连不上。",
+                PluginActions3::mirrorToggle));
+
         l.add(new PluginSpec("下载", "dl_speed",
                 "下载源测速",
                 "测官方源和 BMCLAPI 镜像能不能连、连得多快，推荐更快的那个。",

@@ -318,24 +318,30 @@ public final class PluginActions2 {
                 "★ 「自动匹配兼容版本」做不到 —— 那需要联网查 Modrinth/CurseForge 的版本列表。"));
 
         PluginUiKit.sheet(a, "确认降级", PluginUiKit.scroller(a, col), "替换", () -> {
-            try {
-                File pick = cands.get(0);
-                File bak = new File(oldJar.getParentFile(), oldJar.getName() + ".bak");
-                if (!bak.exists()) {
-                    copy(oldJar, bak);
+            // ★ 复制几十上百 MB 的 jar 是重活 —— 放后台
+            final File fOldJar = oldJar;
+            final List<File> fCands = cands;
+            PluginUiKit.work(a, "正在替换模组…", () -> {
+                try {
+                    File pick = fCands.get(0);
+                    File bak = new File(fOldJar.getParentFile(), fOldJar.getName() + ".bak");
+                    if (!bak.exists()) {
+                        copy(fOldJar, bak);
+                    }
+                    File target = new File(fOldJar.getParentFile(), fOldJar.getName());
+                    if (target.delete() || !target.exists()) {
+                        copy(pick, target);
+                        pick.delete();
+                    } else {
+                        throw new RuntimeException("删除原文件失败，未做改动");
+                    }
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
                 }
-                // 把原文件换掉：删除原文件、把候选改名成原文件名
-                File target = new File(oldJar.getParentFile(), oldJar.getName());
-                if (target.delete() || !target.exists()) {
-                    copy(pick, target);
-                    pick.delete();
-                    PluginUiKit.toast(a, "已降级。原文件备份为 " + bak.getName());
-                } else {
-                    PluginUiKit.toast(a, "删除原文件失败，未做改动");
-                }
-            } catch (Throwable t) {
-                PluginUiKit.toast(a, "降级失败：" + t);
-            }
+            }, () -> {
+                PluginUiKit.log(a, "模组降级 → " + fOldJar.getName());
+                PluginUiKit.toast(a, "已降级。原文件备份为 " + fOldJar.getName() + ".bak");
+            });
         });
     }
 
@@ -445,6 +451,11 @@ public final class PluginActions2 {
     }
 
     private static void showPackTextures(MainActivity a, File pack) {
+        // ★ 解码位图是重活，放后台
+        PluginUiKit.work(a, "正在读取贴图…", () -> buildPackTextures(a, pack), null);
+    }
+
+    private static void buildPackTextures(MainActivity a, File pack) {
         try {
             List<String> pngs = new ArrayList<>();
             try (ZipFile z = new ZipFile(pack)) {

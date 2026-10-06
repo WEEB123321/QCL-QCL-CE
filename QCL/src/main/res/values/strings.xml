@@ -1104,7 +1104,7 @@
     <string name="ui_about_upstream_main">HMCL-PE (legacy upstream; launch pipeline self-built since 1.1.1)</string>
     <string name="ui_about_upstream_sub">QCL (Quanta Craft Launcher) partially uses code from HMCL-PE. Original HMCL-PE author: Tungs (bilibili 18115101).
 This project is licensed under GNU GPL-3.0; the complete source code is provided with every release.</string>
-    <string name="ui_about_author_main">ALLEN201123</string>
+    <string name="ui_about_author_main">WEEB123321</string>
     <string name="ui_about_author_sub">bilibili UID: 550905358</string>
     <string name="ui_about_author_style">Author of this launcher. Enjoys researching every early Minecraft version released before 1.0, and mainly makes videos about those ancient builds.
 

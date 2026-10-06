@@ -1,5 +1,7 @@
 package com.qcl.launcher.launcher.mod.curse;
 
+import com.qcl.launcher.launcher.mod.ModApiMirror;
+
 import com.google.gson.reflect.TypeToken;
 import com.qcl.launcher.launcher.mod.LocalModFile;
 import com.qcl.launcher.launcher.mod.RemoteMod;
@@ -25,7 +27,7 @@ import java.util.stream.Stream;
 
 /* loaded from: classes2.dex */
 public final class CurseForgeRemoteModRepository implements RemoteModRepository {
-    private static final String PREFIX = "https://api.curseforge.com";
+    private static final String PREFIX = ModApiMirror.apply("https://api.curseforge.com");
     public static final int SECTION_ADDONS = 4559;
     public static final int SECTION_BUKKIT_PLUGIN = 5;
     public static final int SECTION_CUSTOMIZATION = 4546;
@@ -154,7 +156,7 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
         query.add(Pair.pair("index", Integer.toString(i)));
         query.add(Pair.pair("pageSize", Integer.toString(i2)));
 
-        return ((List) ((Response) HttpRequest.GET("https://api.curseforge.com/v1/mods/search", query.toArray(new Pair[0])).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.1
+        return ((List) ((Response) HttpRequest.GET(ModApiMirror.apply("https://api.curseforge.com/v1/mods/search"), query.toArray(new Pair[0])).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.1
         }.getType())).getData()).stream().map(new Function() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository$$ExternalSyntheticLambda1
             @Override // java.util.function.Function
             public final Object apply(Object obj) {
@@ -184,7 +186,7 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
             if (newInputStream != null) {
                 newInputStream.close();
             }
-            Response response = (Response) HttpRequest.POST("https://api.curseforge.com/v1/fingerprints").json(Lang.mapOf(Pair.pair("fingerprints", Collections.singletonList(Long.valueOf(Integer.toUnsignedLong(MurmurHash2.hash32(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.size(), 1))))))).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<FingerprintMatchesResult>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.2
+            Response response = (Response) HttpRequest.POST(ModApiMirror.apply("https://api.curseforge.com/v1/fingerprints")).json(Lang.mapOf(Pair.pair("fingerprints", Collections.singletonList(Long.valueOf(Integer.toUnsignedLong(MurmurHash2.hash32(byteArrayOutputStream.toByteArray(), byteArrayOutputStream.size(), 1))))))).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<FingerprintMatchesResult>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.2
             }.getType());
             if (((FingerprintMatchesResult) response.getData()).getExactMatches() == null || ((FingerprintMatchesResult) response.getData()).getExactMatches().isEmpty()) {
                 return Optional.empty();
@@ -204,19 +206,19 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public RemoteMod getModById(String str) throws IOException {
-        return ((CurseAddon) ((Response) HttpRequest.GET("https://api.curseforge.com/v1/mods/" + str).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<CurseAddon>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.3
+        return ((CurseAddon) ((Response) HttpRequest.GET(ModApiMirror.apply("https://api.curseforge.com/v1/mods/") + str).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<CurseAddon>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.3
         }.getType())).data).toMod();
     }
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public RemoteMod.File getModFile(String str, String str2) throws IOException {
-        return ((CurseAddon.LatestFile) ((Response) HttpRequest.GET(String.format("%s/v1/mods/%s/files/%s", "https://api.curseforge.com", str, str2)).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<CurseAddon.LatestFile>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.4
+        return ((CurseAddon.LatestFile) ((Response) HttpRequest.GET(String.format("%s/v1/mods/%s/files/%s", ModApiMirror.apply("https://api.curseforge.com"), str, str2)).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<CurseAddon.LatestFile>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.4
         }.getType())).getData()).toVersion().getFile();
     }
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public Stream<RemoteMod.Version> getRemoteVersionsById(String str) throws IOException {
-        return ((List) ((Response) HttpRequest.GET("https://api.curseforge.com/v1/mods/" + str + "/files", Pair.pair("pageSize", "10000")).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon.LatestFile>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.5
+        return ((List) ((Response) HttpRequest.GET(ModApiMirror.apply("https://api.curseforge.com/v1/mods/") + str + "/files", Pair.pair("pageSize", "10000")).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon.LatestFile>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.5
         }.getType())).getData()).stream().map(new Function() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository$$ExternalSyntheticLambda0
             @Override // java.util.function.Function
             public final Object apply(Object obj) {
@@ -226,7 +228,7 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
     }
 
     public List<CurseAddon.Category> getCategoriesImpl() throws IOException {
-        return reorganizeCategories((List) ((Response) HttpRequest.GET("https://api.curseforge.com/v1/categories", Pair.pair("gameId", "432")).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon.Category>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.6
+        return reorganizeCategories((List) ((Response) HttpRequest.GET(ModApiMirror.apply("https://api.curseforge.com/v1/categories"), Pair.pair("gameId", "432")).header("X-API-KEY", "$2a$10$fgjXkx00bZZ5ypMONic.Uu7/Be1KFjmMcprkzelHhjjs7FErXt7i6").getJson(new TypeToken<Response<List<CurseAddon.Category>>>() { // from class: com.qcl.launcher.launcher.mod.curse.CurseForgeRemoteModRepository.6
         }.getType())).getData(), this.section);
     }
 

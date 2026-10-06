@@ -1,5 +1,7 @@
 package com.qcl.launcher.launcher.mod.modrinth;
 
+import com.qcl.launcher.launcher.mod.ModApiMirror;
+
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.qcl.launcher.auth.offline.YggdrasilServer$$ExternalSyntheticLambda1;
@@ -34,7 +36,7 @@ import java.util.stream.Stream;
 
 /* loaded from: classes2.dex */
 public final class ModrinthRemoteModRepository implements RemoteModRepository {
-    private static final String PREFIX = "https://api.modrinth.com";
+    private static final String PREFIX = ModApiMirror.apply("https://api.modrinth.com");
     private final String projectType;
     public static final ModrinthRemoteModRepository MODS = new ModrinthRemoteModRepository("mod");
     public static final ModrinthRemoteModRepository MODPACKS = new ModrinthRemoteModRepository("modpack");
@@ -124,7 +126,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
         if (category != null && StringUtils.isNotBlank(category.getId()) && !category.getId().equals("all") && !category.getId().equals("0")) {
             arrayList.add(Collections.singletonList("categories:" + category.getId()));
         }
-        return ((Response) HttpRequest.GET(NetworkUtils.withQuery("https://api.modrinth.com/v2/search", Lang.mapOf(Pair.pair("query", str2), Pair.pair("facets", JsonUtils.UGLY_GSON.toJson(arrayList)), Pair.pair("offset", Integer.toString(i)), Pair.pair("limit", Integer.toString(i2)), Pair.pair("index", convertSortType(sortType))))).getJson(new TypeToken<Response<ProjectSearchResult>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.1
+        return ((Response) HttpRequest.GET(NetworkUtils.withQuery(ModApiMirror.apply("https://api.modrinth.com/v2/search"), Lang.mapOf(Pair.pair("query", str2), Pair.pair("facets", JsonUtils.UGLY_GSON.toJson(arrayList)), Pair.pair("offset", Integer.toString(i)), Pair.pair("limit", Integer.toString(i2)), Pair.pair("index", convertSortType(sortType))))).getJson(new TypeToken<Response<ProjectSearchResult>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.1
         }.getType())).getHits().stream().map(new Function() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository$$ExternalSyntheticLambda1
             @Override // java.util.function.Function
             public final Object apply(Object obj) {
@@ -136,7 +138,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public Optional<RemoteMod.Version> getRemoteVersionByLocalFile(LocalModFile localModFile, Path path) throws IOException {
         try {
-            return ((ProjectVersion) HttpRequest.GET("https://api.modrinth.com/v2/version_file/" + Hex.encodeHex(DigestUtils.digest("SHA-1", path)), Pair.pair("algorithm", "sha1")).getJson(ProjectVersion.class)).toVersion();
+            return ((ProjectVersion) HttpRequest.GET(ModApiMirror.apply("https://api.modrinth.com/v2/version_file/") + Hex.encodeHex(DigestUtils.digest("SHA-1", path)), Pair.pair("algorithm", "sha1")).getJson(ProjectVersion.class)).toVersion();
         } catch (ResponseCodeException e) {
             if (e.getResponseCode() == 404) {
                 return Optional.empty();
@@ -147,7 +149,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public RemoteMod getModById(String str) throws IOException {
-        return ((Project) HttpRequest.GET("https://api.modrinth.com/v2/project/" + StringUtils.removePrefix(str, "local-")).getJson(Project.class)).toMod();
+        return ((Project) HttpRequest.GET(ModApiMirror.apply("https://api.modrinth.com/v2/project/") + StringUtils.removePrefix(str, "local-")).getJson(Project.class)).toMod();
     }
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
@@ -157,7 +159,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
 
     @Override // com.qcl.launcher.launcher.mod.RemoteModRepository
     public Stream<RemoteMod.Version> getRemoteVersionsById(String str) throws IOException {
-        return ((List) HttpRequest.GET("https://api.modrinth.com/v2/project/" + StringUtils.removePrefix(str, "local-") + "/version").getJson(new TypeToken<List<ProjectVersion>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.2
+        return ((List) HttpRequest.GET(ModApiMirror.apply("https://api.modrinth.com/v2/project/") + StringUtils.removePrefix(str, "local-") + "/version").getJson(new TypeToken<List<ProjectVersion>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.2
         }.getType())).stream().map(new Function() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository$$ExternalSyntheticLambda2
             @Override // java.util.function.Function
             public final Object apply(Object obj) {
@@ -167,7 +169,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     }
 
     public List<Category> getCategoriesImpl() throws IOException {
-        return (List) ((List) HttpRequest.GET("https://api.modrinth.com/v2/tag/category").getJson(new TypeToken<List<Category>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.3
+        return (List) ((List) HttpRequest.GET(ModApiMirror.apply("https://api.modrinth.com/v2/tag/category")).getJson(new TypeToken<List<Category>>() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository.3
         }.getType())).stream().filter(new Predicate() { // from class: com.qcl.launcher.launcher.mod.modrinth.ModrinthRemoteModRepository$$ExternalSyntheticLambda3
             @Override // java.util.function.Predicate
             public final boolean test(Object obj) {
@@ -632,7 +634,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
         }
 
         public String getUrl() {
-            return this.url;
+            return ModApiMirror.apply(this.url);
         }
 
         public String getFilename() {

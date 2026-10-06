@@ -10,7 +10,7 @@
 Since 1.1.1 the launch / render / input / Java-runtime pipeline is **self-built**, with
 [FoldCraftLauncher (FCL)](https://github.com/FCL-Team/FoldCraftLauncher) as the reference;
 versions 1.1.0 and earlier were based on [HMCL-PE](https://github.com/Tungs-HMCL/HMCL-PE).
-Maintainer: **ALLEN201123** (bilibili UID 550905358).
+Maintainer: **Quanta Craft Launcher 上游项目** (bilibili UID 550905358).
 
 **English summary:** QCL focuses on *ancient* Minecraft versions (pre-classic / classic / indev / infdev /
 alpha / beta / RC) — **the only Android launcher that currently supports downloading every *archived* ancient
@@ -31,7 +31,7 @@ multiplayer powered by Terracotta (China mainland only). Licensed under **GNU GP
 > Android 版 Minecraft: Java Edition 启动器。**1.1.1 起启动 / 渲染 / 输入 / Java 运行时链路全部自研**，
 > 以 [FCL（FoldCraftLauncher）](https://github.com/FCL-Team/FoldCraftLauncher) 为参照；
 > **1.1.0 及更早版本基于 [HMCL-PE](https://github.com/Tungs-HMCL/HMCL-PE)**（Tungs），其代码核心已在 1.1.1 中移除。
-> 作者：**ALLEN201123**（bilibili UID 550905358）—— 喜欢研究 Minecraft 1.0 以前的所有远古版本，视频也主要围绕这些老版本。
+> 作者：**Quanta Craft Launcher 上游项目**（bilibili UID 550905358）—— 喜欢研究 Minecraft 1.0 以前的所有远古版本，视频也主要围绕这些老版本。
 >
 > **目前手机启动器唯一支持下载所有考古社区已归档远古版本的；也是唯一给「全远古版本」做好中文的启动器。**
 

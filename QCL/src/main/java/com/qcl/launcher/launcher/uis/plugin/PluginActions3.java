@@ -161,6 +161,38 @@ public final class PluginActions3 {
         }
     }
 
+    /**
+     * ★ MCIM 镜像开关：Mod / 整合包 / 光影的 API 与文件下载是否走镜像。
+     *
+     * <p>默认开 —— 大陆直连 CurseForge / Modrinth 基本连不上，这正是
+     * 「整合包下载不了」的原因。境外用户可以关掉走官方源。
+     */
+    public static void mirrorToggle(MainActivity a) {
+        boolean on = com.qcl.launcher.launcher.mod.ModApiMirror.enabled();
+        LinearLayout col = PluginUiKit.column(a);
+        col.addView(PluginUiKit.text(a, "Mod / 整合包 下载镜像"));
+        col.addView(PluginUiKit.kv(a, "当前状态", on ? "开启（走 MCIM 镜像）" : "关闭（直连官方源）"));
+        col.addView(PluginUiKit.sub(a, " "));
+        col.addView(PluginUiKit.sub(a, "开启后，CurseForge（api.curseforge.com）和 Modrinth"
+                + "（api.modrinth.com）的 API 与文件下载会改走 MCIM 镜像"
+                + "（mod.mcimirror.top），路径、参数、响应结构与官方一致。"));
+        col.addView(PluginUiKit.sub(a, " "));
+        col.addView(PluginUiKit.sub(a, "★ **大陆用户保持开启** —— 直连官方源基本连不上，"
+                + "这就是整合包/模组下载一直转圈失败的原因。"));
+        col.addView(PluginUiKit.sub(a, "★ 境外用户可以关掉，直连官方源更快。"));
+        col.addView(PluginUiKit.sub(a, "★ 只影响 Mod / 整合包 / 资源包 / 光影的下载，"
+                + "不影响 Minecraft 本体、依赖库、资源文件（那些走 BMCLAPI）。"));
+        TextView toggle = PluginUiKit.row(a, on ? "关闭镜像（直连官方源）" : "开启镜像（大陆推荐）", null);
+        toggle.setGravity(android.view.Gravity.CENTER);
+        toggle.setOnClickListener(v -> {
+            com.qcl.launcher.launcher.mod.ModApiMirror.setEnabled(!on);
+            PluginUiKit.log(a, "下载镜像 " + (!on ? "开启" : "关闭"));
+            PluginUiKit.toast(a, !on ? "已开启镜像" : "已关闭镜像");
+        });
+        col.addView(toggle);
+        PluginUiKit.sheet(a, "下载镜像开关", PluginUiKit.scroller(a, col), "知道了", null);
+    }
+
     /** 下载组合模板：把常用的一组下载项存成模板，一键复用。 */
     public static void downloadTemplate(MainActivity a) {
         try {
@@ -229,9 +261,14 @@ public final class PluginActions3 {
             jars.addAll(PluginUiKit.listByExt(new File(ver, "mods"), ".jar"));
             jars.addAll(PluginUiKit.listByExt(ver, ".jar"));
 
-            LinearLayout col = PluginUiKit.column(a);
-            col.addView(PluginUiKit.text(a, "校验 " + jars.size() + " 个 jar"));
+            // ★ 结果要从后台线程带回 UI 线程 —— 用外层 holder 装着，
+            //   不能在第一个 lambda 里声明 final 变量（第二个 lambda 看不见）
+            final int[] badHolder = new int[1];
+            final java.util.List<String> badHolderList = new ArrayList<>();
 
+            // ★ 重活放后台：逐个打开 jar 读内容，主线程做这个会被系统判 ANR
+            final int fTotal = jars.size();
+            PluginUiKit.work(a, "正在校验 " + jars.size() + " 个 jar…", () -> {
             int bad = 0;
             List<String> badList = new ArrayList<>();
             for (File f : jars) {
@@ -242,10 +279,16 @@ public final class PluginActions3 {
                 }
             }
 
-            col.addView(PluginUiKit.kv(a, "正常", (jars.size() - bad) + " 个"));
-            col.addView(PluginUiKit.kv(a, "有问题", bad + " 个"));
-            for (String s : badList) {
-                col.addView(PluginUiKit.sub(a, "✗ " + s));
+            badHolder[0] = bad;
+            badHolderList.addAll(badList);
+            }, null);   // 后台扫描结束
+            PluginUiKit.work(a, (Runnable) null, () -> {
+            LinearLayout col = PluginUiKit.column(a);
+            col.addView(PluginUiKit.text(a, "校验 " + fTotal + " 个 jar"));
+            col.addView(PluginUiKit.kv(a, "正常", (fTotal - badHolder[0]) + " 个"));
+            col.addView(PluginUiKit.kv(a, "有问题", badHolder[0] + " 个"));
+            for (String s0 : badHolderList) {
+                col.addView(PluginUiKit.sub(a, "✗ " + s0));
             }
             col.addView(PluginUiKit.sub(a, " "));
             col.addView(PluginUiKit.sub(a, "★ 做的是**本地能查的损坏检测**"
@@ -253,6 +296,7 @@ public final class PluginActions3 {
                     + "★ 「和官方哈希对比」需要联网拿官方清单，本项目不做。"));
             col.addView(PluginUiKit.sub(a, "★ 只读，不删不改。发现问题请自己重新下载那个文件。"));
             PluginUiKit.sheet(a, "文件完整性校验", PluginUiKit.scroller(a, col), "知道了", null);
+            });   // UI 回调结束
         } catch (Throwable t) {
             PluginUiKit.toast(a, "校验失败：" + t);
         }
@@ -418,23 +462,28 @@ public final class PluginActions3 {
         col.addView(PluginUiKit.sub(a, "★ **不会删除原包**，只新增一个合并后的 zip。"));
 
         PluginUiKit.sheet(a, "确认合并", PluginUiKit.scroller(a, col), "开始合并", () -> {
-            try {
-                File out = new File(bottom.getParentFile(), outName);
-                java.util.Map<String, byte[]> entries = new java.util.LinkedHashMap<>();
-                readZipInto(bottom, entries);
-                readZipInto(top, entries);
-                try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(out))) {
-                    for (java.util.Map.Entry<String, byte[]> e : entries.entrySet()) {
-                        zos.putNextEntry(new ZipEntry(e.getKey()));
-                        zos.write(e.getValue());
-                        zos.closeEntry();
+            // ★ 合并几百 MB 的 zip 是重活 —— 放后台，主线程做会被系统判 ANR
+            final File out = new File(bottom.getParentFile(), outName);
+            final File fBottom = bottom, fTop = top;
+            PluginUiKit.work(a, "正在合并资源包…", () -> {
+                try {
+                    java.util.Map<String, byte[]> entries = new java.util.LinkedHashMap<>();
+                    readZipInto(fBottom, entries);
+                    readZipInto(fTop, entries);
+                    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(out))) {
+                        for (java.util.Map.Entry<String, byte[]> e : entries.entrySet()) {
+                            zos.putNextEntry(new ZipEntry(e.getKey()));
+                            zos.write(e.getValue());
+                            zos.closeEntry();
+                        }
                     }
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
                 }
+            }, () -> {
                 log(a, "合并资源包 → " + outName);
                 PluginUiKit.toast(a, "已生成 " + outName + "（" + PluginUiKit.size(out.length()) + "）");
-            } catch (Throwable t) {
-                PluginUiKit.toast(a, "合并失败：" + t);
-            }
+            });
         });
     }
 

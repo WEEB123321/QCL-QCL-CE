@@ -156,7 +156,7 @@ Português (Brasil)、Српски。
 
 作为 GPL-3.0 的衍生作品，本项目保留上游署名：
 
-- 上游项目：[Quanta Craft Launcher](https://github.com/ALLEN201123/Quanta-Craft-Launcher)，作者 ALLEN201123
+- 上游项目：[Quanta Craft Launcher](https://github.com/ALLEN201123/Quanta-Craft-Launcher)（GPL-3.0，本项目为其衍生作品）
 - 渲染与启动参照：[FoldCraftLauncher (FCL)](https://github.com/FCL-Team/FoldCraftLauncher)
 - 1.1.0 及更早版本基于：[HMCL-PE](https://github.com/Tungs-HMCL/HMCL-PE)
 - 联机：[Terracotta](https://github.com/burningtnt/Terracotta)（仅限中国大陆地区）

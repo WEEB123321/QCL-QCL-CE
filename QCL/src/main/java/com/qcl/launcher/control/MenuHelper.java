@@ -243,7 +243,7 @@ SeekBar.OnSeekBarChangeListener {
             currentPattern = this.currentPattern.name;
         }
         if (this.currentPattern == null) {
-            this.currentPattern = new ControlPattern(currentPattern == null ? "Default" : currentPattern, "ALLEN201123 (bilibili UID 550905358)", "1.1", "QCL \u9ed8\u8ba4\u63a7\u952e\u5e03\u5c40 \u00b7 Quanta Craft Launcher", 1);
+            this.currentPattern = new ControlPattern(currentPattern == null ? "Default" : currentPattern, "WEEB123321", "1.1", "QCL \u9ed8\u8ba4\u63a7\u952e\u5e03\u5c40 \u00b7 Quanta Craft Launcher", 1);
         }
         ArrayList<ChildLayout> childList = SettingUtils.getChildList(currentPattern);
         String defaultChild = null;

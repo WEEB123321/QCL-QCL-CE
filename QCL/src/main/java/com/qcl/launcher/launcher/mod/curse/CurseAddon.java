@@ -1,5 +1,7 @@
 package com.qcl.launcher.launcher.mod.curse;
 
+import com.qcl.launcher.launcher.mod.ModApiMirror;
+
 import com.qcl.launcher.launcher.mod.ModLoaderType;
 import com.qcl.launcher.launcher.mod.RemoteMod;
 import com.qcl.launcher.launcher.mod.RemoteModRepository;
@@ -544,7 +546,8 @@ public class CurseAddon implements RemoteMod.IMod {
 
         public String getDownloadUrl() {
             String str = this.downloadUrl;
-            return str == null ? String.format("https://edge.forgecdn.net/files/%d/%d/%s", Integer.valueOf(this.id / 1000), Integer.valueOf(this.id % 1000), this.fileName) : str;
+            // ★ 社区版：走 MCIM 镜像（edge.forgecdn.net 大陆连不上）
+            return ModApiMirror.apply(str == null ? String.format("https://edge.forgecdn.net/files/%d/%d/%s", Integer.valueOf(this.id / 1000), Integer.valueOf(this.id % 1000), this.fileName) : str);
         }
 
         public List<String> getGameVersions() {

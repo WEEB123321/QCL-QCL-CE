@@ -55,7 +55,7 @@ public class FeedbackUI extends BaseUI implements View.OnClickListener {
             this.context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse("https://discord.gg/zeMNy8Wdgd")));
         }
         if (view == this.jumpToGit) {
-            this.context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse("https://github.com/ALLEN201123/Quanta-Craft-Launcher/issues")));
+            this.context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse("https://github.com/WEEB123321/QCL-QCL-CE/issues")));
         }
     }
 }

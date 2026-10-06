@@ -32,19 +32,17 @@ import java.util.List;
 
 import com.qcl.launcher.R;
 public class UpdateChecker {
-    public static final String UPDATE_URL = "https://raw.githubusercontent.com/ALLEN201123/Quanta-Craft-Launcher/main/launcher_version.json";
-    public static final String UPDATE_URL_CDN = "https://cdn.jsdelivr.net/gh/ALLEN201123/Quanta-Craft-Launcher@main/launcher_version.json";
+    public static final String UPDATE_URL = "https://raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json";
+    public static final String UPDATE_URL_CDN = "https://cdn.jsdelivr.net/gh/WEEB123321/QCL-QCL-CE@main/launcher_version.json";
     /**
-     * ★★★ 1.2.2：国内镜像（Gitee），照 FCL 的做法
-     * （FCL 用的是 https://gitee.com/fcl-team/FCL-Repo/raw/main/res/version_map.json）。
+     * ★★★ 社区版：去掉了原来的 Gitee 镜像常量（旧值指向 `gitee.com/allne…/qcl-repo`）。
      *
-     * 为什么需要它：上面那两个地址国内经常连不上，很多用户一直收不到更新提示 ——
-     * 不是版本号没改，是根本拉不到文件。Gitee 镜像就是给国内用户用的。
+     * 为什么要去掉：那是**上游作者**的仓库，返回的是上游的版本号，对社区版没有意义，
+     * 而且会把上游账号一直写在社区版代码里。社区版目前没有自建 Gitee 镜像，
+     * 国内可达性交给下面的 jsDelivr 系列 + ghproxy.net 兜底。
      *
-     * 这个仓库只放一个 launcher_version.json，不放安装包；
-     * 安装包仍然从 GitHub Release 下（国内用户可以选弹窗里的「网盘下载」）。
+     * （以后若自建 Gitee 镜像：在这里补回一个常量，并加进下面 urls 列表即可。）
      */
-    public static final String UPDATE_URL_CN = "https://gitee.com/allne201123/qcl-repo/raw/master/launcher_version.json";
 
     /**
      * ★★★ 1.2.6：再多兜几个国内能通的源。
@@ -54,9 +52,9 @@ public class UpdateChecker {
      *   这就是「手机上收不到更新推送」的真凶（旧代码中文环境先读 Gitee，
      *   读到旧版本号就判定「没有新版」，后面更快的源根本没机会看）。
      */
-    public static final String UPDATE_URL_FASTLY = "https://fastly.jsdelivr.net/gh/ALLEN201123/Quanta-Craft-Launcher@main/launcher_version.json";
-    public static final String UPDATE_URL_GCORE = "https://gcore.jsdelivr.net/gh/ALLEN201123/Quanta-Craft-Launcher@main/launcher_version.json";
-    public static final String UPDATE_URL_PROXY = "https://ghproxy.net/https://raw.githubusercontent.com/ALLEN201123/Quanta-Craft-Launcher/main/launcher_version.json";
+    public static final String UPDATE_URL_FASTLY = "https://fastly.jsdelivr.net/gh/WEEB123321/QCL-QCL-CE@main/launcher_version.json";
+    public static final String UPDATE_URL_GCORE = "https://gcore.jsdelivr.net/gh/WEEB123321/QCL-QCL-CE@main/launcher_version.json";
+    public static final String UPDATE_URL_PROXY = "https://ghproxy.net/https://raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json";
 
     /**
      * ★★★ 1.2.8：再加两家国内可达的 jsDelivr 镜像。
@@ -65,8 +63,8 @@ public class UpdateChecker {
      * 1.2.6 只列了部分源，玩家如果恰好只能连到那几个「还没刷新」的源，
      * 取到的最大值就还是旧的 → 依然收不到提示。多列几个源，命中新版本号的几率才够。
      */
-    public static final String UPDATE_URL_JSDMIRROR = "https://cdn.jsdmirror.com/gh/ALLEN201123/Quanta-Craft-Launcher@main/launcher_version.json";
-    public static final String UPDATE_URL_BCDN = "https://jsdelivr.b-cdn.net/gh/ALLEN201123/Quanta-Craft-Launcher@main/launcher_version.json";
+    public static final String UPDATE_URL_JSDMIRROR = "https://cdn.jsdmirror.com/gh/WEEB123321/QCL-QCL-CE@main/launcher_version.json";
+    public static final String UPDATE_URL_BCDN = "https://jsdelivr.b-cdn.net/gh/WEEB123321/QCL-QCL-CE@main/launcher_version.json";
     private Context context;
     private MainActivity activity;
     private boolean isChecking;
@@ -120,7 +118,6 @@ public class UpdateChecker {
                         // ★★★ 1.2.6：国内优先，多带几个兜底源（顺序只是「先试哪个」，不影响结果）
                         List<String> urls = new ArrayList<String>();
                         if (LocaleUtils.isChinese(UpdateChecker.this.context)) {
-                            urls.add(UPDATE_URL_CN);
                             urls.add(UPDATE_URL_JSDMIRROR);
                             urls.add(UPDATE_URL_BCDN);
                             urls.add(UPDATE_URL_FASTLY);
@@ -136,11 +133,10 @@ public class UpdateChecker {
                             urls.add(UPDATE_URL_JSDMIRROR);
                             urls.add(UPDATE_URL_BCDN);
                             urls.add(UPDATE_URL_PROXY);
-                            urls.add(UPDATE_URL_CN);
                         }
 
                         // ★★★ 1.2.6 关键修法：**每个源都读一遍，取 versionCode 最大的那份**。
-                        //   老代码是「谁先返回用谁」→ 中文环境先读 Gitee 镜像，
+                        //   老代码是「谁先返回用谁」→ 中文环境先读当时那个国内镜像，
                         //   镜像只要落后一版（某次只推了 GitHub、没推镜像），
                         //   手机就会拿到旧版本号 → 判定「没有新版」→ 更新提示永远收不到，
                         //   而且**后面的源根本没机会被读到**。

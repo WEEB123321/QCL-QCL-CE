@@ -231,7 +231,94 @@ public final class PluginUiKit {
         }
     }
 
+    // ==================== 后台执行 ====================
+
+    /**
+     * ★★★ 把重活放到后台线程执行，结果回 UI 线程。
+     *
+     * <p><b>为什么必须有这个</b>：插件的确认框「确定」回调跑在 **UI 线程**上。
+     * 如果把「复制整个实例」「合并几百 MB 的 zip」「逐个打开 jar 校验」这类操作
+     * 直接写在回调里，主线程会被卡住几秒到几十秒 → 系统弹 ANR「应用无响应」，
+     * 用户看到的就是「闪退 / 卡死」。
+     *
+     * <p>用法：{@code work(activity, "正在合并…", () -> doHeavyWork(), () -> refreshUI());}
+     *
+     * @param activity 用于切回 UI 线程；如果 Activity 已经销毁，结果会被安全丢弃
+     * @param doing    后台线程执行的任务（重活）
+     * @param done     回到 UI 线程后执行（刷新界面 / 弹结果），可为 null
+     */
+    public static void work(final MainActivity activity, String doing,
+                            final Runnable doing2, final Runnable done) {
+        final android.app.ProgressDialog pd;
+        try {
+            pd = android.app.ProgressDialog.show(activity, null, doing, true, false);
+        } catch (Throwable t) {
+            // 连进度框都弹不出来（页面正在销毁）—— 那就直接后台跑，结果丢弃
+            new Thread(() -> {
+                try { if (doing2 != null) doing2.run(); } catch (Throwable ignored) { }
+            }, "qcl-plugin-work").start();
+            return;
+        }
+        Thread t = new Thread(() -> {
+            Throwable error = null;
+            try {
+                if (doing2 != null) {
+                    doing2.run();
+                }
+            } catch (Throwable e) {
+                error = e;
+            }
+            final Throwable err = error;
+            try {
+                activity.runOnUiThread(() -> {
+                    try {
+                        pd.dismiss();
+                    } catch (Throwable ignored) {
+                    }
+                    if (err != null) {
+                        toast(activity, "操作失败：" + err);
+                        android.util.Log.e("QCLPlugin", "插件后台任务失败", err);
+                        return;
+                    }
+                    if (done != null) {
+                        try {
+                            done.run();
+                        } catch (Throwable e) {
+                            toast(activity, "刷新失败：" + e);
+                        }
+                    }
+                });
+            } catch (Throwable ignored) {
+                // Activity 已销毁：任务本身已完成，只丢掉 UI 部分
+            }
+        }, "qcl-plugin-work");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** 无提示版 {@link #work}：用于「任务已经跑完，只是要回 UI 线程刷界面」的场景。 */
+    public static void work(final MainActivity activity,
+                            final Runnable task, final Runnable done) {
+        work(activity, null, task, done);
+    }
+
     // ==================== 常用小工具 ====================
+
+    /**
+     * ★ 插件操作日志：记录插件做过的写操作（改名 / 替换 / 合并 / 导入…），
+     * 写到 {@code AppManifest.SETTING_DIR/qcl_action_log.json}，可在「操作日志」插件里查看。
+     */
+    public static void log(Context c, String what) {
+        try {
+            java.util.List<String> ls = com.qcl.launcher.launcher.uis.plugin.PluginActions3.Local.lines(
+                    c, "action_log");
+            ls.add(new java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.US)
+                    .format(new java.util.Date()) + "  " + what);
+            com.qcl.launcher.launcher.uis.plugin.PluginActions3.Local.saveLines(c, "action_log", ls);
+        } catch (Throwable ignored) {
+        }
+    }
+
 
     /** 把字节数变成人能读的（1.2 GB / 340 MB / 12 KB）。 */
     public static String size(long bytes) {

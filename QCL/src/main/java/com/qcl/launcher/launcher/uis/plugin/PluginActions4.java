@@ -163,13 +163,17 @@ public final class PluginActions4 {
     }
 
     private static void doCopy(MainActivity a, File src, File dst) {
-        try {
-            copyTree(src, dst, 0);
+        // ★ 复制整个实例（含模组、存档）可能上 GB —— 放后台，主线程做会 ANR
+        PluginUiKit.work(a, "正在导入实例…", () -> {
+            try {
+                copyTree(src, dst, 0);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }, () -> {
             log(a, "导入实例 " + src.getName());
             PluginUiKit.toast(a, "已导入 " + dst.getName() + "（重新进版本列表可见）");
-        } catch (Throwable t) {
-            PluginUiKit.toast(a, "复制失败：" + t);
-        }
+        });
     }
 
     private static void copyTree(File src, File dst, int depth) throws Exception {

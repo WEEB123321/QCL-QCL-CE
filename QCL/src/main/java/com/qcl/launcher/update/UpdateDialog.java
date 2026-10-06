@@ -149,7 +149,7 @@ implements View.OnClickListener {
                             Intent i = new Intent("android.intent.action.VIEW");
                             i.setData(Uri.parse(netdiskUrl != null && !netdiskUrl.isEmpty()
                                     ? netdiskUrl
-                                    : "https://github.com/ALLEN201123/Quanta-Craft-Launcher/releases/latest"));
+                                    : "https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
                             this.getContext().startActivity(i);
                         } catch (Throwable ignored) {
                         }
@@ -225,7 +225,7 @@ implements View.OnClickListener {
             try {
                 Intent i = new Intent("android.intent.action.VIEW");
                 i.setData(Uri.parse(netdiskUrl != null && !netdiskUrl.isEmpty()
-                        ? netdiskUrl : "https://github.com/ALLEN201123/Quanta-Craft-Launcher/releases/latest"));
+                        ? netdiskUrl : "https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
                 this.getContext().startActivity(i);
             }
             catch (Throwable ignored) {
@@ -236,7 +236,7 @@ implements View.OnClickListener {
             // ★★★ 1.1.5：GitHub 下载（跳 GitHub Release 页）。
             try {
                 Intent i = new Intent("android.intent.action.VIEW");
-                i.setData(Uri.parse("https://github.com/ALLEN201123/Quanta-Craft-Launcher/releases/latest"));
+                i.setData(Uri.parse("https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
                 this.getContext().startActivity(i);
             }
             catch (Throwable ignored) {

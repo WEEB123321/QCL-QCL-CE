@@ -68,8 +68,8 @@ FCL 以 **GPL-3.0** 授权。若你需要 FCL 的源码或其许可全文，请�
 
 ## 署名位置
 启动器内「设置 → 关于」页已列出：BMCLAPI、MC 百科、原版项目（HMCL-PE / Tungs）、
-本作作者（ALLEN201123）、**Terracotta / BurningTNT** 与 **FoldCraftLauncher（FCL-Team）**，
-以及 GPL-3.0 说明。
+本作作者（WEEB123321）、**Quanta Craft Launcher（上游项目）**、**Terracotta / BurningTNT**
+与 **FoldCraftLauncher（FCL-Team）**，以及 GPL-3.0 说明。
 
 ## 多人联机的使用限制（合规与免责）
 多人联机功能仅限 **中国大陆地区** 使用；在境外使用本功能，本启动器不承担任何责任，

@@ -1161,7 +1161,7 @@
     <string name="ui_about_upstream_main">HMCL-PE（历史上游，1.1.1 起启动链路自研）</string>
     <string name="ui_about_upstream_sub">QCL（量子方块启动器）部分使用了 HMCL-PE 的代码。HMCL-PE 原作者：Tungs（B 站 18115101）。
 本项目基于 GNU GPL-3.0 开源，发布时会随包提供完整源码。</string>
-    <string name="ui_about_author_main">ALLEN201123</string>
+    <string name="ui_about_author_main">WEEB123321</string>
     <string name="ui_about_author_sub">B 站 UID：550905358</string>
     <string name="ui_about_author_style">本启动器作者。喜欢研究 Minecraft 1.0 以前的所有远古版本，视频也主要围绕这些老版本。
 
