@@ -629,27 +629,35 @@ public final class PluginActions4 {
                 PluginUiKit.info(a, "存档编辑警告", "找不到 saves 目录。");
                 return;
             }
-            List<World> worlds = World.getWorlds(saves.toPath())
+            // ★ 递归算体积是重活（存档可能上 GB），放后台
+            final java.util.List<World> fWorlds = World.getWorlds(saves.toPath())
                     .collect(java.util.stream.Collectors.toList());
-
+            final java.util.List<Object[]> sizes = new java.util.ArrayList<>();
+            PluginUiKit.work(a, "正在统计存档体积…", () -> {
+                for (World w : fWorlds) {
+                    sizes.add(new Object[]{w.getWorldName(),
+                            PluginUiKit.dirSize(w.getFile().toFile(), 0)});
+                }
+            }, null);
+            PluginUiKit.work(a, (Runnable) null, () -> {
             LinearLayout col = PluginUiKit.column(a);
             col.addView(PluginUiKit.text(a, "存档编辑警告"));
-            col.addView(PluginUiKit.sub(a, "共 " + worlds.size() + " 个存档。"));
+            col.addView(PluginUiKit.sub(a, "共 " + fWorlds.size() + " 个存档。"));
             col.addView(PluginUiKit.sub(a, " "));
             col.addView(PluginUiKit.sub(a, "在动存档之前，先确认这几件事："));
             col.addView(PluginUiKit.sub(a, "① 已经在「我的 → 备份与恢复」里备份过"));
             col.addView(PluginUiKit.sub(a, "② 知道这个存档是哪个版本创建的（高版本打开会就地升级，不可逆）"));
             col.addView(PluginUiKit.sub(a, "③ 如果装了模组，删模组可能让存档里的方块变成「未知方块」"));
             col.addView(PluginUiKit.sub(a, " "));
-            for (World w : worlds) {
-                long size = PluginUiKit.dirSize(w.getFile().toFile(), 0);
-                col.addView(PluginUiKit.kv(a, w.getWorldName(), PluginUiKit.size(size)));
+            for (Object[] e : sizes) {
+                col.addView(PluginUiKit.kv(a, (String) e[0], PluginUiKit.size((Long) e[1])));
             }
             col.addView(PluginUiKit.sub(a, " "));
             col.addView(PluginUiKit.sub(a, "★ 「编辑前自动弹警告」在**启动器自己的编辑入口**"
                     + "（重命名 / 删除）里已经生效。"
                     + "你在文件管理器里直接改存档，启动器拦不到。"));
             PluginUiKit.sheet(a, "存档编辑警告", PluginUiKit.scroller(a, col), "知道了", null);
+            });
         } catch (Throwable t) {
             PluginUiKit.toast(a, "失败：" + t);
         }

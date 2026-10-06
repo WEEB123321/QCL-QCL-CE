@@ -542,23 +542,32 @@ public final class PluginActions {
                 return;
             }
 
-            String instanceVer = currentInstanceName(a);
+            // ★ 解析每个 level.dat（NBT 解压）是重活，放后台
+            final List<World> fWorlds = worlds;
+            final String instanceVer = currentInstanceName(a);
+            final java.util.List<Object[]> rows = new java.util.ArrayList<>();
+            PluginUiKit.work(a, "正在读取存档信息…", () -> {
+                for (World w : fWorlds) {
+                    String wv = w.getGameVersion();
+                    boolean okv = instanceVer != null && wv != null && instanceVer.contains(wv);
+                    rows.add(new Object[]{w.getWorldName(), wv,
+                            StatsTracker.formatTime(w.getLastPlayed()), okv});
+                }
+            }, null);
             LinearLayout col = PluginUiKit.column(a);
             int mismatch = 0;
 
-            for (World w : worlds) {
-                String wv = w.getGameVersion();
-                boolean ok = instanceVer != null && wv != null
-                        && instanceVer.contains(wv);
+            for (Object[] r : rows) {
+                String wv = (String) r[1];
+                boolean ok = (Boolean) r[3];
                 if (!ok) {
                     mismatch++;
                 }
                 LinearLayout card = PluginUiKit.card(a);
-                card.addView(PluginUiKit.text(a, (ok ? "✔ " : "⚠ ") + w.getWorldName()));
+                card.addView(PluginUiKit.text(a, (ok ? "✔ " : "⚠ ") + (String) r[0]));
                 card.addView(PluginUiKit.kv(a, "存档版本", wv == null ? "未记录" : wv));
                 card.addView(PluginUiKit.kv(a, "当前实例", instanceVer == null ? "—" : instanceVer));
-                card.addView(PluginUiKit.kv(a, "上次游玩",
-                        StatsTracker.formatTime(w.getLastPlayed())));
+                card.addView(PluginUiKit.kv(a, "上次游玩", (String) r[2]));
                 if (!ok) {
                     card.addView(PluginUiKit.sub(a,
                             "  版本不一致。★ 用**更高版本**打开会就地升级存档，"

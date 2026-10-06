@@ -186,7 +186,8 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
             if (box == null) {
                 return;
             }
-            box.removeAllViews();
+            // ★ 先把「移除全部子视图」推到布局之后 —— 避免在布局过程中改树
+            box.removeAllViewsInLayout();
 
             // ★★★ 按开关状态分成「开启」和「已关闭」两组。
             //   关掉的收进底部「已关闭」区，随时可以再打开 —— 而不是直接消失，
@@ -224,7 +225,7 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
                 reset.setOnClickListener(v -> {
                     PluginSwitch.enableAll();
                     PluginUiKit.toast(this.context, "已全部打开");
-                    renderPlugins();
+                    reset.post(() -> renderPlugins());
                 });
                 box.addView(reset);
             }
@@ -260,7 +261,10 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
         sw.setChecked(on);
         sw.setOnCheckedChangeListener((b, checked) -> {
             PluginSwitch.setEnabled(sp.id, checked);
-            renderPlugins();   // 重绘：关掉的移到「已关闭」区
+            // ★ 不能在开关回调里直接重绘 —— 此时正处于本卡片所在视图树的布局过程，
+            //   removeAllViews + 重新 addView 会抛 IllegalStateException（用户看到的就是闪退）。
+            //   post 到下一帧，等本轮布局结束再重建列表。
+            sw.post(() -> renderPlugins());
         });
         head.addView(sw);
         card.addView(head);

@@ -65,9 +65,12 @@ public final class PluginActions2 {
                 return;
             }
 
-            Map<String, String> idToFile = new LinkedHashMap<>();   // modId -> 文件名
-            Map<String, List<String>> depends = new LinkedHashMap<>();
+            // ★ 逐个打开 jar 读声明是重活 —— 放后台（几十上百个 jar 会卡主线程好几秒）
+            final int fModCount = mods.size();
+            final Map<String, String> idToFile = new LinkedHashMap<>();   // modId -> 文件名
+            final Map<String, List<String>> depends = new LinkedHashMap<>();
 
+            PluginUiKit.work(a, "正在读取 " + mods.size() + " 个模组的依赖声明…", () -> {
             for (File m : mods) {
                 List<String> ids = readModIds(m);
                 List<String> deps = readModDepends(m);
@@ -82,9 +85,11 @@ public final class PluginActions2 {
                 }
             }
 
+            }, null);   // 后台扫描结束
+            PluginUiKit.work(a, (Runnable) null, () -> {
             LinearLayout col = PluginUiKit.column(a);
             LinearLayout head = PluginUiKit.card(a);
-            head.addView(PluginUiKit.text(a, mods.size() + " 个模组，" + idToFile.size() + " 个 modId"));
+            head.addView(PluginUiKit.text(a, fModCount + " 个模组，" + idToFile.size() + " 个 modId"));
             head.addView(PluginUiKit.sub(a, "读的是每个模组**自己声明的**依赖，不是猜的。"));
             col.addView(head);
 
@@ -133,6 +138,7 @@ public final class PluginActions2 {
             col.addView(PluginUiKit.sub(a, "★ 缺失不一定是错：有些依赖是**可选**的，"
                     + "或者被同 jar 内的另一个 modId 提供了。真起不来时以游戏日志为准。"));
             PluginUiKit.sheet(a, "模组依赖树", PluginUiKit.scroller(a, col), "知道了", null);
+            });   // UI 回调结束
         } catch (Throwable t) {
             PluginUiKit.toast(a, "读依赖失败：" + t);
         }
@@ -359,17 +365,25 @@ public final class PluginActions2 {
                 return;
             }
 
-            LinearLayout col = PluginUiKit.column(a);
-            int found = 0;
-            for (File m : mods) {
-                String log = findChangelog(m);
-                if (log == null || log.trim().isEmpty()) {
-                    continue;
+            // ★ 逐个打开 jar 找 CHANGELOG 是重活 —— 放后台（后台只收集，不碰 UI）
+            final List<File> fMods = mods;
+            final java.util.List<String[]> fLogs = new ArrayList<>();
+            PluginUiKit.work(a, "正在读取更新日志…", () -> {
+                for (File m : fMods) {
+                    String log = findChangelog(m);
+                    if (log == null || log.trim().isEmpty()) {
+                        continue;
+                    }
+                    fLogs.add(new String[]{m.getName(), log});
                 }
-                found++;
+            }, null);
+
+            PluginUiKit.work(a, (Runnable) null, () -> {
+            LinearLayout col = PluginUiKit.column(a);
+            for (String[] e : fLogs) {
                 LinearLayout card = PluginUiKit.card(a);
-                card.addView(PluginUiKit.text(a, m.getName()));
-                String show = log.length() > 1500 ? log.substring(0, 1500) + "\n…（截断）" : log;
+                card.addView(PluginUiKit.text(a, e[0]));
+                String show = e[1].length() > 1500 ? e[1].substring(0, 1500) + "\n…（截断）" : e[1];
                 card.addView(PluginUiKit.sub(a, show));
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -378,17 +392,17 @@ public final class PluginActions2 {
                 card.setLayoutParams(lp);
                 col.addView(card);
             }
-
-            if (found == 0) {
+            if (fLogs.isEmpty()) {
                 col.addView(PluginUiKit.text(a, "没找到任何更新日志。"));
                 col.addView(PluginUiKit.sub(a, "★ 很多模组**不打包** CHANGELOG —— "
                         + "它们把更新日志放在 Modrinth/CurseForge 页面上。"
                         + "本项目不联网抓内容，所以只能读到 jar 里自带的那些。"));
             } else {
-                col.addView(PluginUiKit.sub(a, "★ 共 " + found + " 个模组自带更新日志"
+                col.addView(PluginUiKit.sub(a, "★ 共 " + fLogs.size() + " 个模组自带更新日志"
                         + "（其余模组把日志放在网站上，本地读不到）。"));
             }
             PluginUiKit.sheet(a, "更新日志聚合", PluginUiKit.scroller(a, col), "知道了", null);
+            });
         } catch (Throwable t) {
             PluginUiKit.toast(a, "失败：" + t);
         }
@@ -559,10 +573,13 @@ public final class PluginActions2 {
             }
 
             String instance = ver.getName();
-            LinearLayout col = PluginUiKit.column(a);
-            col.addView(PluginUiKit.text(a, "实例：" + instance));
 
-            for (File p : packs) {
+            // ★ 逐个打开光影 zip 读 GLSL 是重活 —— 放后台（后台只收集，不碰 UI）
+            final String fInstance = instance;
+            final List<File> fPacks = packs;
+            final java.util.List<Object[]> fRows = new ArrayList<>();
+            PluginUiKit.work(a, "正在读取光影包…", () -> {
+            for (File p : fPacks) {
                 List<String> glsl = new ArrayList<>();
                 boolean hasShaderDir = false;
                 boolean hasIris = false;
@@ -602,10 +619,24 @@ public final class PluginActions2 {
                 } catch (Throwable ignored) {
                 }
 
+                fRows.add(new Object[]{p.getName(), hasShaderDir, hasIris,
+                        glsl.isEmpty() ? "" : String.join(" / ", glsl)});
+            }
+            }, null);   // 后台扫描结束
+
+            PluginUiKit.work(a, (Runnable) null, () -> {
+            LinearLayout col = PluginUiKit.column(a);
+            col.addView(PluginUiKit.text(a, "实例：" + fInstance));
+            for (Object[] row : fRows) {
+                String name = (String) row[0];
+                boolean hasShaderDir = (Boolean) row[1];
+                boolean hasIris = (Boolean) row[2];
+                String glsl = (String) row[3];
+
                 LinearLayout card = PluginUiKit.card(a);
-                card.addView(PluginUiKit.text(a, p.getName()));
+                card.addView(PluginUiKit.text(a, name));
                 card.addView(PluginUiKit.kv(a, "有 shaders/ 目录", hasShaderDir ? "是" : "否"));
-                card.addView(PluginUiKit.kv(a, "GLSL 版本", glsl.isEmpty() ? "未读到" : String.join(" / ", glsl)));
+                card.addView(PluginUiKit.kv(a, "GLSL 版本", glsl.isEmpty() ? "未读到" : glsl));
                 card.addView(PluginUiKit.kv(a, "自带 Iris/OptiFine 提示", hasIris ? "是" : "否"));
 
                 if (!hasShaderDir) {
@@ -616,7 +647,7 @@ public final class PluginActions2 {
                             + "或者入口文件命名不常规。"));
                 } else {
                     boolean modern = false;
-                    for (String g : glsl) {
+                    for (String g : glsl.split(" / ")) {
                         if (g.contains("330") || g.contains("400") || g.contains("410")
                                 || g.contains("430") || g.contains("460")) {
                             modern = true;
@@ -641,6 +672,7 @@ public final class PluginActions2 {
                     + "渲染它需要 GL 上下文 + 游戏场景，启动器里没有。"
                     + "如果光影包自带截图，可以直接去 shaderpacks 目录看图。"));
             PluginUiKit.sheet(a, "光影兼容检测", PluginUiKit.scroller(a, col), "知道了", null);
+            });
         } catch (Throwable t) {
             PluginUiKit.toast(a, "失败：" + t);
         }
