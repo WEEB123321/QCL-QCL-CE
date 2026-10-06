@@ -36,4 +36,5 @@
     <!-- %1$s 错误信息 -->
     <string name="qcl_export_log_failed">导出失败：%1$s</string>
 
+    <string name="qcl_lang_applied">语言已切换，立即生效。</string>
 </resources>

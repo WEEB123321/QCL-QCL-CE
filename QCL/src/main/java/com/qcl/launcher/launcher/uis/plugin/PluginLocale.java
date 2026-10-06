@@ -31,7 +31,7 @@ public final class PluginLocale {
     }
 
     /** 语言标签 → 显示名。标签要和 values-<tag> 目录对得上。 */
-    private static final String[][] LOCALES = {
+    public static final String[][] LOCALES = {
             {"", "跟随系统 / System"},
             {"zh", "简体中文"},
             {"zh-rTW", "繁體中文"},
@@ -89,7 +89,7 @@ public final class PluginLocale {
         }
     }
 
-    private static void apply(MainActivity a, String tag) {
+    public static void apply(MainActivity a, String tag) {
         try {
             if (tag == null || tag.isEmpty()) {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
@@ -104,8 +104,24 @@ public final class PluginLocale {
         }
     }
 
+    /**
+     * ★ 供「通用设置」的语言下拉使用：静默切换（不弹 toast）。
+     *
+     * <p>设置页自己有提示文案，这里再弹一次会重复。
+     */
+    public static void applySilently(String tag) {
+        try {
+            if (tag == null || tag.isEmpty()) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList());
+            } else {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag));
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     /** 当前生效的语言标签（空 = 跟随系统）。 */
-    private static String currentTag() {
+    public static String currentTag() {
         try {
             LocaleListCompat l = AppCompatDelegate.getApplicationLocales();
             if (l == null || l.isEmpty()) {

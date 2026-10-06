@@ -125,15 +125,35 @@ public class UniversalSettingUI extends BaseUI
         // ★ 语言下拉：三项固定文案 + 当前选中值。放 Adapter 而不是硬编码下标，
         //   以后要加语言只需动这个数组。
         if (this.languageSpinner != null) {
+            // ★★★ 社区版：语言下拉从**写死的 4 种**改成复用 PluginLocale 的完整语言表（19 种）。
+            //   原来这里只列「跟随系统 / English / 简体 / 繁體」—— 而社区版实际支持 19 种，
+            //   用户看到「只有 4 种」就是因为这里没跟上。现在两边共用同一份数据，
+            //   以后加语言只需改 PluginLocale.LOCALES 一处。
             List<String> items = new ArrayList<String>();
-            items.add(this.context.getString(R.string.qcl_lang_system));
-            items.add(this.context.getString(R.string.qcl_lang_en));
-            items.add(this.context.getString(R.string.qcl_lang_zh_cn));
-            items.add(this.context.getString(R.string.qcl_lang_zh_tw));
+            for (String[] l : com.qcl.launcher.launcher.uis.plugin.PluginLocale.LOCALES) {
+                items.add(l[1]);
+            }
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.context,
                     android.R.layout.simple_spinner_dropdown_item, items);
             this.languageSpinner.setAdapter(adapter);
             this.languageSpinner.setOnItemSelectedListener(this);
+
+            // 回显当前语言（用 suppress 挡住回调，避免「程序化设置」被当成用户选择）
+            try {
+                String cur = com.qcl.launcher.launcher.uis.plugin.PluginLocale.currentTag();
+                int idx = 0;
+                for (int i = 0; i < com.qcl.launcher.launcher.uis.plugin.PluginLocale.LOCALES.length; i++) {
+                    if (com.qcl.launcher.launcher.uis.plugin.PluginLocale.LOCALES[i][0].equals(cur)) {
+                        idx = i;
+                        break;
+                    }
+                }
+                this.suppress = true;
+                this.languageSpinner.setSelection(idx);
+                this.suppress = false;
+            } catch (Throwable ignored) {
+                this.suppress = false;
+            }
         }
     }
 
@@ -864,13 +884,29 @@ public class UniversalSettingUI extends BaseUI
             return;
         }
         try {
-            SharedPreferences sp = this.context.getSharedPreferences("lang", 0);
-            int cur = sp.getInt("lang", LANG_SYSTEM);
-            if (cur == position) {
+            // ★★★ 社区版：改走 AppCompatDelegate 的「每应用语言」——**立即生效，不用重启**。
+            //   原来写 SharedPreferences 再等下次启动由 LocaleUtils 读，所以要提示「重启后生效」。
+            //   ★ 同时把旧机制的值清成「跟随系统」，否则两套机制会互相打架
+            //     （LocaleUtils 在 attachBaseContext 里读它，会盖掉这里的设置）。
+            if (position < 0
+                    || position >= com.qcl.launcher.launcher.uis.plugin.PluginLocale.LOCALES.length) {
                 return;
             }
-            sp.edit().putInt("lang", position).apply();
-            toast(R.string.qcl_lang_need_restart);
+            String tag = com.qcl.launcher.launcher.uis.plugin.PluginLocale.LOCALES[position][0];
+
+            String curTag = com.qcl.launcher.launcher.uis.plugin.PluginLocale.currentTag();
+            if (tag.equals(curTag)) {
+                return;
+            }
+
+            com.qcl.launcher.launcher.uis.plugin.PluginLocale.applySilently(tag);
+
+            try {
+                SharedPreferences sp = this.context.getSharedPreferences("lang", 0);
+                sp.edit().putInt("lang", LANG_SYSTEM).apply();
+            } catch (Throwable ignored) {
+            }
+            toast(R.string.qcl_lang_applied);
         } catch (Throwable ignored) {
         }
     }
