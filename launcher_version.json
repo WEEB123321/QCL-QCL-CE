@@ -1,14 +1,14 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 1505,
-    "versionName": "1.5.5",
-    "date": "2026-10-06",
+    "versionCode": 1620,
+    "versionName": "1.6.2",
+    "date": "2026-10-07",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.5.5/QCL-CE-v1.5.5-arm64.apk",
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.5.5/QCL-CE-BASE-v1.5.5-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.6.2/QCL-CE-v1.6.2-arm64.apk",
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.6.2/QCL-CE-BASE-v1.6.2-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 1.5.5</b><br/>· 修正署名与仓库归属：作者改为 WEEB123321，更新检查/反馈/下载页全部指向本仓库<br/>· 其余同 1.5.4：左侧竖排导航、编辑式主界面、AGSL 液态玻璃<br/>· 42 个内置工具、19 种语言可切换<br/>· 保留官方版全部核心能力：下载全部已归档远古版本、全远古版本中文补丁"
+    "updateLog": "<b>QCL-CE 1.6.2</b><br/>· 通用设置的语言下拉从 4 种修到 <b>19 种</b>，切换立即生效不用重启<br/>· 底部导航「插件」改名<b>内置插件页</b>，44 个插件每个都能单独开关<br/>· <b>修整合包/模组下载不了</b>：接入 MCIM 镜像（原来直连 CurseForge/Modrinth，大陆连不上）<br/>· <b>修一批闪退/卡死</b>：14 处主线程重活挪到后台（依赖树、更新日志、光影检测、存档体积统计等）<br/>· 修插件开关切换时的崩溃（布局过程中重建视图树）<br/>· 修「上次启动没有走完」的误报（日志在外置存储，卸载不清掉）<br/>· 崩溃捕获提前到 attachBaseContext，ContentProvider 阶段的崩溃也能留下日志<br/>· <b>安装包从 328MB 缩到 229MB</b>：按架构裁掉用不到的运行时副本<br/>· 保留官方版全部核心能力：下载全部已归档远古版本、全远古版本中文补丁"
   },
   "latestPrerelease": null
 }
