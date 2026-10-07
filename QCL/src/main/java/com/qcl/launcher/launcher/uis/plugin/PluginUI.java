@@ -189,13 +189,71 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
             // ★ 先把「移除全部子视图」推到布局之后 —— 避免在布局过程中改树
             box.removeAllViewsInLayout();
 
+            // ★★★ 社区版：44 个插件一长条，找东西要一直滚 —— 加个搜索框。
+            //   只按名字/说明过滤，不改变开关状态（关掉的插件仍能被搜到，方便重新打开）。
+            if (this.pluginSearchBox == null) {
+                android.widget.EditText et = new android.widget.EditText(this.context);
+                et.setHint("搜索插件（名字或说明）");
+                et.setSingleLine(true);
+                et.setText(this.pluginSearch);
+                et.addTextChangedListener(new android.text.TextWatcher() {
+                    public void beforeTextChanged(CharSequence s2, int a2, int b2, int c2) { }
+                    public void onTextChanged(CharSequence s2, int a2, int b2, int c2) { }
+                    public void afterTextChanged(android.text.Editable e2) {
+                        pluginSearch = e2 == null ? "" : e2.toString().trim();
+                        // 只重建列表，不重建搜索框本身（否则输入法会掉）
+                        rebuildListOnly();
+                    }
+                });
+                this.pluginSearchBox = et;
+            }
+            box.addView(this.pluginSearchBox);
+
+            fillPluginList(box);
+        } catch (Throwable t) {
+            // 插件列表渲染失败不能把整页带崩
+        }
+    }
+
+    /**
+     * 只重建列表内容（搜索框不动）。
+     *
+     * <p>★ 为什么不能直接调 renderPlugins：那样会把 EditText 也换掉，
+     * 每敲一个字输入法就会掉、光标会跑。这里保留搜索框，只清掉它后面的内容再重填。
+     */
+    private void rebuildListOnly() {
+        try {
+            LinearLayout box = this.activity.findViewById(R.id.plugin_list_container);
+            if (box == null) {
+                return;
+            }
+            int keep = this.pluginSearchBox == null ? 0 : 1;
+            while (box.getChildCount() > keep) {
+                box.removeViewAt(box.getChildCount() - 1);
+            }
+            fillPluginList(box);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 填充插件列表（分组 + 卡片）。搜索框不在这里管。 */
+    private void fillPluginList(LinearLayout box) {
+        try {
             // ★★★ 按开关状态分成「开启」和「已关闭」两组。
             //   关掉的收进底部「已关闭」区，随时可以再打开 —— 而不是直接消失，
             //   否则用户找不到重新打开的入口。
             java.util.List<PluginSpec> all = PluginRegistry.all();
             java.util.List<PluginSpec> on = new java.util.ArrayList<>();
             java.util.List<PluginSpec> off = new java.util.ArrayList<>();
+            String kw = this.pluginSearch == null ? "" : this.pluginSearch.toLowerCase();
             for (PluginSpec sp : all) {
+                if (!kw.isEmpty()) {
+                    String nm = loc("plugin_" + sp.id + "_name", sp.name).toLowerCase();
+                    String ds = loc("plugin_" + sp.id + "_desc", sp.desc).toLowerCase();
+                    if (!nm.contains(kw) && !ds.contains(kw)) {
+                        continue;   // 搜不到就跳过（开关状态不变）
+                    }
+                }
                 if (PluginSwitch.enabled(sp.id)) {
                     on.add(sp);
                 } else {
@@ -245,6 +303,11 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
      * <p>★ 开关存到 {@link PluginSwitch}（本地文件），重启保持。
      * 点卡片主体执行插件；点开关只改状态并重绘列表。
      */
+    /** ★ 搜索关键词（空 = 不过滤）。 */
+    private String pluginSearch = "";
+    /** 搜索框实例（只建一次，避免每次重绘都换新控件导致输入法掉）。 */
+    private android.widget.EditText pluginSearchBox;
+
     private View buildPluginCard(final PluginSpec sp, boolean on) {
         LinearLayout card = PluginUiKit.card(this.context);
 
