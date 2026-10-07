@@ -267,20 +267,26 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
             for (final PluginSpec sp : on) {
                 if (!sp.category.equals(cur)) {
                     cur = sp.category;
-                    box.addView(PluginUiKit.label(this.context, loc("plugin_cat_" + cur, cur)));
+                    TextView catLabel = PluginUiKit.label(this.context, loc("plugin_cat_" + cur, cur));
+                    PluginUiKit.fadeInUp(catLabel, Math.min(cardSeq++, 8) * 28L);
+                    box.addView(catLabel);
                 }
                 box.addView(buildPluginCard(sp, true));
             }
 
             // ---------- 已关闭的插件（收在底部，随时可再开） ----------
             if (!off.isEmpty()) {
-                box.addView(PluginUiKit.label(this.context,
-                        "已关闭 " + off.size() + " 个（点开关重新打开）"));
+                TextView offLabel = PluginUiKit.label(this.context,
+                        "已关闭 " + off.size() + " 个（点开关重新打开）");
+                PluginUiKit.fadeInUp(offLabel, 0);
+                box.addView(offLabel);
                 for (final PluginSpec sp : off) {
                     box.addView(buildPluginCard(sp, false));
                 }
                 TextView reset = PluginUiKit.row(this.context, "全部打开", null);
                 reset.setGravity(android.view.Gravity.CENTER);
+                PluginUiKit.pressEffect(reset);
+                PluginUiKit.fadeInUp(reset, 0);
                 reset.setOnClickListener(v -> {
                     PluginSwitch.enableAll();
                     PluginUiKit.toast(this.context, "已全部打开");
