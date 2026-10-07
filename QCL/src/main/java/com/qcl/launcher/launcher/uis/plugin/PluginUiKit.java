@@ -218,6 +218,31 @@ public final class PluginUiKit {
             }
             current = b.create();
             current.show();
+
+            // ★★★ 对话框进出场动效（社区版）。
+            //
+            //   改这一处，**44 个插件的所有弹窗全都受益** —— 覆盖面最大的一处动效。
+            //
+            //   ★ 为什么不卡：动的是**窗口的 decorView**（整个窗口一层），
+            //     只改 alpha / scaleX / scaleY —— 窗口变换由渲染线程合成，
+            //     不触发任何 measure/layout，也不产生新的绘制指令。
+            //   ★ 先关掉系统默认的窗口动画（setWindowAnimations(0)），否则会叠加。
+            boolean dialogEnterAnim = true;
+            try {
+                android.view.Window w = current.getWindow();
+                if (w != null) {
+                    w.setWindowAnimations(0);
+                    final android.view.View dv = w.getDecorView();
+                    dv.setAlpha(0f);
+                    dv.setScaleX(0.94f);
+                    dv.setScaleY(0.94f);
+                    dv.animate().alpha(1f).scaleX(1f).scaleY(1f)
+                            .setDuration(180)
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                            .start();
+                }
+            } catch (Throwable ignored) {
+            }
         } catch (Throwable t) {
             // 弹框本身失败绝不能把插件页带崩
             toast(a, "打不开：" + t);
