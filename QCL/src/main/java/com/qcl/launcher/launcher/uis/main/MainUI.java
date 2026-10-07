@@ -212,6 +212,21 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
             android.util.Log.e("QCLStartup", "收起主页入口失败", t);
         }
 
+        // ★ 动效：左侧 5 个导航项的按压反馈 —— 点击频率最高，最该有触感。
+        //   同样只动 scaleX/scaleY（合成层属性），零布局成本。
+        boolean navPressDone = true;
+        try {
+            int[] navIds = new int[]{R.id.nav_tab_home, R.id.nav_tab_instance,
+                    R.id.nav_tab_download, R.id.nav_tab_plugin, R.id.nav_tab_mine};
+            for (int id : navIds) {
+                View nv = activity.findViewById(id);
+                if (nv != null) {
+                    com.qcl.launcher.launcher.uis.plugin.PluginUiKit.pressEffect(nv);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+
         // ★ 动效：启动按钮与侧栏菜单按钮的按压反馈（只动 scale，合成层属性，不影响帧率）
         try {
             com.qcl.launcher.launcher.uis.plugin.PluginUiKit.pressEffect(startGame);
