@@ -302,6 +302,72 @@ public final class PluginUiKit {
         work(activity, null, task, done);
     }
 
+    // ==================== 动效 ====================
+
+    /**
+     * ★★★ 按压反馈：按下缩到 0.97，抬起弹回 1.0。
+     *
+     * <p><b>为什么不卡</b>：只动 {@code scaleX/scaleY} —— 这是**渲染线程合成**的属性，
+     * 不触发 measure/layout，不产生新的绘制指令，几乎零成本。
+     * <b>绝不</b>去动 {@code width/height/margin}：那些每帧都要重新测量布局，
+     * 44 个卡片一起动必然掉帧。
+     *
+     * <p>★ 返回 false 很关键 —— 不拦截触摸事件，否则点击会被吃掉。
+     */
+    public static void pressEffect(final View v) {
+        if (v == null) {
+            return;
+        }
+        v.setOnTouchListener((view, e) -> {
+            try {
+                switch (e.getActionMasked()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        view.animate().cancel();
+                        view.animate().scaleX(0.97f).scaleY(0.97f)
+                                .setDuration(90)
+                                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                                .start();
+                        break;
+                    case android.view.MotionEvent.ACTION_UP:
+                    case android.view.MotionEvent.ACTION_CANCEL:
+                        view.animate().cancel();
+                        view.animate().scaleX(1f).scaleY(1f)
+                                .setDuration(150)
+                                .setInterpolator(new android.view.animation.OvershootInterpolator(1.1f))
+                                .start();
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Throwable ignored) {
+            }
+            return false;   // ★ 不消费事件，点击照常触发
+        });
+    }
+
+    /**
+     * 入场动效：透明 + 轻微上移 → 归位。
+     *
+     * <p>★ 只动 alpha / translationY，同样是合成层属性。
+     *
+     * @param delayMs 延迟（做错落效果用），超过 8 个元素就别再加了
+     */
+    public static void fadeInUp(View v, long delayMs) {
+        if (v == null) {
+            return;
+        }
+        try {
+            v.setAlpha(0f);
+            v.setTranslationY(12f);
+            v.animate().alpha(1f).translationY(0f)
+                    .setStartDelay(delayMs)
+                    .setDuration(220)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .start();
+        } catch (Throwable ignored) {
+        }
+    }
+
     // ==================== 常用小工具 ====================
 
     /**

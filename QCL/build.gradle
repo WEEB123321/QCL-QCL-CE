@@ -73,8 +73,8 @@ android {
         //
         //   ⚠️ 以后每次发版：versionName 末位 +1，versionCode 按同一公式重算，
         //      两者必须一起改（只改 versionName 会导致装不上）。
-        versionCode 1623
-        versionName "1.6.5"
+        versionCode 1624
+        versionName "1.6.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

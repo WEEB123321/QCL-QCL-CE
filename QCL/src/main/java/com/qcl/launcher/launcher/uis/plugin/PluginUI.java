@@ -188,6 +188,7 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
             }
             // ★ 先把「移除全部子视图」推到布局之后 —— 避免在布局过程中改树
             box.removeAllViewsInLayout();
+            this.cardSeq = 0;
 
             // ★★★ 社区版：44 个插件一长条，找东西要一直滚 —— 加个搜索框。
             //   只按名字/说明过滤，不改变开关状态（关掉的插件仍能被搜到，方便重新打开）。
@@ -305,6 +306,8 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
      */
     /** ★ 搜索关键词（空 = 不过滤）。 */
     private String pluginSearch = "";
+    /** 入场错落用的序号（每次重建列表归零）。 */
+    private int cardSeq = 0;
     /** 搜索框实例（只建一次，避免每次重绘都换新控件导致输入法掉）。 */
     private android.widget.EditText pluginSearchBox;
 
@@ -343,6 +346,11 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
                 PluginUiKit.toast(this.context, "插件出错：" + t);
             }
         });
+
+        // ★ 按压动效（只动 scale，合成层属性，零布局成本）
+        PluginUiKit.pressEffect(card);
+        // ★ 入场错落：只给前 8 张加延迟 —— 44 张一起做入场必然掉帧
+        PluginUiKit.fadeInUp(card, Math.min(cardSeq++, 8) * 28L);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

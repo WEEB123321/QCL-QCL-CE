@@ -183,6 +183,7 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                                 android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = (int) (4 * activity.getResources().getDisplayMetrics().density);
                 btn.setLayoutParams(lp);
+                com.qcl.launcher.launcher.uis.plugin.PluginUiKit.pressEffect(btn);
                 btn.setOnClickListener(v2 -> {
                     try {
                         new android.app.AlertDialog.Builder(activity)
@@ -209,6 +210,12 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         } catch (Throwable t) {
             // 折叠失败不能影响主页 —— 大不了还是原来的平铺
             android.util.Log.e("QCLStartup", "收起主页入口失败", t);
+        }
+
+        // ★ 动效：启动按钮与侧栏菜单按钮的按压反馈（只动 scale，合成层属性，不影响帧率）
+        try {
+            com.qcl.launcher.launcher.uis.plugin.PluginUiKit.pressEffect(startGame);
+        } catch (Throwable ignored) {
         }
 
         startAccountUI.setOnClickListener(this);
