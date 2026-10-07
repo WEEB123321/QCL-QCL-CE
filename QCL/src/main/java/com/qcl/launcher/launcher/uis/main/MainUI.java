@@ -157,11 +157,13 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                     startDownloadUI, startLobbyUI, startLabUI, startMultiPlayerUI, startSettingUI};
             String[] names = new String[]{"账号", "版本管理", "版本列表", "下载",
                     "大厅", "实验室", "多人联机", "设置"};
-            // ① 主页隐藏这 8 个（INVISIBLE 而不是 GONE：不破坏原有布局占位，
-            //    万一哪个页面还引用它们的位置也不会跳）
+            // ① 主页隐藏这 8 个。
+            //   ★ 用 GONE 而不是 INVISIBLE —— INVISIBLE 只让控件不可见，**仍然占着布局位置**，
+            //     结果主页底部留一大片空白，和「主页要干净」正好相反 ✗（上一版就踩了这个坑）
+            //     GONE 才是「不显示也不占位」。
             for (View v : entries) {
                 if (v != null) {
-                    v.setVisibility(View.INVISIBLE);
+                    v.setVisibility(View.GONE);
                     v.setClickable(false);
                 }
             }
