@@ -50,6 +50,22 @@ public class QCLApplication extends Application {
         StartupTrace.init(this);
         StartupTrace.mark("Application.attachBaseContext 完成"
                 + "（下一段是 ContentProvider，再下一段才是 onCreate）");
+
+        // ★★★ 社区版（本轮）：**把崩溃捕获提前到这里**。
+        //
+        //   为什么必须提前：崩溃处理器原来在 onCreate（第 74 行左右）才装，
+        //   而 ContentProvider 阶段**在 onCreate 之前**跑 —— 那一段崩了，
+        //   处理器还没装上 → 没有 crash.log、弹不出崩溃页，用户只看到「打开就闪退」。
+        //   实测证据：启动路标停在「attachBaseContext 完成」这一行，下面什么都没有，
+        //   正是「ContentProvider 阶段崩了、但没留下任何异常信息」的典型现象。
+        //
+        //   挂在这里之后，哪怕是 Provider 阶段抛的异常也会被写进 crash.log，
+        //   下次就能拿到真实堆栈，不用再靠猜。
+        try {
+            installCrashLogger();
+        } catch (Throwable ignored) {
+            // 装不上也不能影响启动
+        }
     }
 
     @Override // android.app.Application
