@@ -143,6 +143,74 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         multiplayerIcon = activity.findViewById(R.id.multiplayer_icon);
         settingIcon = activity.findViewById(R.id.setting_icon);
 
+        // ★★★ 社区版：把主页底部那 8 个入口收进左侧「菜单」按钮。
+        //
+        //   为什么：8 个入口平铺在主页底部，主页显得很挤（PCL 的主页只有一个启动按钮）。
+        //   现在主页只留「当前档案 + 最近游玩 + 启动按钮」，8 个入口进菜单。
+        //
+        //   ★ 为什么这样改最安全：这 8 个 View 原本就通过 setOnClickListener(this) 统一
+        //     路由到 MainUI.onClick，所以菜单项只要 performClick() 就能**完全复用**原有逻辑，
+        //     不需要碰任何路由代码，也不会丢功能。
+        //   ★ 全程程序化，不改 XML —— 避免动 ui_main.xml（792 行）出布局事故。
+        try {
+            View[] entries = new View[]{startAccountUI, startGameManagerUI, startVersionListUI,
+                    startDownloadUI, startLobbyUI, startLabUI, startMultiPlayerUI, startSettingUI};
+            String[] names = new String[]{"账号", "版本管理", "版本列表", "下载",
+                    "大厅", "实验室", "多人联机", "设置"};
+            // ① 主页隐藏这 8 个（INVISIBLE 而不是 GONE：不破坏原有布局占位，
+            //    万一哪个页面还引用它们的位置也不会跳）
+            for (View v : entries) {
+                if (v != null) {
+                    v.setVisibility(View.INVISIBLE);
+                    v.setClickable(false);
+                }
+            }
+            // ② 左侧栏加「菜单」按钮
+            View nav = activity.findViewById(R.id.qcl_bottom_nav);
+            if (nav instanceof android.view.ViewGroup) {
+                android.widget.TextView btn = new android.widget.TextView(activity);
+                btn.setText("≡\n菜\n单");
+                btn.setTextSize(12f);
+                btn.setGravity(android.view.Gravity.CENTER);
+                btn.setTextColor(0xFFA8452F);
+                int pad = (int) (8 * activity.getResources().getDisplayMetrics().density);
+                btn.setPadding(0, pad, 0, pad);
+                btn.setClickable(true);
+                btn.setFocusable(true);
+                android.widget.LinearLayout.LayoutParams lp =
+                        new android.widget.LinearLayout.LayoutParams(
+                                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.topMargin = (int) (4 * activity.getResources().getDisplayMetrics().density);
+                btn.setLayoutParams(lp);
+                btn.setOnClickListener(v2 -> {
+                    try {
+                        new android.app.AlertDialog.Builder(activity)
+                                .setTitle("功能菜单")
+                                .setItems(names, (d2, which) -> {
+                                    try {
+                                        View vv = entries[which];
+                                        if (vv != null) {
+                                            vv.performClick();
+                                        }
+                                    } catch (Throwable t2) {
+                                        android.widget.Toast.makeText(activity, "打开失败：" + t2,
+                                                android.widget.Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .show();
+                    } catch (Throwable t3) {
+                        android.widget.Toast.makeText(activity, "菜单打开失败：" + t3,
+                                android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                });
+                ((android.view.ViewGroup) nav).addView(btn);
+            }
+        } catch (Throwable t) {
+            // 折叠失败不能影响主页 —— 大不了还是原来的平铺
+            android.util.Log.e("QCLStartup", "收起主页入口失败", t);
+        }
+
         startAccountUI.setOnClickListener(this);
         // ★ 社区版新增：**长按**账号按钮 = 快速切换账号。
         //   刻意不做成长按之外的第二个入口 —— 主界面顶部已经排了 7 个按钮，
