@@ -116,6 +116,51 @@ public final class StartupTrace {
      */
     private static volatile boolean lastStartupIncomplete;
 
+    /**
+     * ★★★ 社区版：「上次的日志是不是**本次安装**留下的」。
+     *
+     * <p><b>为什么需要</b>：日志写在 {@code getExternalFilesDir(null)} 上，
+     * 而它位于**外置存储** —— **卸载应用不会清掉**。
+     * 于是「卸载 → 重装 → 第一次打开」时，读到的是**上一次安装残留的、
+     * 没写完的日志**，被 {@link #lastRunWasAbnormal()} 误判成「上次启动没走完」，
+     * 弹出误导性提示框。用户看到的就是「每次装好第一次打开就崩」。
+     *
+     * <p>用 {@code firstInstallTime} 做判据：它每次安装都会变。
+     * 对不上就说明日志是旧安装的，当作「没有历史」处理，并把时间戳更新掉。
+     *
+     * @return true = 日志属于本次安装，可以信；false = 旧安装残留，别信
+     */
+    public static boolean sameInstall(Context c) {
+        try {
+            long cur = c.getPackageManager()
+                    .getPackageInfo(c.getPackageName(), 0).firstInstallTime;
+            File dir = c.getExternalFilesDir(null);
+            if (dir == null) {
+                dir = c.getFilesDir();
+            }
+            File f = new File(dir, "install_stamp");
+            if (f.isFile()) {
+                byte[] b = new byte[(int) f.length()];
+                try (java.io.FileInputStream fis = new java.io.FileInputStream(f)) {
+                    //noinspection ResultOfMethodCallIgnored
+                    fis.read(b);
+                }
+                String old = new String(b, "UTF-8").trim();
+                if (old.equals(Long.toString(cur))) {
+                    return true;
+                }
+            }
+            // 首次写入 或 对不上 → 视为新安装
+            try (java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
+                fos.write(Long.toString(cur).getBytes("UTF-8"));
+            }
+            return false;
+        } catch (Throwable t) {
+            // 判不出来时保守：按老行为走（宁可多提示一次，也不要漏掉真崩溃）
+            return true;
+        }
+    }
+
     /** 走完整个启动流程时写入的标记 —— 「上次是否走完」的判据。值必须与 MainActivity 里的一致。 */
     public static final String MARK_STARTUP_OK = "启动成功";
 

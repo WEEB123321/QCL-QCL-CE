@@ -163,7 +163,12 @@ implements View.OnClickListener {
         //   ★ 顺序很重要：必须先弹框、等用户点掉再走 requestPermission()。
         //     缓存命中路径会在 init() 里立刻 runOnUiThread(enterLauncher) → finish()，
         //     本页一销毁，刚弹出来的框就跟着没了，用户什么都看不到。
-        if (com.qcl.launcher.launcher.StartupTrace.lastRunWasAbnormal()) {
+        // ★★★ 社区版修正：日志在外置存储上，卸载重装不会清掉 ——
+        //   新装的第一次打开会读到**上一次安装残留的、没写完的日志**，
+        //   被误判成「上次启动没走完」，弹出误导性提示框。
+        //   这里先确认日志属于本次安装，是旧的就直接忽略。
+        boolean sameInstall = com.qcl.launcher.launcher.StartupTrace.sameInstall(this);
+        if (sameInstall && com.qcl.launcher.launcher.StartupTrace.lastRunWasAbnormal()) {
             this.showLastRunAbnormal();
         } else {
             // ★★★ 社区版：启动没异常，但**上次使用中崩过** —— 也提示一次。
