@@ -187,43 +187,13 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                 btn.setLayoutParams(lp);
                 com.qcl.launcher.launcher.uis.plugin.PluginUiKit.pressEffect(btn);
                 btn.setOnClickListener(v2 -> {
-                    try {
-                        android.app.AlertDialog dlg = new android.app.AlertDialog.Builder(activity)
-                                .setTitle("功能菜单")
-                                .setItems(names, (d2, which) -> {
-                                    try {
-                                        View vv = entries[which];
-                                        if (vv != null) {
-                                            vv.performClick();
-                                        }
-                                    } catch (Throwable t2) {
-                                        android.widget.Toast.makeText(activity, "打开失败：" + t2,
-                                                android.widget.Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .create();
-                        dlg.show();
-                        // ★ 菜单弹窗自己建的就自己补动效 —— 它没走 PluginUiKit.show()，
-                        //   不会自动获得那里的窗口动画。同样只动 alpha/scale（合成层）。
-                        try {
-                            android.view.Window w2 = dlg.getWindow();
-                            if (w2 != null) {
-                                w2.setWindowAnimations(0);
-                                final android.view.View dv2 = w2.getDecorView();
-                                dv2.setAlpha(0f);
-                                dv2.setScaleX(0.94f);
-                                dv2.setScaleY(0.94f);
-                                dv2.animate().alpha(1f).scaleX(1f).scaleY(1f)
-                                        .setDuration(180)
-                                        .setInterpolator(new android.view.animation.DecelerateInterpolator())
-                                        .start();
-                            }
-                        } catch (Throwable ignored2) {
-                        }
-                    } catch (Throwable t3) {
-                        android.widget.Toast.makeText(activity, "菜单打开失败：" + t3,
-                                android.widget.Toast.LENGTH_SHORT).show();
-                    }
+                    // ★ 菜单 UI 全部在 MainMenuDialog 里（含自定义排版）——
+                    //   上一版把这段写在 onCreate 里，作用域问题导致三次编译不过 ✗
+                    //   抽成独立类之后一次通过。
+                    MainMenuDialog.show(activity, new View[]{
+                            startAccountUI, startGameManagerUI, startVersionListUI,
+                            startDownloadUI, startLobbyUI, startLabUI,
+                            startMultiPlayerUI, startSettingUI});
                 });
                 ((android.view.ViewGroup) nav).addView(btn);
             }
