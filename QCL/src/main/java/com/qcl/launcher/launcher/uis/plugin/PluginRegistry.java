@@ -297,6 +297,29 @@ public final class PluginRegistry {
                         + "Español·Italiano·Русский·العربية·ไทย·Tiếng Việt·Bahasa Indonesia·Türkçe·Polski）。",
                 PluginLocale::open));
 
+        // ===== 模组增强（第 21-28 项）=====
+        l.add(new PluginSpec("模组", "mod_search",
+                "模组快速搜索", "按文件名或 modId 搜，命中用【】标出来。",
+                PluginMod2::modSearch));
+        l.add(new PluginSpec("模组", "mod_dep_cache",
+                "模组依赖缓存", "解析每个 jar 的 modId 和依赖并缓存到本地，离线也能看。",
+                PluginMod2::depCache));
+        l.add(new PluginSpec("模组", "mod_pack_share",
+                "模组打包分享", "勾选模组打成一个 zip，输出到 share 目录。",
+                PluginMod2::packShare));
+        l.add(new PluginSpec("模组", "mod_conflict_rules",
+                "模组冲突规则库", "★ 未实现 —— 点进去说明为什么（要改安装流程）。",
+                PluginMod2::conflictRules));
+        l.add(new PluginSpec("模组", "mod_batch_config",
+                "模组批量配置", "★ 未实现 —— 点进去说明为什么（要重写 jar）。",
+                PluginMod2::batchConfig));
+        l.add(new PluginSpec("模组", "mod_meta_edit",
+                "模组元数据编辑", "★ 未实现 —— 点进去说明为什么（要重打包 jar）。",
+                PluginMod2::metaEdit));
+        l.add(new PluginSpec("模组", "mod_conf_compare",
+                "模组配置对比", "★ 已存在 —— 就是「实例配置差异对比」，点进去看说明。",
+                PluginMod2::depTreeHint));
+
         return l;
     }
 
