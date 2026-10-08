@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qcl.launcher.launcher.MainActivity;
+import com.qcl.launcher.launcher.uis.plugin.UiPalette;
 import com.qcl.launcher.manifest.AppManifest;
 import com.qcl.launcher.launcher.uis.plugin.PluginServer;
 import com.qcl.launcher.launcher.uis.plugin.PluginUiKit;
@@ -77,7 +78,7 @@ public final class MainMenuDialog {
             TextView title = new TextView(act);
             title.setText("功能菜单");
             title.setTextSize(16f);
-            title.setTextColor(0xFF3A342C);
+            title.setTextColor(UiPalette.TEXT);
             title.setTypeface(null, Typeface.BOLD);
             title.setLayoutParams(new LinearLayout.LayoutParams(0,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -86,7 +87,7 @@ public final class MainMenuDialog {
             TextView edit = new TextView(act);
             edit.setText("排版");
             edit.setTextSize(13f);
-            edit.setTextColor(0xFFA8452F);
+            edit.setTextColor(UiPalette.ACCENT);
             edit.setPadding(dp(act, 10), dp(act, 6), dp(act, 10), dp(act, 6));
             edit.setClickable(true);
             PluginUiKit.pressEffect(edit);
@@ -111,9 +112,9 @@ public final class MainMenuDialog {
                 TextView cell = new TextView(act);
                 cell.setText(it.label);
                 cell.setTextSize(13f);
-                cell.setTextColor(0xFF3A342C);
+                cell.setTextColor(UiPalette.TEXT);
                 cell.setGravity(Gravity.CENTER);
-                cell.setBackgroundColor(0xFFF7F4EF);
+                cell.setBackgroundColor(UiPalette.SURFACE);
                 cell.setPadding(0, dp(act, 12), 0, dp(act, 12));
                 LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(0,
                         ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
@@ -140,7 +141,7 @@ public final class MainMenuDialog {
                 TextView empty = new TextView(act);
                 empty.setText("菜单是空的 —— 点右上角「排版」把功能加回来。");
                 empty.setTextSize(13f);
-                empty.setTextColor(0xFF8A8378);
+                empty.setTextColor(UiPalette.TEXT_SUB);
                 root.addView(empty);
             }
 
@@ -192,7 +193,7 @@ public final class MainMenuDialog {
             TextView tip = new TextView(act);
             tip.setText("勾选 = 显示在菜单里；↑↓ 调顺序。改完点「保存」。");
             tip.setTextSize(12f);
-            tip.setTextColor(0xFF8A8378);
+            tip.setTextColor(UiPalette.TEXT_SUB);
             tip.setPadding(0, 0, 0, dp(act, 10));
             col.addView(tip);
 
@@ -240,7 +241,7 @@ public final class MainMenuDialog {
                         android.widget.CheckBox cb = new android.widget.CheckBox(act);
                         cb.setText(label);
                         cb.setTextSize(13f);
-                        cb.setTextColor(0xFF3A342C);
+                        cb.setTextColor(UiPalette.TEXT);
                         cb.setChecked(visible.contains(id));
                         cb.setLayoutParams(new LinearLayout.LayoutParams(0,
                                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -258,7 +259,7 @@ public final class MainMenuDialog {
                         TextView up = new TextView(act);
                         up.setText("↑");
                         up.setTextSize(16f);
-                        up.setTextColor(0xFFA8452F);
+                        up.setTextColor(UiPalette.ACCENT);
                         up.setPadding(dp(act, 12), dp(act, 4), dp(act, 12), dp(act, 4));
                         up.setClickable(true);
                         PluginUiKit.pressEffect(up);
@@ -274,7 +275,7 @@ public final class MainMenuDialog {
                         TextView down = new TextView(act);
                         down.setText("↓");
                         down.setTextSize(16f);
-                        down.setTextColor(0xFFA8452F);
+                        down.setTextColor(UiPalette.ACCENT);
                         down.setPadding(dp(act, 12), dp(act, 4), dp(act, 12), dp(act, 4));
                         down.setClickable(true);
                         PluginUiKit.pressEffect(down);
