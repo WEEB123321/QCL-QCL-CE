@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ★★★ 社区版：语义色的**夜间值**（深色模式地基）=====================
+         只覆盖那 7 个 qcl_s_* 语义色 —— 因为代码里只引用语义色，
+         所以系统切到深色时，这 7 个自动换成深色值，界面跟着变深。
+         ★ 为什么不用改 values-night/themes.xml 的 parent：
+           颜色资源本身就是 night 限定符，换 colors 就够，
+           动主题 parent 会牵动 AppCompat 的一堆默认属性，风险更大。 -->
+    <color name="qcl_s_bg">#1B1A18</color>
+    <color name="qcl_s_surface">#242220</color>
+    <color name="qcl_s_surface_alt">#2E2B28</color>
+    <color name="qcl_s_text">#EDE7DE</color>
+    <color name="qcl_s_text_sub">#A8A196</color>
+    <color name="qcl_s_accent">#D97A5E</color>
+    <color name="qcl_s_divider">#3A3733</color>
+</resources>

@@ -77,6 +77,11 @@ public class QCLApplication extends Application {
         //   等于「为了报告崩溃而再崩一次」，用户最终什么都看不到。
         if (isSecondaryProcess()) {
             context = getApplicationContext();
+        // ★ 语义色调色板：早期初始化一次（MainActivity 里还会再 init，保证主题切换后是最新值）
+        try {
+            com.qcl.launcher.launcher.uis.plugin.UiPalette.init(context);
+        } catch (Throwable ignored) {
+        }
             return;
         }
         // ★★★ 社区版：路标放在最前面 —— 它是唯一能在 native 崩溃后留下痕迹的手段

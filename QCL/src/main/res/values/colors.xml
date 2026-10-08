@@ -42,4 +42,16 @@
     <color name="colorPressed">#BDBDBD</color>
     <!-- 参考图里的米白（按钮文字 / 米色底），比纯白柔和 -->
     <color name="qcl_cream">#FFF6EFE6</color>
+    <!-- ★★★ 社区版：语义色（深色模式地基）=================================
+         这 7 个是「按用途命名」而不是「按颜色命名」——
+         代码里只引用它们，不写死颜色值，换主题时只需要在
+         values-night/colors.xml 里给同名资源另一套值即可。
+         值取自现有插件界面的实际配色（铁锈红 + 米白面板）。 -->
+    <color name="qcl_s_bg">#EDE7DE</color>          <!-- 页面背景 -->
+    <color name="qcl_s_surface">#F7F4EF</color>     <!-- 面板 / 卡片底 -->
+    <color name="qcl_s_surface_alt">#FFFFFF</color> <!-- 更亮的卡片（弹窗内） -->
+    <color name="qcl_s_text">#3A342C</color>        <!-- 正文 -->
+    <color name="qcl_s_text_sub">#8A8378</color>    <!-- 次要文字 / 说明 -->
+    <color name="qcl_s_accent">#A8452F</color>      <!-- 强调（铁锈红） -->
+    <color name="qcl_s_divider">#DED7CC</color>     <!-- 分隔线 -->
 </resources>

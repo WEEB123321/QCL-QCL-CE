@@ -152,8 +152,8 @@ public final class PluginTags {
                             boolean on = cur.contains(p);
                             chip.setText(p);
                             chip.setTextSize(12f);
-                            chip.setTextColor(on ? 0xFFFFFFFF : 0xFFA8452F);
-                            chip.setBackgroundColor(on ? 0xFFA8452F : 0xFFF0EAE2);
+                            chip.setTextColor(on ? 0xFFFFFFFF : UiPalette.ACCENT);
+                            chip.setBackgroundColor(on ? UiPalette.ACCENT : UiPalette.SURFACE);
                             int px = PluginUiKit.dp(a, 7);
                             chip.setPadding(px, px / 2, px, px / 2);
                             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(

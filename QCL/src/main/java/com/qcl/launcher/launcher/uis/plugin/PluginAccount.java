@@ -66,7 +66,7 @@ public final class PluginAccount {
 
             final TextView info = new TextView(a);
             info.setTextSize(12f);
-            info.setTextColor(0xFF8A8378);
+            info.setTextColor(UiPalette.TEXT_SUB);
             col.addView(info);
 
             final Bitmap[] bmp = new Bitmap[1];
@@ -149,7 +149,7 @@ public final class PluginAccount {
         int hairRows = 2 + (Math.abs(h) % 3);
         c.drawRect(n * 0.25f, n * 0.25f, n * 0.75f, n * (0.25f + 0.06f * hairRows), p);
         // 眼睛
-        p.setColor(0xFF3A342C);
+        p.setColor(UiPalette.TEXT);
         float ey = n * 0.52f;
         c.drawRect(n * 0.35f, ey, n * 0.42f, ey + n * 0.08f, p);
         c.drawRect(n * 0.58f, ey, n * 0.65f, ey + n * 0.08f, p);

@@ -59,7 +59,7 @@ public final class PluginMod2 {
 
             final TextView count = new TextView(a);
             count.setTextSize(12f);
-            count.setTextColor(0xFF8A8378);
+            count.setTextColor(UiPalette.TEXT_SUB);
             col.addView(count);
 
             final LinearLayout listBox = new LinearLayout(a);
