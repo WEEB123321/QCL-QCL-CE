@@ -30,7 +30,7 @@
             android:layout_marginBottom="8dp"
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="@color/colorPureBlack"/>
+            android:background="#FF000000"/>
 
         <LinearLayout
             android:padding="10dp"

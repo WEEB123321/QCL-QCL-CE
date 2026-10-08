@@ -230,7 +230,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="18dp"
         android:layout_marginBottom="8dp"
-        android:background="@color/colorPureBlack"
+        android:background="#FF000000"
         android:alpha="0.25"/>
 
     <TextView

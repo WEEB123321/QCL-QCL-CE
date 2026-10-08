@@ -2,6 +2,9 @@
     <!-- Base application theme. -->
     <style name="Theme.HelloMinecraftLauncherPocketEdition" parent="Theme.AppCompat.NoActionBar">
         <!-- Primary brand color. -->
+                <!-- ★ Light 主题默认的 windowBackground 是**白色** ——
+             深色模式下页面容器如果没铺满就会露出白底。这里显式给深色。 -->
+        <item name="android:windowBackground">@color/qcl_s_bg</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorPrimary</item>
