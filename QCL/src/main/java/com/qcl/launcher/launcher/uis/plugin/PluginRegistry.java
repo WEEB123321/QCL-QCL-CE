@@ -101,6 +101,26 @@ public final class PluginRegistry {
                 "Mod / 整合包下载是否走 MCIM 镜像。★ 大陆保持开启，直连官方源连不上。",
                 PluginActions3::mirrorToggle));
 
+        // ===== 下载增强（第 15-20 项）=====
+        l.add(new PluginSpec("下载", "dl_mirror_custom",
+                "下载镜像自定义", "Mod/整合包下载走哪个镜像。留空用默认 MCIM。★ 真生效，不是摆设。",
+                PluginDownload2::mirrorCustom));
+        l.add(new PluginSpec("下载", "dl_cache_clean",
+                "下载缓存清理", "扫描缓存目录、勾选清理。★ 只碰缓存，不碰实例/存档/模组。",
+                PluginDownload2::cacheClean));
+        l.add(new PluginSpec("下载", "dl_stats",
+                "下载统计", "统计游戏目录的文件数/目录数/总占用。",
+                PluginDownload2::downloadStats));
+        l.add(new PluginSpec("下载", "dl_speed_schedule",
+                "下载限速时段", "★ 未实现 —— 点进去说明为什么（限速要改下载框架）。",
+                PluginDownload2::speedSchedule));
+        l.add(new PluginSpec("下载", "dl_notify_custom",
+                "下载通知自定义", "★ 未实现 —— 点进去说明为什么（要重做通知层）。",
+                PluginDownload2::notifyCustom));
+        l.add(new PluginSpec("下载", "dl_queue_group",
+                "下载队列分组", "★ 未实现 —— 点进去说明为什么（队列没有对外接口）。",
+                PluginDownload2::queueGroup));
+
         l.add(new PluginSpec("下载", "dl_speed",
                 "下载源测速",
                 "测官方源和 BMCLAPI 镜像能不能连、连得多快，推荐更快的那个。",

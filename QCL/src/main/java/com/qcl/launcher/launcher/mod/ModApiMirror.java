@@ -40,6 +40,9 @@ public final class ModApiMirror {
     }
 
     private static final String MIRROR = "https://mod.mcimirror.top";
+    /** ★ 自定义镜像根地址（空 = 用默认 MIRROR）。由「下载镜像自定义」插件写入。 */
+    private static final String CUSTOM_FILE = "qcl_mirror_custom.txt";
+    private static volatile String cachedCustom = null;
     private static final String FLAG_FILE = "qcl_mirror_off";
 
     /** 开关缓存（进程内只读一次盘）。 */
@@ -87,6 +90,51 @@ public final class ModApiMirror {
      * <p>★ 所有「可能指向 CurseForge / Modrinth」的地址都应该过这一层 ——
      * 不在表里的地址原样返回，所以对其它下载（Minecraft 本体等）无影响。
      */
+    /** 读自定义镜像根地址（空字符串 = 用默认）。 */
+    public static String customMirror() {
+        String c = cachedCustom;
+        if (c != null) {
+            return c;
+        }
+        String v = "";
+        try {
+            File f = new File(AppManifest.SETTING_DIR, CUSTOM_FILE);
+            if (f.isFile()) {
+                byte[] b = new byte[(int) f.length()];
+                try (java.io.FileInputStream in = new java.io.FileInputStream(f)) {
+                    //noinspection ResultOfMethodCallIgnored
+                    in.read(b);
+                }
+                v = new String(b, "UTF-8").trim();
+            }
+        } catch (Throwable ignored) {
+        }
+        cachedCustom = v;
+        return v;
+    }
+
+    /** 写自定义镜像根地址。传空字符串 = 恢复默认。 */
+    public static void setCustomMirror(String base) {
+        try {
+            File f = new File(AppManifest.SETTING_DIR, CUSTOM_FILE);
+            File dir = f.getParentFile();
+            if (dir != null && !dir.exists()) {
+                dir.mkdirs();
+            }
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write((base == null ? "" : base).getBytes("UTF-8"));
+            }
+        } catch (Throwable ignored) {
+        }
+        cachedCustom = base == null ? "" : base;
+    }
+
+    /** 当前实际生效的镜像根地址。 */
+    private static String mirrorRoot() {
+        String c = customMirror();
+        return c.isEmpty() ? MIRROR : c;
+    }
+
     public static String apply(String url) {
         if (url == null || url.isEmpty()) {
             return url;
@@ -96,16 +144,16 @@ public final class ModApiMirror {
         }
         // ★ 顺序有讲究：先替换带路径前缀的 API 域名，再替换纯 CDN 域名。
         if (url.startsWith("https://api.curseforge.com")) {
-            return MIRROR + "/curseforge" + url.substring("https://api.curseforge.com".length());
+            return mirrorRoot() + "/curseforge" + url.substring("https://api.curseforge.com".length());
         }
         if (url.startsWith("https://api.modrinth.com")) {
-            return MIRROR + "/modrinth" + url.substring("https://api.modrinth.com".length());
+            return mirrorRoot() + "/modrinth" + url.substring("https://api.modrinth.com".length());
         }
         if (url.startsWith("https://cdn.modrinth.com/")) {
-            return MIRROR + "/" + url.substring("https://cdn.modrinth.com/".length());
+            return mirrorRoot() + "/" + url.substring("https://cdn.modrinth.com/".length());
         }
         if (url.startsWith("https://edge.forgecdn.net/")) {
-            return MIRROR + "/" + url.substring("https://edge.forgecdn.net/".length());
+            return mirrorRoot() + "/" + url.substring("https://edge.forgecdn.net/".length());
         }
         // mediafilez.forgecdn.net 官方明确排除，不动。
         return url;
