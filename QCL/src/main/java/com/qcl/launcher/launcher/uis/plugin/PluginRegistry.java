@@ -380,6 +380,32 @@ public final class PluginRegistry {
                 "游客模式", "★ 未实现 —— 点进去说明为什么（全局拦截不是插件能做的）。",
                 PluginAccount::guestMode));
 
+        // ===== 界面与体验（第 7-14 项）=====
+        l.add(new PluginSpec("界面", "ui_font_size",
+                "字体大小", "全局字体缩放（0.85× ~ 1.30×），立即生效。",
+                PluginUiPrefs::fontSize));
+        l.add(new PluginSpec("界面", "ui_orientation",
+                "屏幕方向", "锁横屏 / 跟随系统。★ 锁竖屏会很难看（没有竖屏布局）。",
+                PluginUiPrefs::orientation));
+        l.add(new PluginSpec("界面", "ui_nav_custom",
+                "底部导航自定义", "★ 未实现 —— 点进去说明为什么 + 指出真正能自定义的是「菜单排版」。",
+                PluginUiPrefs::navCustom));
+        l.add(new PluginSpec("界面", "ui_gestures",
+                "快捷手势", "★ 未实现 —— 点进去说明为什么（会和滚动/游戏控制冲突）。",
+                PluginUiPrefs::gestures));
+        l.add(new PluginSpec("界面", "ui_search_hist",
+                "搜索历史与收藏", "★ 只能做一半 —— 点进去看说明。",
+                PluginUiPrefs::searchHistory));
+        l.add(new PluginSpec("界面", "ui_dark_mode",
+                "深色/浅色自动切换", "★ 做不到 —— 点进去说明为什么（要整套深色主题）。",
+                PluginUiPrefs::darkMode));
+        l.add(new PluginSpec("界面", "ui_high_contrast",
+                "高对比度模式", "★ 做不到 —— 点进去说明为什么（要另一套配色方案）。",
+                PluginUiPrefs::highContrast));
+        l.add(new PluginSpec("界面", "ui_one_hand",
+                "单手模式", "★ 做不到 —— 点进去说明为什么（要重排布局）。",
+                PluginUiPrefs::oneHand));
+
         return l;
     }
 
