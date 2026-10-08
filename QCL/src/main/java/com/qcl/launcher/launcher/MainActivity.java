@@ -230,6 +230,15 @@ implements View.OnClickListener {
         //   崩在这里和崩在 super 之后必须在日志里分得开（原因同 RuntimeInstallActivity 同处注释）。
         StartupTrace.mark("MainActivity.onCreate 进入（super.onCreate 之前）");
         super.onCreate(bundle);
+
+        // ★★★ 语义色调色板必须在**每次 Activity 创建时**重新读一次：
+        //   Application.onCreate 只在进程启动跑一次，而切换深色模式会重建 Activity
+        //   但**不会**重跑 Application ✗ —— 不在这里重新 init，
+        //   切了主题插件页颜色还是旧的（功能等于没生效）。
+        try {
+            com.qcl.launcher.launcher.uis.plugin.UiPalette.init(this);
+        } catch (Throwable ignored) {
+        }
         // ★★★ 社区版加固：activity_main.xml 是本社区版改动最大的布局 ——
         //   新增了插件页 / 备份页两个 include、底部导航条、以及搜索悬浮按钮。
         //   布局 inflate 阶段的异常（资源缺失、属性不合法、include 目标异常）
