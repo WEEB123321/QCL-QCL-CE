@@ -23,4 +23,13 @@
     <color name="qcl_panel_gray">#B81E1C1A</color>
     <color name="qcl_panel_gray_alt">#9E242220</color>
     <color name="colorWhiteGray">#FF2E2B28</color>
+    <!-- ★★★★ 最关键的一行：colorPureBlack 的夜间值 ====================
+         上游把 colorPureBlack 当**正文颜色**用了 **1079 次**（textColor）✗
+         不覆盖它的话，深色模式下就是「黑字压深底」→ 整屏文字看不见 ✗✗
+
+         ★ 为什么敢覆盖：它还用在 56 处 fillColor（图标）——
+           图标在深色下变亮也是对的 ✓
+           只有 7 处 background 会跟着变亮（7 对 1079，值得）✓
+         ★ 一行修 1135 处，这是整个深色模式里性价比最高的一处 ✓ -->
+    <color name="colorPureBlack">#FFEDE7DE</color>
 </resources>
