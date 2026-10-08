@@ -83,7 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/colorPureWhite">
+        android:background="@color/qcl_s_surface_alt">
 
         <ListView
             android:id="@+id/update_mod_list"

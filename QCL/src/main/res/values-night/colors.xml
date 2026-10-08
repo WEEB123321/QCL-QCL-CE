@@ -14,4 +14,13 @@
     <color name="qcl_s_accent">#D97A5E</color>
     <color name="qcl_s_ink">#EDE7DE</color>
     <color name="qcl_s_divider">#3A3733</color>
+    <!-- ★★★ 上游的面板色夜间值 ==========================================
+         这三个才是**真正的面板**（其余 colorLightGray/colorDarkGray/colorGray
+         都是透明遮罩，不该跟主题变）。
+         ★ alpha 保持不变 → 半透明的「玻璃」观感在深色下也保留 ✓
+         ★ 它们本来就是资源引用（@color/qcl_panel_gray），所以这里给夜间值
+           就**同时修好了 XML 和 Java 两边的用法**，不用改任何代码 ✓ -->
+    <color name="qcl_panel_gray">#B81E1C1A</color>
+    <color name="qcl_panel_gray_alt">#9E242220</color>
+    <color name="colorWhiteGray">#FF2E2B28</color>
 </resources>
