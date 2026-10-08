@@ -360,6 +360,26 @@ public final class PluginRegistry {
                 "分享菜单接入", "★ 部分未实现 —— 点进去看说明（分享出去能用，导入要改清单）。",
                 PluginSystem::shareImport));
 
+        // ===== 账号与身份（第 1-6 项）=====
+        l.add(new PluginSpec("账号", "acc_avatar",
+                "账号头像生成器", "按玩家名生成确定性像素头像，可保存 PNG。",
+                PluginAccount::avatarGen));
+        l.add(new PluginSpec("账号", "acc_groups",
+                "多账号分组", "给账号打分组：主号 / 小号 / 测试号…",
+                PluginAccount::accountGroups));
+        l.add(new PluginSpec("账号", "acc_skin_bind",
+                "账号皮肤绑定", "把账号和皮肤文件对应起来。只存映射，不自动替换。",
+                PluginAccount::skinBind));
+        l.add(new PluginSpec("账号", "acc_stats",
+                "账号数据统计", "统计实例数 / 存档数 / 总占用。",
+                PluginAccount::accountStats));
+        l.add(new PluginSpec("账号", "acc_login_hist",
+                "登录历史记录", "★ 未实现 —— 点进去说明为什么（登录模块没有回调钩子）。",
+                PluginAccount::loginHistory));
+        l.add(new PluginSpec("账号", "acc_guest",
+                "游客模式", "★ 未实现 —— 点进去说明为什么（全局拦截不是插件能做的）。",
+                PluginAccount::guestMode));
+
         return l;
     }
 
