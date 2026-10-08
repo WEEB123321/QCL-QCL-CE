@@ -320,6 +320,26 @@ public final class PluginRegistry {
                 "模组配置对比", "★ 已存在 —— 就是「实例配置差异对比」，点进去看说明。",
                 PluginMod2::depTreeHint));
 
+        // ===== 联机增强（第 37-42 项）=====
+        l.add(new PluginSpec("联机", "multi_latency",
+                "联机延迟记录", "对一组地址做 TCP 测速，结果记到本地历史。★ 这批里唯一真做的。",
+                PluginMulti::latencyHistory));
+        l.add(new PluginSpec("联机", "multi_room_tpl",
+                "联机房间模板", "★ 未实现 —— 点进去说明为什么（Terracotta 不暴露房间状态）。",
+                PluginMulti::roomTemplate));
+        l.add(new PluginSpec("联机", "multi_list",
+                "联机黑白名单", "★ 未实现（客户端侧）—— 点进去看说明和替代方案。",
+                PluginMulti::blackWhiteList));
+        l.add(new PluginSpec("联机", "multi_chat",
+                "联机聊天记录", "★ 未实现 —— 点进去说明为什么（聊天在游戏进程内）。",
+                PluginMulti::chatHistory));
+        l.add(new PluginSpec("联机", "multi_file",
+                "局域网文件直传", "★ 未实现 —— 点进去说明为什么（那是新模块的体量）。",
+                PluginMulti::fileTransfer));
+        l.add(new PluginSpec("联机", "multi_ver_sync",
+                "联机版本自动同步", "★ 未实现 —— 点进去说明为什么（不交换实例清单）。",
+                PluginMulti::versionSync));
+
         return l;
     }
 
