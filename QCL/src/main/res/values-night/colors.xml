@@ -32,4 +32,11 @@
            只有 7 处 background 会跟着变亮（7 对 1079，值得）✓
          ★ 一行修 1135 处，这是整个深色模式里性价比最高的一处 ✓ -->
     <color name="colorPureBlack">#FFEDE7DE</color>
+    <!-- ★★★ 强调色的夜间值 ==============================================
+         colorAccent = #B0552F（深铁锈红）被当作 **textColor 用了 88 次** ✗
+         深色下「深锈红压深底」对比度只有约 2.5:1（正文要 ≥ 4.5:1）✗ 读起来费劲。
+         调亮到 #D97A5E → 对比度约 5.5:1 ✓
+         ★ colorPrimary 同值（1 处 background），一起调亮保持一致 ✓ -->
+    <color name="colorAccent">#D97A5E</color>
+    <color name="colorPrimary">#D97A5E</color>
 </resources>
