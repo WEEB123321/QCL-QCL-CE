@@ -131,6 +131,26 @@ public final class PluginRegistry {
                 "记录插件做过的写操作（改名、替换、合并、改色…），可回溯。",
                 PluginActions3::actionLog));
 
+        // ===== 资源与存档（第 29-36 项，第一批 6 个）=====
+        l.add(new PluginSpec("资源", "plugin_tags_pack",
+                "资源包标签", "给资源包打标签（材质/音效/界面…），按标签筛选。标签只存本地。",
+                PluginTags::packTags));
+        l.add(new PluginSpec("资源", "plugin_tags_shader",
+                "光影标签", "给光影打标签（低配/中配/高配/写实…），按标签筛选。",
+                PluginTags::shaderTags));
+        l.add(new PluginSpec("资源", "plugin_tags_world",
+                "存档标签", "给存档打标签（生存/创造/冒险…），按标签筛选。",
+                PluginTags::worldTags));
+        l.add(new PluginSpec("资源", "plugin_tags_skin",
+                "皮肤标签", "给皮肤打标签（简约/华丽/动漫…），按标签筛选。",
+                PluginTags::skinTags));
+        l.add(new PluginSpec("资源", "world_finder",
+                "存档快速定位", "按名字搜索存档，显示大小和修改时间。",
+                PluginTags::worldFinder));
+        l.add(new PluginSpec("资源", "skin_favorites",
+                "皮肤收藏夹", "收藏常用皮肤，收藏的排在最前面。",
+                PluginTags::skinFavorites));
+
         l.add(new PluginSpec("资源", "pack_merge",
                 "资源包合并",
                 "把两个资源包 zip 合成一个，同名文件以上层为准。不删原包。",
