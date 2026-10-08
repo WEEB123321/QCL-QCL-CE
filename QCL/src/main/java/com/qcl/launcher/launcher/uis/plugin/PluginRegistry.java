@@ -340,6 +340,26 @@ public final class PluginRegistry {
                 "联机版本自动同步", "★ 未实现 —— 点进去说明为什么（不交换实例清单）。",
                 PluginMulti::versionSync));
 
+        // ===== 系统集成（第 43-48 项）=====
+        l.add(new PluginSpec("系统", "sys_clipboard",
+                "剪贴板检测", "手动读一次剪贴板，识别 Modrinth/CurseForge 链接类型。★ 不是后台监听。",
+                PluginSystem::clipboardCheck));
+        l.add(new PluginSpec("系统", "sys_task",
+                "定时任务系统", "★ 已存在 —— 就是「我的 → 自动任务」，点进去看说明。",
+                PluginSystem::taskSystem));
+        l.add(new PluginSpec("系统", "sys_notify_quick",
+                "通知栏快捷操作", "★ 未实现 —— 点进去说明为什么（要改通知层+前台服务）。",
+                PluginSystem::notifyQuick));
+        l.add(new PluginSpec("系统", "sys_shortcut_folder",
+                "桌面快捷方式分类", "★ 未实现 —— 点进去说明为什么（Android 没有快捷方式文件夹）。",
+                PluginSystem::shortcutFolder));
+        l.add(new PluginSpec("系统", "sys_widget_size",
+                "启动器小部件尺寸", "★ 未实现 —— 点进去说明为什么（AppWidget 是新模块）。",
+                PluginSystem::widgetSize));
+        l.add(new PluginSpec("系统", "sys_share_import",
+                "分享菜单接入", "★ 部分未实现 —— 点进去看说明（分享出去能用，导入要改清单）。",
+                PluginSystem::shareImport));
+
         return l;
     }
 
