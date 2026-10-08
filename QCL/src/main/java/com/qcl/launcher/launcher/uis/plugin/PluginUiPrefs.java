@@ -90,6 +90,84 @@ public final class PluginUiPrefs {
         }
     }
 
+    // ==================== 主题模式（深色模式开关） ====================
+
+    /** 主题模式：0=跟随系统 1=始终浅色 2=始终深色。 */
+    public static int readThemeMode() {
+        try {
+            File f = prefs();
+            if (!f.isFile()) {
+                return 0;
+            }
+            byte[] b = new byte[(int) f.length()];
+            try (java.io.FileInputStream in = new java.io.FileInputStream(f)) {
+                //noinspection ResultOfMethodCallIgnored
+                in.read(b);
+            }
+            for (String line : new String(b, "UTF-8").split("\n")) {
+                String t = line.trim();
+                if (t.startsWith("themeMode=")) {
+                    return Integer.parseInt(t.substring("themeMode=".length()).trim());
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return 0;
+    }
+
+    /** 启动时应用主题模式（在 Application.onCreate 里调）。 */
+    public static void applyThemeMode() {
+        try {
+            int m = readThemeMode();
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                    m == 2 ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                            : m == 1 ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+                            : androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public static void themeMode(MainActivity a) {
+        try {
+            final int cur = readThemeMode();
+            LinearLayout col = PluginUiKit.column(a);
+            col.addView(PluginUiKit.text(a, "深浅色模式"));
+            col.addView(PluginUiKit.sub(a, "★ 现在可以在这里**直接切**，不用去改系统设置 —— "
+                    + "方便你看深色下哪些地方不对。"));
+            col.addView(PluginUiKit.sub(a, "★ 深色模式**还在完善中**：插件页已经跟着变了，"
+                    + "但上游的老页面还有一些地方没换成语义色 ✗ 看起来可能「半深半浅」✗"));
+            col.addView(PluginUiKit.sub(a, " "));
+
+            String[] labels = {"跟随系统", "始终浅色", "始终深色"};
+            final int[] modes = {0, 1, 2};
+            for (int i = 0; i < labels.length; i++) {
+                final int m = modes[i];
+                TextView row = PluginUiKit.row(a, (cur == m ? "● " : "　") + labels[i], null);
+                row.setGravity(android.view.Gravity.CENTER);
+                PluginUiKit.pressEffect(row);
+                row.setOnClickListener(v -> {
+                    try {
+                        save("themeMode", Integer.toString(m));
+                        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                                m == 2 ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                                        : m == 1 ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+                                        : androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                        PluginUiKit.log(a, "主题模式 → " + labels[m]);
+                        PluginUiKit.toast(a, "已设为：" + labels[m]);
+                    } catch (Throwable t) {
+                        PluginUiKit.toast(a, "切换失败：" + t);
+                    }
+                });
+                col.addView(row);
+            }
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.sub(a, "★ 切完界面会重建一次（闪一下），正常。"));
+            PluginUiKit.sheet(a, "深浅色模式", PluginUiKit.scroller(a, col), "知道了", null);
+        } catch (Throwable t) {
+            PluginUiKit.toast(a, "出错：" + t);
+        }
+    }
+
     // ==================== #14 横竖屏锁定 ====================
 
     public static void orientation(MainActivity a) {

@@ -406,6 +406,10 @@ public final class PluginRegistry {
                 "单手模式", "★ 做不到 —— 点进去说明为什么（要重排布局）。",
                 PluginUiPrefs::oneHand));
 
+        l.add(new PluginSpec("界面", "ui_theme_mode",
+                "深浅色模式", "跟随系统 / 始终浅色 / 始终深色。★ 不用改系统设置就能测深色。",
+                PluginUiPrefs::themeMode));
+
         return l;
     }
 

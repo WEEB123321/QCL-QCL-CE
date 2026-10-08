@@ -79,6 +79,8 @@ public class QCLApplication extends Application {
             context = getApplicationContext();
         // ★ 语义色调色板：早期初始化一次（MainActivity 里还会再 init，保证主题切换后是最新值）
         try {
+            // 先应用用户选的主题模式（深色/浅色/跟随系统），再读调色板
+            com.qcl.launcher.launcher.uis.plugin.PluginUiPrefs.applyThemeMode();
             com.qcl.launcher.launcher.uis.plugin.UiPalette.init(context);
         } catch (Throwable ignored) {
         }
