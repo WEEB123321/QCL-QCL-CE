@@ -39,4 +39,16 @@
          ★ colorPrimary 同值（1 处 background），一起调亮保持一致 ✓ -->
     <color name="colorAccent">#D97A5E</color>
     <color name="colorPrimary">#D97A5E</color>
+    <!-- ★★★ 链接色 / 棕色文字的夜间值 ==================================
+         这三个都是**当文字用的深色**，深色底上对比度不够：
+         - colorLinkBlue     #0E9384  textColor 88 + textColorLink 11（青，勉强）
+         - colorLinkBlueDark #0A5F55  textColor 34（**太暗，几乎看不见**）✗
+         - colorBrown        #835300  textColor 10（太暗）✗
+         统一调亮到深色底上对比度 ≥ 4.5:1 ✓
+
+         ★ colorPureWhite 的 44 处 textColor **不动** ——
+           那是「彩色/深色底上的白字」，深色模式下本来就该是白的 ✓ -->
+    <color name="colorLinkBlue">#4DD9C0</color>
+    <color name="colorLinkBlueDark">#3BC4A8</color>
+    <color name="colorBrown">#D9A24D</color>
 </resources>
