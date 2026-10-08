@@ -12,5 +12,6 @@
     <color name="qcl_s_text">#EDE7DE</color>
     <color name="qcl_s_text_sub">#A8A196</color>
     <color name="qcl_s_accent">#D97A5E</color>
+    <color name="qcl_s_ink">#EDE7DE</color>
     <color name="qcl_s_divider">#3A3733</color>
 </resources>

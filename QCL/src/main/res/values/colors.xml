@@ -53,5 +53,7 @@
     <color name="qcl_s_text">#3A342C</color>        <!-- 正文 -->
     <color name="qcl_s_text_sub">#8A8378</color>    <!-- 次要文字 / 说明 -->
     <color name="qcl_s_accent">#A8452F</color>      <!-- 强调（铁锈红） -->
+    <!-- 深色文字（上游大量使用 #FF1B1B1B，日间值保持完全一致，夜间变亮） -->
+    <color name="qcl_s_ink">#FF1B1B1B</color>
     <color name="qcl_s_divider">#DED7CC</color>     <!-- 分隔线 -->
 </resources>
