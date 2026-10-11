@@ -397,10 +397,10 @@ public final class PluginRegistry {
                 "搜索历史与收藏", "★ 只能做一半 —— 点进去看说明。",
                 PluginUiPrefs::searchHistory));
         l.add(new PluginSpec("界面", "ui_dark_mode",
-                "深色/浅色自动切换", "★ 做不到 —— 点进去说明为什么（要整套深色主题）。",
+                "深浅色自动切换", "★ **已实现** ✓ 点进去看实现方式和剩下的验证步骤。",
                 PluginUiPrefs::darkMode));
         l.add(new PluginSpec("界面", "ui_high_contrast",
-                "高对比度模式", "★ 做不到 —— 点进去说明为什么（要另一套配色方案）。",
+                "高对比度模式", "★ 未实现但**已可行** —— 点进去看为什么以及前提。",
                 PluginUiPrefs::highContrast));
         l.add(new PluginSpec("界面", "ui_one_hand",
                 "单手模式", "★ 做不到 —— 点进去说明为什么（要重排布局）。",

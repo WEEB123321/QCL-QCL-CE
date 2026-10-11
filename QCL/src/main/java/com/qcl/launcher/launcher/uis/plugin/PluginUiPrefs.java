@@ -238,23 +238,60 @@ public final class PluginUiPrefs {
     }
 
     public static void darkMode(MainActivity a) {
-        notSupported(a, "深浅色自动切换",
-                "这个应用**只有浅色一套视觉** ✗ —— 颜色全写在 values/colors.xml，"
-                        + "**没有 values-night 主题**，也没有第二套 drawable。"
-                        + "做深色模式 = 重做整套配色 + 逐个页面适配，"
-                        + "这是**一个新阶段的工作量**，不是插件能承载的。",
-                "★ 这不是「不做」，是**做不了** ✗ —— 硬做一个假的「深色模式」开关"
-                        + "（点了没变化）比不做更糟。"
-                        + "要做的话应该作为独立任务：先建 values-night/colors.xml，"
-                        + "再逐页验证对比度。");
+        // ★★★ 这条已经**做完了** —— 原来的「做不到」说明必须改掉 ✗
+        //   功能已实现而文案还写着做不到，是最误导人的情况。
+        try {
+            LinearLayout col = PluginUiKit.column(a);
+            col.addView(PluginUiKit.text(a, "深浅色自动切换"));
+            col.addView(PluginUiKit.sub(a, "★ 这个功能**已经做了** ✓ 入口在隔壁："
+                    + "「界面 → 深浅色模式」。"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.label(a, "实现方式"));
+            col.addView(PluginUiKit.sub(a, "· values/colors.xml 里建了 13 个**语义色**"
+                    + "（正文/面板/强调/链接…）"));
+            col.addView(PluginUiKit.sub(a, "· values-night/colors.xml 给同名的 13 个色配深色值"));
+            col.addView(PluginUiKit.sub(a, "· values-night/themes.xml 的 parent 换成深色主题"));
+            col.addView(PluginUiKit.sub(a, "· UiPalette 把语义色读成静态字段，插件代码只引用字段"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.label(a, "★ 一条重要的设计约束"));
+            col.addView(PluginUiKit.sub(a, "所有语义色的**日间值都与被替换的原值完全相同** ✓ —— "
+                    + "所以转换后日间外观零变化 ✓ 只有夜间才不同 ✓ "
+                    + "这条保证了「深色模式做一半也不会把浅色改坏」✓"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.sub(a, "★ 还剩一步：**逐页目视验证**（看哪些地方对比度不够）—— "
+                    + "这一步只能靠人眼，建议切到深色后把各页面翻一遍。"));
+            PluginUiKit.sheet(a, "深浅色自动切换", PluginUiKit.scroller(a, col), "知道了", null);
+        } catch (Throwable t) {
+            PluginUiKit.toast(a, "出错：" + t);
+        }
     }
 
     public static void highContrast(MainActivity a) {
-        notSupported(a, "高对比度模式",
-                "和深色模式同一个原因 ✗ —— 高对比度需要**另一套配色方案**"
-                        + "（正文/背景对比度 ≥ 7:1，还要给色盲用户换掉红绿区分）。",
-                "★ 同样不是「不做」而是「做不了」✗。"
-                        + "如果要做，建议和深色模式一起作为「主题系统」任务做。");
+        // ★★★ 条件变了：语义色建好之后，高对比度**技术上可行了** ✓
+        //   但只能覆盖「用语义色的页面」= 插件页 ✓
+        //   上游老页面用的是资源引用（@color/xxx），要覆盖它们得再逐个改 ✗
+        //   —— 如实说明，不假装能全app生效 ✗
+        try {
+            LinearLayout col = PluginUiKit.column(a);
+            col.addView(PluginUiKit.text(a, "高对比度模式"));
+            col.addView(PluginUiKit.sub(a, "★ **还没做**，但和之前不一样了 —— "
+                    + "**技术上可行了** ✓"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.label(a, "为什么现在可行"));
+            col.addView(PluginUiKit.sub(a, "深色模式那轮建的**语义色机制**正好能复用 ✓ —— "
+                    + "给同一批语义色再配一套「高对比度值」（正文/背景对比度 ≥ 7:1）就行。"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.label(a, "★ 但有个前提要说清"));
+            col.addView(PluginUiKit.sub(a, "只能覆盖**用了语义色的页面**（插件页 ✓）。"
+                    + "上游老页面用的是资源引用（@color/colorPureBlack 这种），"
+                    + "要给它们上高对比度得再逐个改 —— 那是深色模式那一轮的工作量 ✗"));
+            col.addView(PluginUiKit.sub(a, " "));
+            col.addView(PluginUiKit.sub(a, "★ 所以现在做的话会得到「插件页高对比、老页面不变」"
+                    + "的半成品 ✗ —— 要做就等深色模式完全验证完，一起做 ✓"));
+            PluginUiKit.sheet(a, "高对比度模式", PluginUiKit.scroller(a, col), "知道了", null);
+        } catch (Throwable t) {
+            PluginUiKit.toast(a, "出错：" + t);
+        }
     }
 
     public static void oneHand(MainActivity a) {
