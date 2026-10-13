@@ -217,13 +217,42 @@ public class EditDownloadNameDialog extends Dialog implements View.OnClickListen
         if (deps == null || deps.isEmpty()) {
             return;
         }
+        // ★★★ 1.9.3：**递归**补全「前置的前置」=================================
+        //   国外第三方启动器（CurseForge App / Prism / ATLauncher）装模组时，
+        //   会把**整条依赖链**都拉下来；我们原来只处理一层 ✗ ——
+        //   结果「A 需要 B，B 又需要 C」时 C 不会被装，进游戏照样崩 ✗
+        //
+        //   ★ 为什么递归的成本很低：`pickDependencyVersion()` 返回的
+        //     `RemoteMod.Version` **自带 getDependencies()** ✓ ——
+        //     已经拿到手的数据里就有下一层，不需要额外请求 ✓
+        //   ★ visited 用 projectId 去重 → 天然防环（A→B→A）✓
+        //   ★ 深度上限 6 层 → 防御异常数据把下载队列撑爆 ✓
+        java.util.Set<String> visited = new java.util.HashSet<>();
         String mcv = com.qcl.launcher.launcher.setting.SettingUtils.getCurrentGameVersion(this.ui.activity);
+        appendDepsRecursive(out, modsDir, deps, this.ui.getDependencyTypes(), mcv, 0, visited);
+    }
+
+    /**
+     * ★ 1.9.3：递归补全依赖链。
+     *
+     * @param types 顶层依赖的类型表（来自 UI）；递归下去时为 null，
+     *              改用每个版本自带的 {@code getDependencyType()} ✓
+     */
+    private void appendDepsRecursive(List<DownloadTaskListBean> out, String modsDir,
+                                     List<RemoteMod> deps, java.util.Map<String, String> types,
+                                     String mcv, int depth, java.util.Set<String> visited) {
+        if (deps == null || deps.isEmpty() || depth > 6) {
+            return;
+        }
         for (RemoteMod dep : deps) {
             try {
                 // ★ 1.2.5：**只自动装「必需」的**前置。可选/不兼容/已内置的不动 ——
                 //   前置列表里已经标了「【可选前置】」，玩家想装自己点一下就下。
                 String depId = dep.getData() == null ? null : dep.getData().getRemoteId();
-                String depType = depId == null ? null : this.ui.getDependencyTypes().get(depId);
+                if (depId != null && visited.contains(depId)) {
+                    continue;   // ★ 防环：这条依赖链上已经处理过
+                }
+                String depType = types == null ? null : types.get(depId);
                 if ("optional".equals(depType) || "incompatible".equals(depType)
                         || "embedded".equals(depType)) {
                     continue;
@@ -263,6 +292,38 @@ public class EditDownloadNameDialog extends Dialog implements View.OnClickListen
                 out.add(new DownloadTaskListBean(fileName,
                         com.qcl.launcher.utils.io.MirrorUtils.rewriteCdn(best.getFile().getUrl()),
                         modsDir + fileName, "").withFallback(best.getFile().getUrl()));
+
+                // ★★★ 1.9.3：**递归下一层** —— 这个前置自己也有前置时，一并补上 ✓
+                //   判据用「它自己那个版本」声明的依赖类型（types 为 null 时）✓
+                if (depId != null) {
+                    visited.add(depId);
+                }
+                java.util.List<String> subIds = best.getDependencies();
+                if (subIds != null && !subIds.isEmpty()) {
+                    java.util.List<RemoteMod> subDeps = new java.util.ArrayList<>();
+                    for (String subId : subIds) {
+                        try {
+                            if (subId == null || visited.contains(subId)) {
+                                continue;
+                            }
+                            String t = best.getDependencyType(subId);
+                            if (t != null && !"required".equals(t)) {
+                                continue;   // 只要必需的（可选/不兼容/内置的跳过 ✓）
+                            }
+                            RemoteMod sub = this.ui.getRepository().getModById(subId);
+                            if (sub != null) {
+                                visited.add(subId);
+                                subDeps.add(sub);
+                            }
+                        }
+                        catch (Throwable ignored) {
+                            // 某一条解析失败不影响其它 —— 依赖链本来就常有 404
+                        }
+                    }
+                    if (!subDeps.isEmpty()) {
+                        appendDepsRecursive(out, modsDir, subDeps, null, mcv, depth + 1, visited);
+                    }
+                }
             }
             catch (Throwable ignored) {
             }
