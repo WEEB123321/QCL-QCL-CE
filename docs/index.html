@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QCL-CE · Android 上的 Minecraft Java 启动器</title>
+<meta name="description" content="QCL-CE —— Android 上跑 Minecraft Java 版的启动器。90 个内置插件、深色模式、支持全部已归档远古版本。">
+<style>
+  :root{
+    --bg:#F2F7F7; --surface:#FFFFFF; --text:#142B2A; --sub:#5F7A78;
+    --accent:#0E9E8E; --accent-dark:#0A7A6E; --divider:#D5E5E3;
+    --code:#0C1616;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0C1616; --surface:#142222; --text:#E6F4F2; --sub:#8FABA8;
+           --accent:#2AC9B4; --accent-dark:#1FA492; --divider:#223837; --code:#060C0C; }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px}
+
+  /* 顶栏 */
+  nav{
+    position:sticky;top:0;z-index:10;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter:blur(12px); border-bottom:1px solid var(--divider);
+  }
+  nav .wrap{display:flex;align-items:center;gap:22px;height:58px}
+  .brand{font-weight:700;letter-spacing:.5px;color:var(--text)}
+  .brand i{display:inline-block;width:12px;height:12px;background:var(--accent);
+           border-radius:3px;margin-right:8px;vertical-align:middle}
+  nav .links{margin-left:auto;display:flex;gap:18px;font-size:14px}
+  nav .links a{color:var(--sub)}
+  nav .links a:hover{color:var(--accent)}
+
+  /* Hero */
+  header{padding:74px 0 54px;text-align:center}
+  header h1{font-size:clamp(30px,6vw,46px);letter-spacing:-.5px;margin-bottom:14px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--sub);font-size:17px;max-width:620px;margin:0 auto 30px}
+  .btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:13px 26px;border-radius:11px;font-weight:600;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);text-decoration:none}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 20px -8px var(--accent)}
+  .btn-ghost{background:var(--surface);color:var(--accent);border:1.5px solid var(--accent)}
+
+  /* 手机模型 */
+  .phone{
+    width:270px;height:150px;margin:44px auto 0;border-radius:16px;
+    border:2px solid var(--divider); background:var(--surface);
+    position:relative;overflow:hidden;
+    box-shadow:0 18px 50px -22px rgba(0,0,0,.35);
+  }
+  .phone .side{position:absolute;left:0;top:0;bottom:0;width:44px;background:var(--bg);
+               border-right:1px solid var(--divider)}
+  .phone .dot{width:10px;height:10px;border-radius:3px;background:var(--accent);
+              position:absolute;left:17px;top:14px}
+  .phone .nav-item{position:absolute;left:8px;height:9px;border-radius:3px;background:var(--divider)}
+  .phone .nav-item.on{background:var(--accent)}
+  .phone .card{position:absolute;left:58px;top:26px;right:14px;height:52px;
+               border-radius:9px;background:var(--bg);border:1px solid var(--divider)}
+  .phone .line{position:absolute;height:7px;border-radius:3px;background:var(--divider)}
+  .phone .play{position:absolute;left:58px;right:14px;bottom:14px;height:26px;
+               border-radius:9px;background:var(--accent);opacity:.9}
+
+  /* 区块 */
+  section{padding:52px 0;border-top:1px solid var(--divider)}
+  h2{font-size:23px;margin-bottom:8px;letter-spacing:-.3px}
+  .lead{color:var(--sub);font-size:14px;margin-bottom:28px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:16px}
+  .card{
+    background:var(--surface);border:1px solid var(--divider);border-radius:14px;
+    padding:20px 20px 18px;
+  }
+  .card h3{font-size:15px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card h3 em{
+    font-style:normal;font-size:11px;font-weight:600;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 13%,transparent);
+    padding:2px 7px;border-radius:5px;
+  }
+  .card p{color:var(--sub);font-size:13.5px}
+
+  /* 对比表 */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--divider)}
+  th{color:var(--sub);font-weight:600;font-size:13px}
+  td.y{color:var(--accent);font-weight:600}
+
+  /* 步骤 */
+  ol.steps{list-style:none;counter-reset:s}
+  ol.steps li{
+    counter-increment:s;position:relative;padding:0 0 18px 46px;color:var(--sub);font-size:14.5px;
+  }
+  ol.steps li::before{
+    content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;
+    background:var(--accent);color:#fff;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;
+  }
+  ol.steps li b{color:var(--text)}
+
+  .warn{
+    background:color-mix(in srgb,var(--accent) 9%,transparent);
+    border-left:3px solid var(--accent);border-radius:0 10px 10px 0;
+    padding:14px 18px;font-size:14px;color:var(--sub);margin:20px 0;
+  }
+  .warn b{color:var(--text)}
+
+  footer{padding:40px 0 60px;border-top:1px solid var(--divider);color:var(--sub);font-size:13px}
+  footer .wrap{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  footer .sp{margin-left:auto}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><i></i>QCL-CE</span>
+    <span class="links">
+      <a href="#features">功能</a>
+      <a href="#download">下载</a>
+      <a href="wiki.html">Wiki</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE">GitHub</a>
+    </span>
+  </div>
+</nav>
+
+<header class="wrap">
+  <h1>在 Android 上玩 <span>Minecraft Java 版</span></h1>
+  <p>QCL-CE 是 Quanta Craft Launcher 的社区版。内置 90 个插件、支持深色模式、能下载并给全部已归档远古版本打中文补丁。</p>
+  <div class="btns">
+    <a class="btn btn-primary" href="#download">下载最新版</a>
+    <a class="btn btn-ghost" href="wiki.html">看 Wiki</a>
+  </div>
+
+  <div class="phone">
+    <div class="side"></div>
+    <div class="dot"></div>
+    <div class="nav-item on" style="top:40px"></div>
+    <div class="nav-item" style="top:58px"></div>
+    <div class="nav-item" style="top:76px"></div>
+    <div class="nav-item" style="top:94px"></div>
+    <div class="nav-item" style="top:112px"></div>
+    <div class="card"></div>
+    <div class="line" style="left:70px;top:38px;width:120px"></div>
+    <div class="line" style="left:70px;top:52px;width:74px;height:11px;background:var(--text);opacity:.25"></div>
+    <div class="line" style="left:70px;top:70px;width:150px"></div>
+    <div class="play"></div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>主要特性</h2>
+    <p class="lead">这些都是实测可用的功能，不是规划。</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>90 个内置插件 <em>可搜索</em></h3>
+        <p>资源标签、下载镜像、模组依赖树、存档快速定位、皮肤收藏夹…… 插件页顶部可直接搜索。</p>
+      </div>
+      <div class="card">
+        <h3>深色模式 <em>可开关</em></h3>
+        <p>13 个语义色 + 完整的夜间配色，正文、面板、强调色、链接色都适配。内置「跟随系统 / 始终浅色 / 始终深色」开关。</p>
+      </div>
+      <div class="card">
+        <h3>主页改版 <em>可自定义</em></h3>
+        <p>原来挤在底部的 8 个入口收进左侧「≡ 菜单」。菜单支持自定义排版：勾选显示哪些、上下调顺序。</p>
+      </div>
+      <div class="card">
+        <h3>全部远古版本 <em>独有</em></h3>
+        <p>能下载全部已归档的远古版本（181 条），并给它们打中文补丁 —— 这是其他启动器都没做的。</p>
+      </div>
+      <div class="card">
+        <h3>装模组自动补前置</h3>
+        <p>下载模组时会把整条依赖链都拉下来（不只一层）。已装的自动跳过，不会重复下载。</p>
+      </div>
+      <div class="card">
+        <h3>体积 229 MB</h3>
+        <p>内置的运行时按需裁剪：只保留当前设备架构的 JRE 与原生库，比全量包小约 100 MB。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>和原版有什么不同</h2>
+    <p class="lead">QCL-CE 基于 QCL（HMCL-PE → FCL → PojavLauncher 血统），在其之上做社区版增补。</p>
+    <table>
+      <tr><th>项目</th><th>原版 QCL</th><th>QCL-CE</th></tr>
+      <tr><td>主页布局</td><td>8 个入口平铺底部</td><td class="y">收进侧栏菜单，可自定义</td></tr>
+      <tr><td>深色模式</td><td>无</td><td class="y">完整夜间配色 + 开关</td></tr>
+      <tr><td>内置插件</td><td>基础</td><td class="y">90 个，可搜索</td></tr>
+      <tr><td>安装包体积</td><td>328 MB</td><td class="y">229 MB</td></tr>
+      <tr><td>共存</td><td>—</td><td class="y">包名独立，可与原版同时安装</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <h2>下载与安装</h2>
+    <p class="lead">当前版本 v1.9.4（versionCode 1742），仅提供 arm64 包。</p>
+
+    <ol class="steps">
+      <li><b>先卸载官方版</b>。QCL-CE 与官方包签名不同，不能直接覆盖安装。</li>
+      <li><b>建议清除应用数据</b>。旧设置文件可能自我延续，导致一些奇怪现象。</li>
+      <li><b>安装 APK</b>。到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">GitHub Releases</a> 下载 <code>QCL-CE-v1.9.4-arm64.apk</code>。</li>
+      <li><b>首次启动会解压运行时</b>，约 452 MB，需要几分钟。这一步是离线解压，断网也能装。</li>
+    </ol>
+
+    <div class="warn">
+      <b>装不上？</b> 先确认手机是 arm64 架构（绝大多数现代手机都是）。
+      如果提示签名冲突，说明官方版没卸干净 —— 到「设置 → 应用」里把 QCL 卸载后再装。
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>遇到问题？</h2>
+    <p class="lead">先看 Wiki 的排错页，那里有最常见的几类问题和排查方法。</p>
+    <div class="btns" style="justify-content:flex-start">
+      <a class="btn btn-primary" href="wiki.html#trouble">打开排错页</a>
+      <a class="btn btn-ghost" href="https://github.com/WEEB123321/QCL-QCL-CE/issues">提 Issue</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>QCL-CE · 社区版</span>
+    <span>GPL-3.0</span>
+    <span class="sp">by ALLEN201123</span>
+  </div>
+</footer>
+
+</body>
+</html>

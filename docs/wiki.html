@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QCL-CE Wiki · 安装 · 使用 · 排错</title>
+<meta name="description" content="QCL-CE 使用文档：安装步骤、启动器用法、常见问题排查。">
+<style>
+  :root{
+    --bg:#F2F7F7; --surface:#FFFFFF; --text:#142B2A; --sub:#5F7A78;
+    --accent:#0E9E8E; --divider:#D5E5E3; --code-bg:#0C1616; --code-fg:#E6F4F2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0C1616; --surface:#142222; --text:#E6F4F2; --sub:#8FABA8;
+           --accent:#2AC9B4; --divider:#223837; --code-bg:#060C0C; --code-fg:#E6F4F2; }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code{background:color-mix(in srgb,var(--accent) 11%,transparent);color:var(--accent);
+       padding:2px 6px;border-radius:5px;font-size:.9em}
+  pre{background:var(--code-bg);color:var(--code-fg);padding:14px 16px;border-radius:10px;
+      overflow-x:auto;font-size:13px;line-height:1.6;margin:14px 0}
+
+  nav{position:sticky;top:0;z-index:10;
+      background:color-mix(in srgb,var(--bg) 88%,transparent);
+      backdrop-filter:blur(12px);border-bottom:1px solid var(--divider)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:58px;max-width:1060px;margin:0 auto;padding:0 22px}
+  .brand{font-weight:700;color:var(--text)}
+  .brand i{display:inline-block;width:12px;height:12px;background:var(--accent);
+           border-radius:3px;margin-right:8px;vertical-align:middle}
+  nav .links{margin-left:auto;display:flex;gap:18px;font-size:14px}
+  nav .links a{color:var(--sub)}
+
+  .layout{max-width:1060px;margin:0 auto;padding:34px 22px 70px;
+          display:grid;grid-template-columns:190px 1fr;gap:40px;align-items:start}
+  aside{position:sticky;top:84px;font-size:14px}
+  aside h4{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;
+           margin:20px 0 8px;font-weight:600}
+  aside h4:first-child{margin-top:0}
+  aside a{display:block;color:var(--sub);padding:5px 0;border-left:2px solid transparent;padding-left:11px}
+  aside a:hover{color:var(--accent);border-left-color:var(--accent);text-decoration:none}
+
+  main{min-width:0}
+  h1{font-size:29px;letter-spacing:-.4px;margin-bottom:8px}
+  .lead{color:var(--sub);font-size:15px;margin-bottom:30px}
+  h2{font-size:20px;margin:42px 0 12px;padding-top:8px;letter-spacing:-.2px}
+  h2:first-of-type{margin-top:0}
+  h3{font-size:15px;margin:24px 0 8px}
+  p,li{color:var(--sub);font-size:14.5px}
+  ul,ol{margin:10px 0 10px 22px}
+  li{margin:5px 0}
+  strong,b{color:var(--text)}
+
+  .box{background:var(--surface);border:1px solid var(--divider);border-radius:13px;
+       padding:18px 20px;margin:16px 0}
+  .box h3{margin-top:0}
+  .box.warn{border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+  .box.bad{border-left:3px solid #C0392B;background:color-mix(in srgb,#C0392B 8%,transparent)}
+  .box.ok{border-left:3px solid var(--accent)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--divider);vertical-align:top}
+  th{color:var(--sub);font-size:13px;font-weight:600}
+
+  footer{border-top:1px solid var(--divider);color:var(--sub);font-size:13px}
+  footer .wrap{max-width:1060px;margin:0 auto;padding:26px 22px;display:flex;gap:16px;flex-wrap:wrap}
+  footer .sp{margin-left:auto}
+
+  @media (max-width:820px){
+    .layout{grid-template-columns:1fr;gap:0}
+    aside{position:static;margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--divider)}
+    aside a{display:inline-block;margin-right:14px;border-left:0;padding-left:0}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><i></i>QCL-CE Wiki</span>
+    <span class="links">
+      <a href="index.html">主页</a>
+      <a href="#install">安装</a>
+      <a href="#use">使用</a>
+      <a href="#trouble">排错</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE">GitHub</a>
+    </span>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <aside>
+    <h4>开始</h4>
+    <a href="#install">安装</a>
+    <a href="#first">第一次启动</a>
+    <a href="#arch">确认手机架构</a>
+
+    <h4>使用</h4>
+    <a href="#launch">启动游戏</a>
+    <a href="#version">装版本</a>
+    <a href="#mod">装模组</a>
+    <a href="#theme">深色模式</a>
+    <a href="#menu">菜单排版</a>
+    <a href="#plugin">插件</a>
+
+    <h4>排错</h4>
+    <a href="#trouble">出问题先做这个</a>
+    <a href="#crash">一打开就闪退</a>
+    <a href="#canttap">游戏里点不了</a>
+    <a href="#download-fail">下载失败</a>
+    <a href="#install-fail">装不上</a>
+
+    <h4>其他</h4>
+    <a href="#faq">FAQ</a>
+    <a href="#license">许可</a>
+  </aside>
+
+  <main>
+
+    <h1>QCL-CE 使用文档</h1>
+    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v1.9.4。</p>
+
+    <h2 id="install">安装</h2>
+
+    <div class="box bad">
+      <h3>装之前一定要做两件事</h3>
+      <ol>
+        <li><b>卸载官方版 QCL</b>。QCL-CE 和官方包<b>签名不同</b>，不卸载会装不上。</li>
+        <li><b>清除应用数据</b>（如果之前装过 QCL-CE）。旧设置文件会自我延续，可能导致一些难以理解的现象。</li>
+      </ol>
+    </div>
+
+    <p>然后到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">GitHub Releases</a> 下载对应文件：</p>
+
+    <table>
+      <tr><th>文件</th><th>用途</th></tr>
+      <tr><td><code>QCL-CE-v1.9.4-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
+      <tr><td><code>QCL-CE-BASE-v1.9.4-arm64.apk</code></td><td>干净基线，不含社区版改动。用于对比排查。</td></tr>
+    </table>
+
+    <h2 id="first">第一次启动</h2>
+    <p>第一次打开会<b>解压内置运行时</b>，约 452 MB，需要几分钟。这一步是<b>离线解压</b> —— 断网也能装完。</p>
+    <p>如果卡在这一步不动，先确认手机剩余空间够（建议留 2 GB 以上）。</p>
+
+    <h2 id="arch">确认手机架构</h2>
+    <p>本项目只提供 <code>arm64</code> 包。确认方法：</p>
+    <ul>
+      <li>设置 → 关于手机 → 处理器，写着 <code>arm64-v8a</code> 或 <code>aarch64</code> 就是。</li>
+      <li>2017 年之后的手机基本都是 arm64。</li>
+      <li>如果是 <code>x86_64</code>（模拟器常见），需要另外构建 x86_64 包。</li>
+    </ul>
+
+    <h2 id="use">使用</h2>
+
+    <h3 id="launch">启动游戏</h3>
+    <ol>
+      <li>主页显示<b>当前要启动的版本</b>和<b>已装版本数</b>（都是实时读出来的）。</li>
+      <li>点<b>启动游戏</b>即可。</li>
+      <li>启动日志会实时显示在弹窗里 —— 出问题就看那里。</li>
+    </ol>
+
+    <h3 id="version">装版本</h3>
+    <ol>
+      <li>左侧「≡ 菜单」→ <b>下载</b>，或直接进<b>版本列表</b>。</li>
+      <li>选版本安装。下载会走国内镜像加速。</li>
+    </ol>
+    <div class="box warn">
+      <b>注意</b>：远古版本（很老的 alpha/beta）需要额外的中文补丁，QCL-CE 会自动处理。
+    </div>
+
+    <h3 id="mod">装模组</h3>
+    <p>在<b>下载 → 模组</b>里搜索并安装。安装时 QCL-CE 会<b>自动把前置也一起装上</b>：</p>
+    <ul>
+      <li>只装<b>必需</b>的前置，可选/不兼容/内置的会跳过。</li>
+      <li>会按你当前的<b>游戏版本</b>挑合适的前置版本。</li>
+      <li>已经装过的会自动跳过，不会重复下载。</li>
+      <li><b>整条依赖链都会拉下来</b> —— A 需要 B、B 又需要 C 时，C 也会被装上。</li>
+    </ul>
+
+    <h3 id="theme">深色模式</h3>
+    <p>内置插件页 → <b>界面 → 深浅色模式</b>，三个选项：跟随系统 / 始终浅色 / 始终深色。</p>
+    <p>不用去改手机系统设置，在应用里就能切，方便试。</p>
+
+    <h3 id="menu">菜单排版</h3>
+    <p>点左侧「≡ 菜单」打开功能菜单，右上角有<b>排版</b>按钮：</p>
+    <ul>
+      <li>勾选要显示哪些入口</li>
+      <li>用 ↑↓ 调顺序</li>
+      <li>保存 / 恢复默认</li>
+    </ul>
+
+    <h3 id="plugin">插件</h3>
+    <p>左侧「≡ 菜单」→ <b>插件</b>。顶部有搜索框，可以按名字搜。</p>
+    <p>插件分几类：下载、界面、资源、模组、账号、联机、系统、安全与备份等。</p>
+
+    <h2 id="trouble">排错</h2>
+
+    <div class="box ok">
+      <h3 id="trouble-first">出问题先做这个</h3>
+      <p><b>「我的 → 启动诊断」→ 分享给作者</b>。</p>
+      <p>这一页会生成一份完整报告：设备信息、上次启动断点、本次启动路标、系统记录的进程退出原因、以及<b>输入链路自检</b>。把这段发出来，绝大多数问题能直接定位。</p>
+    </div>
+
+    <h3 id="crash">一打开就闪退</h3>
+    <p>按顺序排查：</p>
+    <ol>
+      <li><b>先卸载官方版 QCL</b>。两个包签名不同却曾共用同一个数据目录，会导致读写失败。</li>
+      <li><b>清除应用数据</b>再打开。</li>
+      <li>看日志：<code>/sdcard/QCL-CE/crash.log</code>（1.9.3 起的新路径）。</li>
+      <li>把「启动诊断」的报告发出来。</li>
+    </ol>
+
+    <h3 id="canttap">游戏里点不了</h3>
+    <p>表现是<b>画面正常、游戏也能进去，但点什么都没反应</b>。这类问题的根因在输入层，从界面看不出来。</p>
+    <p>去「我的 → 启动诊断」，报告里有一段 <code>----- 输入链路自检 -----</code>，它会列出：</p>
+    <ul>
+      <li><b>进程实际加载了哪些输入相关库</b>（读 <code>/proc/self/maps</code>）</li>
+      <li>磁盘上有哪些输入库</li>
+      <li>控制布局目录的内容</li>
+    </ul>
+    <p>判读方法写在报告末尾。把这段发出来即可定位。</p>
+
+    <h3 id="download-fail">下载失败</h3>
+    <ul>
+      <li>默认会走国内镜像。如果某个镜像挂了，会自动回退到官方源。</li>
+      <li>可以在插件页的「下载镜像自定义」里换一个镜像。</li>
+      <li>如果一直失败，检查网络是否有限制。</li>
+    </ul>
+
+    <h3 id="install-fail">装不上 / 提示签名冲突</h3>
+    <ul>
+      <li><b>签名冲突</b>：官方版没卸干净。到「设置 → 应用」卸载 QCL 后再装。</li>
+      <li><b>版本降级</b>：装了更高 versionCode 的包。卸载后重装即可。</li>
+      <li><b>解析包出错</b>：文件没下载完整，重新下载。</li>
+    </ul>
+
+    <h2 id="faq">FAQ</h2>
+
+    <h3>能和官方版同时装吗？</h3>
+    <p>能。QCL-CE 的包名是 <code>com.qcl.launcher.ce</code>，和官方版不同，可以共存。</p>
+
+    <h3>装 QCL-CE 会不会影响官方版的存档？</h3>
+    <p>不会动官方版的存档。但两者<b>曾经共用同一个外部目录</b>，所以建议先把官方版的存档备份一份再折腾。</p>
+
+    <h3>为什么只提供 arm64？</h3>
+    <p>因为绝大多数手机是 arm64。内置运行时会按架构分包，只带一份能让安装包小约 100 MB。</p>
+
+    <h3>支持正版登录吗？</h3>
+    <p>支持微软账号登录。离线账号也能用，但只能进单人游戏或离线服务器。</p>
+
+    <h3>怎么反馈问题？</h3>
+    <p>到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/issues">GitHub Issues</a> 提，或者带上「启动诊断」的报告。</p>
+
+    <h2 id="license">许可</h2>
+    <p>QCL-CE 以 <b>GPL-3.0</b> 发布。它基于 QCL（HMCL-PE → FCL → PojavLauncher 血统）。</p>
+    <p>第三方组件与许可清单见仓库里的 <code>THIRD_PARTY_NOTICES.md</code>。</p>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>QCL-CE Wiki</span>
+    <a href="index.html">← 回主页</a>
+    <span class="sp">by ALLEN201123</span>
+  </div>
+</footer>
+
+</body>
+</html>
