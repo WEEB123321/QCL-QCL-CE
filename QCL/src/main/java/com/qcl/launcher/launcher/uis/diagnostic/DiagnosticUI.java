@@ -137,7 +137,7 @@ public class DiagnosticUI extends BaseUI implements View.OnClickListener {
                     this.context.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cm != null) {
                 cm.setPrimaryClip(ClipData.newPlainText(
-                        this.context.getString(R.string.diagnostic_share_subject), buildReport()));
+                        this.context.getString(R.string.diagnostic_share_subject), shareText()));
                 toast(R.string.diagnostic_toast_copied);
                 return;
             }
@@ -147,13 +147,53 @@ public class DiagnosticUI extends BaseUI implements View.OnClickListener {
         toast(R.string.diagnostic_toast_copy_failed);
     }
 
+    // ★★★ 分享文本的上限 ================================================
+    //   为什么必须有这个上限：报告里带「上次断点 + 本次路标 + 系统退出记录」，
+    //   长起来能到几百 KB ✗。而 Intent 的 extras 走 Binder，超过约 1MB 会抛
+    //   **TransactionTooLargeException** ✗ —— 关键在于：**它是在系统侧抛的**，
+    //   本方法的 try/catch **接不住** ✗ → 表现为「点分享就闪退」✗
+    //   （这就是用户报的「分享日志也分享不了 / 闪退」的根因 ✗）
+    //   5 万字符 ≈ 100KB，远低于上限，同时足够放下关键信息 ✓
+    private static final int SHARE_MAX_CHARS = 50000;
+
+    /** 截断到安全长度；被截断时在末尾说明「完整报告在哪」✓ */
+    private String shareText() {
+        String full = buildReport();
+        String tailNote = "";
+        try {
+            // 完整报告落盘（外部私有目录，不需要任何权限 ✓）
+            java.io.File dir = this.context.getExternalFilesDir(null);
+            if (dir != null) {
+                java.io.File out = new java.io.File(dir, "qcl-report.txt");
+                try (java.io.FileOutputStream fos = new java.io.FileOutputStream(out)) {
+                    fos.write(full.getBytes("UTF-8"));
+                }
+                tailNote = "\n\n【完整报告已存到文件】\n" + out.getAbsolutePath()
+                        + "\n（分享时如果太长，直接把上面这段发出去即可）";
+            }
+        } catch (Throwable ignored) {
+        }
+        if (full.length() <= SHARE_MAX_CHARS) {
+            return full + tailNote;
+        }
+        // 截断时保留「开头（设备信息）」+「结尾（最近的路标）」——
+        // 中间通常是重复的常规日志，掐掉损失最小 ✓
+        int head = SHARE_MAX_CHARS * 3 / 5;
+        int tail = SHARE_MAX_CHARS - head;
+        return full.substring(0, head)
+                + "\n\n……（中间省略 " + (full.length() - SHARE_MAX_CHARS)
+                + " 个字符，完整报告见下方文件路径）……\n\n"
+                + full.substring(full.length() - tail)
+                + tailNote;
+    }
+
     private void shareAll() {
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_SUBJECT,
                     this.context.getString(R.string.diagnostic_share_subject));
-            intent.putExtra(Intent.EXTRA_TEXT, buildReport());
+            intent.putExtra(Intent.EXTRA_TEXT, shareText());
             this.activity.startActivity(Intent.createChooser(intent,
                     this.context.getString(R.string.diagnostic_share_chooser)));
         } catch (Throwable t) {

@@ -30,6 +30,17 @@ public class AppManifest {
     public static String SAVES_CACHE_DIR;
     public static String SETTING_DIR;
     public static String STYLE_DIR;
+    // ★★★ 已知问题（暂未改，原因见下）======================================
+    //   这里写的是 /sdcard/QCL —— 和**正式版 QCL 共用同一个目录** ✗
+    //   两个包签名不同 ⇒ 目录属主是正式版时，CE 版**读写会被拒** ✗
+    //   这是「装了正式版的手机会出问题」的根源之一 ✓
+    //
+    //   ★ 为什么这一轮**先不改**：
+    //     改成 /sdcard/QCL-CE 之后，**老用户的游戏数据（存档/模组/版本）
+    //     会「看起来全丢了」** ✗ —— 必须先做**迁移**（把旧目录搬过来或提示用户），
+    //     否则比闪退更吓人 ✗
+    //   ⇒ 先把**日志路径**改掉（QCLApplication / StartupTrace 已改 ✓），
+    //     让崩溃日志能写出来，拿到真实日志后再决定游戏目录怎么迁 ✓
     public static String LAUNCHER_DIR = Environment.getExternalStorageDirectory() + "/QCL";
     public static String DEFAULT_GAME_DIR = LAUNCHER_DIR + "/.minecraft";
 

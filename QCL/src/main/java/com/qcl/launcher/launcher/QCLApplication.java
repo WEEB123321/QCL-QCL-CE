@@ -21,7 +21,12 @@ import java.util.Locale;
 
 /* loaded from: classes2.dex */
 public class QCLApplication extends Application {
-    private static final String SHARED_CRASH_DIR = "QCL";
+    // ★★★ 社区版必须用**独立目录** ==========================================
+    //   原来写 "QCL"，和正式版 QCL **共用 /sdcard/QCL/** ✗
+    //   两个包**签名不同** ✗ —— 目录是正式版建的，CE 版**写不进去** ✗
+    //   ⇒ 崩溃时 crash.log **写不出来** ✗ → 用户「拿不到日志」✗
+    //   这就是「装了正式版的手机会出问题、没装的不会」的原因 ✓
+    private static final String SHARED_CRASH_DIR = "QCL-CE";
     private static final String TAG = "QCLCrash";
     private static Context context;
 
@@ -273,7 +278,7 @@ public class QCLApplication extends Application {
         String stringWriter2 = stringWriter.toString();
         Log.e("QCLCrash", stringWriter2);
         writeTo(new File(getExternalFilesDir(null), "crash.log"), stringWriter2);
-        writeTo(new File(Environment.getExternalStorageDirectory(), "QCL/crash.log"), stringWriter2);
+        writeTo(new File(Environment.getExternalStorageDirectory(), "QCL-CE/crash.log"), stringWriter2);
         // ★★★ 社区版：再写一份到 Android/media/<包名>/crash.log。
         //   前两份各有一个致命短板：Android/data 在 Android 11+ 第三方文件管理器打不开；
         //   /sdcard/QCL 需要 MANAGE_EXTERNAL_STORAGE，而「崩在 Provider 阶段」时

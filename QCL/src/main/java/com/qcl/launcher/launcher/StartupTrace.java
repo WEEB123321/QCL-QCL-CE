@@ -35,7 +35,7 @@ import java.util.Locale;
  * {@code Android/data/<包名>/files/}。但 <b>Android 11+ 起 /Android/data 对第三方文件管理器
  * 基本不可见</b>（系统有意封堵），玩家拿着手机根本打不开这个目录 ——
  * 路标写得再准，取不到就等于没写。所以现在<b>同时镜像一份到
- * {@code /sdcard/QCL/startup_trace.log}</b>：那是用户随手就能打开的位置，
+ * {@code /sdcard/QCL-CE/startup_trace.log}</b>：那是用户随手就能打开的位置，
  * 应用自己的 {@code crash.log} 本来也就写在那儿。
  * <p>未授予 {@code MANAGE_EXTERNAL_STORAGE} 时镜像会写失败（静默吞掉，不影响主份）；
  * 授权后从下一次启动起镜像即生效。崩溃若是稳定复现的，第二次启动就能拿到。
@@ -67,7 +67,7 @@ public final class StartupTrace {
 
     /** 主份：Android/data/&lt;包名&gt;/files/（不需要任何权限，但用户不易打开） */
     private static volatile File traceFile;
-    /** 镜像份：/sdcard/QCL/（需要 MANAGE_EXTERNAL_STORAGE，但用户随手可开） */
+    /** 镜像份：/sdcard/QCL-CE/（需要 MANAGE_EXTERNAL_STORAGE，但用户随手可开） */
     private static volatile File mirrorFile;
     /**
      * ★★★ 第三份（本轮新增）：/sdcard/Android/media/&lt;包名&gt;/。
@@ -193,7 +193,7 @@ public final class StartupTrace {
 
             // ★ 镜像份（best-effort）：写失败就置 null，后续自动跳过
             try {
-                File mdir = new File(Environment.getExternalStorageDirectory(), "QCL");
+                File mdir = new File(Environment.getExternalStorageDirectory(), "QCL-CE");
                 if (!mdir.exists()) {
                     //noinspection ResultOfMethodCallIgnored
                     mdir.mkdirs();
@@ -331,7 +331,7 @@ public final class StartupTrace {
      * ★★★ 社区版新增：取路标的**最后 n 行**，直接显示在崩溃/失败弹框里。
      *
      * <p>为什么要在弹框里显示内容而不只是路径：让用户「去文件管理器找
-     * {@code /sdcard/QCL/startup_trace.log} 再把内容发我」这件事，实际执行率很低
+     * {@code /sdcard/QCL-CE/startup_trace.log} 再把内容发我」这件事，实际执行率很低
      * （路径难找、编码易错、很多人不知道文件管理器怎么进内部存储）。
      * 而**截一张图**几乎没有门槛 —— 堆栈和断点一次性到手。
      */
