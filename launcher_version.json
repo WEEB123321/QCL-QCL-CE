@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 1739,
-    "versionName": "1.9.1",
-    "date": "2026-10-11",
+    "versionCode": 1742,
+    "versionName": "1.9.4",
+    "date": "2026-10-13",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.1/QCL-CE-v1.9.1-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 1.9.1</b><br/>· 48 项功能清单全部过完（插件 90 个）<br/>· 主页 8 个入口收进左侧「≡ 菜单」，支持自定义排版<br/>· 菜单新增一键开服<br/>· 深色模式：13 个语义色 + 夜间配色（正文/面板/强调/链接都适配）<br/>· 新增「深浅色模式」开关（跟随系统 / 浅色 / 深色）<br/>· 动效：卡片/导航/按钮/弹窗（只动合成层属性）<br/>· 修整合包下载（MCIM 镜像）、修 14 处主线程重活导致的卡死<br/>· 安装包 328MB → 229MB"
+    "updateLog": "<b>QCL-CE 1.9.4</b><br/>· 内置插件 90 个（可搜索、可逐个开关）<br/>· 深色模式：13 个语义色 + 完整夜间配色，内置「跟随系统 / 浅色 / 深色」开关<br/>· 主页改版：8 个入口收进左侧「≡ 菜单」，菜单支持自定义排版<br/>· 界面排版自定义：长按进入编辑模式，控件可拖动 / 隐藏 / 缩放，支持导入导出布局<br/>· 新增「一键开服」<br/>· 装模组自动补全整条前置依赖链（已装的自动跳过）<br/>· 白天 / 黑夜背景（跟随系统深色模式自动切换）<br/>· 新增「输入链路自检」：检查输入桥加载、isInputReady、控制布局，结果写进启动诊断报告<br/>· 修一批闪退 / 卡死，修整合包下载<br/>· 安装包 328MB → 229MB<br/>· 新增官网落地页与 Wiki（docs/）"
   },
   "latestPrerelease": null
 }
