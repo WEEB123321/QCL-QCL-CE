@@ -215,6 +215,17 @@ public class DiagnosticUI extends BaseUI implements View.OnClickListener {
         //   这类 Java 侧观测不到的情况的证据。不需要 root，也不需要 adb。
         sb.append("----- 系统记录的进程退出原因（无需 root/adb）-----\n");
         sb.append(ProcessExitDiagnostics.describeLastExit(this.context)).append('\n');
+        // ★★★ 1.9.4：输入链路自检 —— 「能启动但点不了」必须靠它定位 ✗
+        //   这类问题从 Java 侧看不出来，只能读 /proc/self/maps 看**实际加载了哪个输入桥** ✓
+        //   （PojavLauncher 的 Android.mk 注释里记着：旧桥/新桥导出相同的 17 个 JNI 符号，
+        //    ART 按「已加载库」顺序解析、先加载者胜 —— 历史上就因此让输入全落到
+        //    isInputReady 恒 0 的旧桥，表现为「画面正常但点击毫无反应」✗）
+        try {
+            sb.append(com.qcl.launcher.launcher.diagnostic.InputDiagnostics
+                    .describe(this.context)).append('\n');
+        } catch (Throwable t) {
+            sb.append("（输入自检失败：").append(t).append("）\n");
+        }
         if (StartupTrace.lastRunWasAbnormal()) {
             sb.append("----- 上次启动未走完（最后一行 = 断点）-----\n");
             sb.append(StartupTrace.lastRunTail()).append('\n');
