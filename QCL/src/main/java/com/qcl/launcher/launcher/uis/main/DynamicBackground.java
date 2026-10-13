@@ -48,7 +48,14 @@ public class DynamicBackground {
      * <p>★ 只留两张是有意的：轮播间隔 10 秒，图多了要几分钟才轮一圈，
      * 反而看不出「背景在动」。两张刚好一眼能感知到切换。
      */
-    public static final int[] RES_IDS = new int[]{R.drawable.qcl_bg_7, R.drawable.qcl_bg_8};
+    // ★★★ 1.9.3：用户提供的「白天 / 黑夜」背景放**第一个** ✓
+    //   同一个资源名 qcl_bg_theme 在两个目录下各有一份：
+    //     res/drawable-nodpi/qcl_bg_theme.png       ← 白天（蓝天白云）
+    //     res/drawable-nodpi-night/qcl_bg_theme.png ← 黑夜（月亮暗森林）
+    //   Android 会按**夜间模式自动选** ✓ —— 系统/应用切深色就换成黑夜那张 ✓
+    //   这正是用户要的「一个白天模式一个黑夜模式」✓
+    public static final int[] RES_IDS = new int[]{
+            R.drawable.qcl_bg_theme, R.drawable.qcl_bg_7, R.drawable.qcl_bg_8};
     private final Activity activity;
     private final View target;
     private final Handler handler = new Handler(Looper.getMainLooper());
