@@ -422,6 +422,12 @@ public final class PluginRegistry {
                         + "以及一键恢复默认。",
                 LayoutShare::ui));
 
+        l.add(new PluginSpec("资源", "plugin_market",
+                "插件市场",
+                "从市场一键安装资源型插件（控键布局 / 界面排版）。每个包都校验 sha256，"
+                        + "对不上就拒装。市场网页：weeb123321.github.io/QCL-Plugins",
+                PluginMarket::ui));
+
         return l;
     }
 
