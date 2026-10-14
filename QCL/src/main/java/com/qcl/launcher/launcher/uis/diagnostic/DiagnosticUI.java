@@ -56,6 +56,13 @@ public class DiagnosticUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.diagnosticUI = this.activity.findViewById(R.id.ui_diagnostic);
+        // ★★★ 1.10.0：界面排版 —— 启动诊断 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.diagnosticUI, "diagnostic");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.diagnosticUI, "diagnostic");
+        } catch (Throwable ignored) {
+        }
+
         this.lastSection = this.activity.findViewById(R.id.diagnostic_last_section);
         this.lastText = this.activity.findViewById(R.id.diagnostic_last_text);
         this.traceText = this.activity.findViewById(R.id.diagnostic_trace_text);

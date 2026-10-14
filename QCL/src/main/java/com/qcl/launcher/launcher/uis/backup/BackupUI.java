@@ -53,6 +53,13 @@ public class BackupUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.backupUI = this.activity.findViewById(R.id.ui_backup);
+        // ★★★ 1.10.0：界面排版 —— 备份 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.backupUI, "backup");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.backupUI, "backup");
+        } catch (Throwable ignored) {
+        }
+
         this.createButton = this.activity.findViewById(R.id.backup_create_button);
         this.createTarget = this.activity.findViewById(R.id.backup_create_target);
         this.listContainer = this.activity.findViewById(R.id.backup_list_container);

@@ -55,6 +55,13 @@ public class PluginUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.pluginUI = this.activity.findViewById(R.id.ui_plugin);
+        // ★★★ 1.10.0：界面排版 —— 插件 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.pluginUI, "plugin");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.pluginUI, "plugin");
+        } catch (Throwable ignored) {
+        }
+
         this.runtimeState = this.activity.findViewById(R.id.plugin_runtime_state);
         this.rendererContainer = this.activity.findViewById(R.id.plugin_renderer_container);
         this.openDirButton = this.activity.findViewById(R.id.plugin_open_dir_button);
