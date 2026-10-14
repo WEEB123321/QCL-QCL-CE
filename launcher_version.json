@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 2001,
-    "versionName": "1.10.1",
+    "versionCode": 2002,
+    "versionName": "1.10.2",
     "date": "2026-10-14",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.10.1/QCL-CE-v1.10.1-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.10.2/QCL-CE-v1.10.2-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 1.10.0</b><br/>· <b>界面排版自定义</b>：长按任意页面进编辑模式，单击切显隐、长按拖动换位、可导入导出（12 个页面已接入）<br/>· 新增「适合你的手机」：读本机配置分档，按性能优化/战斗/养老/纯生存四类推荐整合包<br/>· 装模组递归补全前置（整条依赖链）<br/>· 白天/黑夜背景（随夜间模式自动切换）<br/>· 修：CE 版改用独立日志目录（不再与正式版冲突）<br/>· 修：分享诊断报告闪退<br/>· 插件 92 个"
+    "updateLog": "<b>QCL-CE 1.10.2</b><br/>· <b>新增插件市场</b>：应用内一键安装资源型插件（控键布局 / 界面排版），每个包校验 sha256<br/>· 界面排版：13 个页面全部支持长按编辑<br/>· 新增「适合你的手机」整合包推荐<br/>· 装模组递归补全前置<br/>· 白天/黑夜背景<br/>· 修：CE 版独立日志目录、分享诊断报告闪退<br/>· 修：构建默认堆太小导致打包 OOM<br/>· 插件 93 个"
   },
   "latestPrerelease": null
 }
