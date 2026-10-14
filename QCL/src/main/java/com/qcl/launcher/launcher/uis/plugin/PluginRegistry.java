@@ -416,6 +416,12 @@ public final class PluginRegistry {
                         + "整合包实时从 Modrinth 查，保证真实存在。",
                 SmartModpack::ui));
 
+        l.add(new PluginSpec("界面", "layout_share",
+                "排版导入 / 导出",
+                "把界面排版导出成一段文本，发到群里别人粘贴就能用。支持剪贴板 + 文件两种方式，"
+                        + "以及一键恢复默认。",
+                LayoutShare::ui));
+
         return l;
     }
 
