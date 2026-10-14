@@ -111,6 +111,17 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         super.onCreate();
         mainUI = activity.findViewById(R.id.ui_main);
 
+        // ★★★ 1.9.6：界面排版 —— 主页接入（阶段 ③）
+        //   ① 先把**已保存的排版**应用上 ✓（没有自定义时完全不动 ✓）
+        //   ② 再挂「长按进编辑」✓
+        //   ★ 顺序不能反：先 apply 再挂手势 ✓
+        //     （apply 会 removeView/addView，若先挂手势再重排，监听器可能被搬乱 ✗）
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, mainUI, "main");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, mainUI, "main");
+        } catch (Throwable ignored) {
+        }
+
         startAccountUI = activity.findViewById(R.id.start_ui_account);
         startGameManagerUI = activity.findViewById(R.id.start_ui_game_manager);
         startVersionListUI = activity.findViewById(R.id.start_ui_version_list);

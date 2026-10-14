@@ -62,6 +62,88 @@ public final class LayoutEditor {
         });
     }
 
+    /**
+     * ★ 把**已保存的排版**应用到页面上（阶段 ③ 的核心）。
+     *
+     * <p>没有这一步，编辑器保存的东西**根本不会生效** ✗ ——
+     * 存进 JSON 只是一堆数据，得有人把它「落到 View 上」✓
+     *
+     * <p>做两件事：
+     * <ol>
+     *   <li><b>显隐</b>：按 Item.visible 设 VISIBLE / GONE ✓</li>
+     *   <li><b>顺序</b>：对**每一个父容器**，把其中有 Item 的子 View 按 order 排序，
+     *       然后插回它们原本占据的那些索引位置 ✓
+     *       （不是简单地 addView 到末尾 ✗ —— 那样没被编辑过的兄弟会被挤到前面 ✗）</li>
+     * </ol>
+     */
+    public static void apply(Activity activity, View pageRoot, String pageId) {
+        if (activity == null || pageRoot == null || pageId == null) {
+            return;
+        }
+        if (!QclLayout.has(pageId)) {
+            return;   // 没自定义过就完全不动 ✓（保证「恢复默认」= 原样 ✗）
+        }
+        try {
+            List<View> all = new ArrayList<>();
+            walk(pageRoot, all, 0);
+
+            // ① 显隐
+            for (View v : all) {
+                QclLayout.Item it = QclLayout.get(pageId, idOf(v));
+                if (it != null) {
+                    v.setVisibility(it.visible ? View.VISIBLE : View.GONE);
+                }
+            }
+
+            // ② 顺序：按父容器分组 ✓
+            java.util.LinkedHashMap<ViewGroup, List<View>> byParent = new java.util.LinkedHashMap<>();
+            for (View v : all) {
+                if (QclLayout.get(pageId, idOf(v)) == null) {
+                    continue;
+                }
+                if (!(v.getParent() instanceof ViewGroup)) {
+                    continue;
+                }
+                ViewGroup par = (ViewGroup) v.getParent();
+                byParent.computeIfAbsent(par, k -> new ArrayList<>()).add(v);
+            }
+
+            for (java.util.Map.Entry<ViewGroup, List<View>> e : byParent.entrySet()) {
+                ViewGroup par = e.getKey();
+                List<View> group = e.getValue();
+                if (group.size() < 2) {
+                    continue;
+                }
+                // 记下它们原本占据的索引（升序）✓
+                List<Integer> slots = new ArrayList<>();
+                for (View v : group) {
+                    slots.add(par.indexOfChild(v));
+                }
+                java.util.Collections.sort(slots);
+                // 按 order 排序（相同则保持原相对顺序 ✓ 稳定排序）
+                final String pid = pageId;
+                group.sort((a, b) -> {
+                    QclLayout.Item ia = QclLayout.get(pid, idOf(a));
+                    QclLayout.Item ib = QclLayout.get(pid, idOf(b));
+                    int oa = ia == null ? 0 : ia.order;
+                    int ob = ib == null ? 0 : ib.order;
+                    return Integer.compare(oa, ob);
+                });
+                // 全部摘下再按 slots 插回 ✓
+                for (View v : group) {
+                    par.removeView(v);
+                }
+                for (int i = 0; i < group.size(); i++) {
+                    int at = Math.min(slots.get(i), par.getChildCount());
+                    par.addView(group.get(i), at);
+                }
+                par.invalidate();
+            }
+        } catch (Throwable ignored) {
+            // 排版应用失败不能影响页面正常显示 ✓ 静默退回 XML 原样 ✓
+        }
+    }
+
     /** 进编辑模式。 */
     private static void enterEditMode(final Activity activity, final View pageRoot, final String pageId) {
         try {
