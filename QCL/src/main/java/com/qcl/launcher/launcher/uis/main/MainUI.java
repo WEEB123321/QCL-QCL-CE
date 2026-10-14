@@ -119,6 +119,15 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         try {
             com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, mainUI, "main");
             com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, mainUI, "main");
+            // ★★★ 1.10.1：联机页（ui_multi_player）接入
+            //   ★ 它**没有自己的 UI 类** ✗ —— 全工程只有 MainUI 引用了它的按钮 ✗
+            //     但它是**预加载在 activity_main.xml 里**的 ✓
+            //     ⇒ 直接从 MainUI 接 ✓（不用新建类 ✓）
+            android.view.View mp = activity.findViewById(R.id.ui_multi_player);
+            if (mp != null) {
+                com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, mp, "multiplayer");
+                com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, mp, "multiplayer");
+            }
         } catch (Throwable ignored) {
         }
 
