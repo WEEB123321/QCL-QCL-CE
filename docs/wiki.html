@@ -108,6 +108,8 @@
     <a href="#theme">深色模式</a>
     <a href="#menu">菜单排版</a>
     <a href="#plugin">插件</a>
+    <a href="#layout">界面排版</a>
+    <a href="#market">插件市场</a>
 
     <h4>排错</h4>
     <a href="#trouble">出问题先做这个</a>
@@ -124,7 +126,7 @@
   <main>
 
     <h1>QCL-CE 使用文档</h1>
-    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v1.9.4。</p>
+    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v2.0.1。</p>
 
     <h2 id="install">安装</h2>
 
@@ -137,16 +139,16 @@
     </div>
 
     <p><b>直接下载：</b>
-      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk">GitHub 直链</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.1/QCL-CE-v2.0.1-arm64.apk">GitHub 直链</a>
       ｜
-      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk">国内镜像（gh-proxy）</a>
+      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.1/QCL-CE-v2.0.1-arm64.apk">国内镜像（gh-proxy）</a>
     </p>
     <p>gh-proxy 只是把同一条 GitHub 直链转发一遍，下载到的文件完全一样。
       也可以到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">Releases 页面</a>查看全部发布：</p>
 
     <table>
       <tr><th>文件</th><th>用途</th></tr>
-      <tr><td><code>QCL-CE-v1.9.4-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
+      <tr><td><code>QCL-CE-v2.0.1-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
     </table>
 
     <h2 id="first">第一次启动</h2>
@@ -200,9 +202,31 @@
       <li>保存 / 恢复默认</li>
     </ul>
 
+    <h3 id="layout">界面排版自定义</h3>
+    <p><b>长按任意页面</b>就能进编辑模式：</p>
+    <ul>
+      <li><b>单击</b>一个控件 = 显示 / 隐藏</li>
+      <li><b>长按控件再拖动</b> = 在同层里换位置</li>
+      <li>底部浮动条：保存 / 取消 / 恢复默认</li>
+    </ul>
+    <p>支持 <b>13 个页面</b>：主页、下载、版本列表、设置、账号、游戏管理、大厅、实验室、备份、启动诊断、资源下载、插件、联机。</p>
+    <div class="box warn">
+      <b>排版是「进页面时应用」的</b> —— 改完要退出再进主页才生效，不会立刻变。
+    </div>
+    <p>想把排版分享给别人：插件页 → 界面 → <b>排版导入 / 导出</b> → 复制到剪贴板 → 发群里。别人复制后点「从剪贴板导入」即可。</p>
+
     <h3 id="plugin">插件</h3>
     <p>左侧「≡ 菜单」→ <b>插件</b>。顶部有搜索框，可以按名字搜。</p>
     <p>插件分几类：下载、界面、资源、模组、账号、联机、系统、安全与备份等。</p>
+
+    <h3 id="market">插件市场</h3>
+    <p>插件页 → 资源 → <b>插件市场</b>，可以直接在应用内安装资源型插件。</p>
+    <ul>
+      <li>市场里的插件是<b>资源型</b>的（控键布局 / 界面排版）—— 启动器没有插件运行时，所以不加载代码。</li>
+      <li>每个包都会<b>校验 sha256</b>，对不上就拒装。</li>
+      <li>安装完如果是排版类，<b>退出再进主页</b>生效；控键类到「设置 → 控键布局」里选。</li>
+      <li>市场网页：<a href="https://weeb123321.github.io/QCL-Plugins/">weeb123321.github.io/QCL-Plugins</a></li>
+    </ul>
 
     <h2 id="trouble">排错</h2>
 
