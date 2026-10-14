@@ -97,6 +97,13 @@ public class LobbyUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.rootView = this.activity.findViewById(R.id.ui_lobby);
+        // ★★★ 1.9.9：界面排版 —— 大厅 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.rootView, "lobby");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.rootView, "lobby");
+        } catch (Throwable ignored) {
+        }
+
 
         this.newsStatus = this.activity.findViewById(R.id.lobby_news_status);
         this.newsContainer = this.activity.findViewById(R.id.lobby_news_container);

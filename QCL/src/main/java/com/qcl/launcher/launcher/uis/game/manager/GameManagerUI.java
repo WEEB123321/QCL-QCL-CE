@@ -67,6 +67,13 @@ implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.gameManagerUI = (LinearLayout)this.activity.findViewById(R.id.ui_game_manager);
+        // ★★★ 1.9.9：界面排版 —— 游戏管理 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.gameManagerUI, "game_manager");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.gameManagerUI, "game_manager");
+        } catch (Throwable ignored) {
+        }
+
         this.startGameSetting = (LinearLayout)this.activity.findViewById(R.id.game_manager_game_setting);
         this.startModManager = (LinearLayout)this.activity.findViewById(R.id.game_manager_manage_mod);
         this.startAutoInstall = (LinearLayout)this.activity.findViewById(R.id.game_manager_auto_install);

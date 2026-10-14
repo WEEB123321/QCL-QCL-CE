@@ -35,6 +35,13 @@ public class LabUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.labUI = (LinearLayout) this.activity.findViewById(R.id.ui_lab);
+        // ★★★ 1.9.9：界面排版 —— 实验室 页接入
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, this.labUI, "lab");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, this.labUI, "lab");
+        } catch (Throwable ignored) {
+        }
+
         this.cardColorText = (LinearLayout) this.activity.findViewById(R.id.lab_card_color_text);
         this.cardSeed = (LinearLayout) this.activity.findViewById(R.id.lab_card_seed);
         this.cardRecipe = (LinearLayout) this.activity.findViewById(R.id.lab_card_recipe);
