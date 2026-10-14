@@ -410,6 +410,12 @@ public final class PluginRegistry {
                 "深浅色模式", "跟随系统 / 始终浅色 / 始终深色。★ 不用改系统设置就能测深色。",
                 PluginUiPrefs::themeMode));
 
+        l.add(new PluginSpec("资源", "smart_modpack",
+                "适合你的手机",
+                "读本机配置 → 分档 → 在四个分类里各推荐整合包（性能优化 / 战斗 / 养老 / 纯生存带辅助）。"
+                        + "整合包实时从 Modrinth 查，保证真实存在。",
+                SmartModpack::ui));
+
         return l;
     }
 
