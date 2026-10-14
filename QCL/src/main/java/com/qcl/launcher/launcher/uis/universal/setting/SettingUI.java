@@ -48,6 +48,16 @@ public class SettingUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.settingUI = (LinearLayout) this.activity.findViewById(R.id.ui_setting);
+        // ★★★ 1.9.8：界面排版 —— 设置 页接入
+        //   ① 先 apply 已保存的排版 ✓（没自定义过就完全不动 ✓）
+        //   ② 再挂「长按进编辑」✓
+        //   ★ 顺序不能反：apply 会 removeView/addView，先挂手势会被搬乱 ✗
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, settingUI, "setting");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, settingUI, "setting");
+        } catch (Throwable ignored) {
+        }
+
         this.startGlobalGameSettingUI = (LinearLayout) this.activity.findViewById(R.id.start_global_game_setting_ui);
         this.startExteriorSettingUI = (LinearLayout) this.activity.findViewById(R.id.start_exterior_setting_ui);
         this.startDownloadSettingUI = (LinearLayout) this.activity.findViewById(R.id.start_download_setting_ui);

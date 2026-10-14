@@ -28,6 +28,16 @@ public class DownloadUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.downloadUI = (LinearLayout) this.activity.findViewById(R.id.ui_download);
+        // ★★★ 1.9.8：界面排版 —— 下载 页接入
+        //   ① 先 apply 已保存的排版 ✓（没自定义过就完全不动 ✓）
+        //   ② 再挂「长按进编辑」✓
+        //   ★ 顺序不能反：apply 会 removeView/addView，先挂手势会被搬乱 ✗
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, downloadUI, "download");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, downloadUI, "download");
+        } catch (Throwable ignored) {
+        }
+
         this.startDownloadGameUI = (LinearLayout) this.activity.findViewById(R.id.start_download_game_ui);
         this.startDownloadModUI = (LinearLayout) this.activity.findViewById(R.id.start_download_mod_ui);
         this.startDownloadPackageUI = (LinearLayout) this.activity.findViewById(R.id.start_download_package_ui);

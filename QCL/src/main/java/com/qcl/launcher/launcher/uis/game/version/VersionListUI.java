@@ -53,6 +53,16 @@ public class VersionListUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         versionListUI = activity.findViewById(R.id.ui_version_list);
+        // ★★★ 1.9.8：界面排版 —— 版本列表 页接入
+        //   ① 先 apply 已保存的排版 ✓（没自定义过就完全不动 ✓）
+        //   ② 再挂「长按进编辑」✓
+        //   ★ 顺序不能反：apply 会 removeView/addView，先挂手势会被搬乱 ✗
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, versionListUI, "version_list");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, versionListUI, "version_list");
+        } catch (Throwable ignored) {
+        }
+
 
         gameDirRow = activity.findViewById(R.id.game_dir_row);
         versionList = activity.findViewById(R.id.local_version_list);

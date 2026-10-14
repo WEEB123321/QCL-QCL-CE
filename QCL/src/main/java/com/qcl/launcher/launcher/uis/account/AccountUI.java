@@ -50,6 +50,16 @@ public class AccountUI extends BaseUI implements View.OnClickListener {
     public void onCreate() {
         super.onCreate();
         this.accountUI = (LinearLayout) this.activity.findViewById(R.id.ui_account);
+        // ★★★ 1.9.8：界面排版 —— 账号 页接入
+        //   ① 先 apply 已保存的排版 ✓（没自定义过就完全不动 ✓）
+        //   ② 再挂「长按进编辑」✓
+        //   ★ 顺序不能反：apply 会 removeView/addView，先挂手势会被搬乱 ✗
+        try {
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.apply(activity, accountUI, "account");
+            com.qcl.launcher.launcher.uis.layout.LayoutEditor.attach(activity, accountUI, "account");
+        } catch (Throwable ignored) {
+        }
+
         this.addOfflineAccount = (LinearLayout) this.activity.findViewById(R.id.add_offline_account);
         this.addMojangAccount = (LinearLayout) this.activity.findViewById(R.id.add_mojang_account);
         this.addMicrosoftAccount = (LinearLayout) this.activity.findViewById(R.id.add_microsoft_account);
