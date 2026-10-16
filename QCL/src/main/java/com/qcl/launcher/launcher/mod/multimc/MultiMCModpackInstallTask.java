@@ -467,12 +467,22 @@ public class MultiMCModpackInstallTask extends AsyncTask<Object, Integer, Except
         boolean hasJson = new File(versionDir, name + ".json").isFile();
         boolean hasJar = new File(versionDir, name + ".jar").isFile();
         if (!hasJson || !hasJar) {
-            throw new IOException("整合包安装完成，但基础游戏版本不齐全（json=" + hasJson
-                    + ", jar=" + hasJar + "）。\n"
-                    + "整合包自身只带模组和配置，原版文件需要另外下载 —— "
-                    + "自动下载基础版本这一步还没接通，请先在「下载 → 游戏」里装一遍原版 "
+            // ★★★ 2.0.3：修一句**过时的提示** ✗
+            //   原来这里写「自动下载基础版本这一步还没接通」✗ ——
+            //   但 install() 里**早就调了 ensureGameInstalled()** ✓（而且紧接着还有
+            //   ensureBaseGame()）✓ 自动下载是**接通**的 ✓
+            //   走到这里说明**自动下载试过了但没成** ✗（网络 / 版本号取不到 / 磁盘满）
+            //   ⇒ 提示必须说清「试过了、失败了、为什么可能失败」✗
+            //     而不是说「没接通」✗ —— 那会让用户以为功能缺失，白等一个更新 ✗
+            throw new IOException("整合包装完了，但基础游戏版本仍然不齐全"
+                    + "（版本 json=" + hasJson + "，本体 jar=" + hasJar + "）。\n\n"
+                    + "启动器**已经尝试自动下载**原版 "
                     + (manifest == null ? "" : manifest.getGameVersion())
-                    + "，再导入这个整合包。");
+                    + " 但没成功 ✗\n"
+                    + "常见原因：网络不通 / 这个版本号在镜像里取不到 / 存储空间不够。\n\n"
+                    + "可以这样绕过去：先在「下载 → 游戏」里手动装一遍原版 "
+                    + (manifest == null ? "" : manifest.getGameVersion())
+                    + "，再重新导入这个整合包 ✓");
         }
     }
 
