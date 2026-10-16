@@ -232,6 +232,67 @@ public class InstallPackageUI extends BaseUI implements View.OnClickListener {
             return;
         }
 
+        // ★★★ 2.0.2：Modrinth 整合包（.mrpack）现在能装了 ✓
+        //   以前这里会把非 MultiMC 的包**全部拦下** ✗ —— 包括 Modrinth ✗
+        //   而「适合你的手机」推荐的就是 Modrinth 包 ✗ ⇒ 推荐了装不了 ✗
+        //   现在 ModrinthInstallTask 已实现（支持 Fabric ✓，其余加载器明确说明 ✗）
+        if (modpack.getManifest() instanceof com.qcl.launcher.launcher.mod.modrinth.ModrinthManifest) {
+            View dialogView2 = View.inflate(context, R.layout.dialog_install_game, null);
+            RecyclerView taskListView2 = dialogView2.findViewById(R.id.download_task_list);
+            taskListView2.setLayoutManager(new LinearLayoutManager(context));
+            installTaskAdapter = new DownloadTaskListAdapter(context);
+            taskListView2.setAdapter(installTaskAdapter);
+            if (taskListView2.getItemAnimator() != null) {
+                taskListView2.getItemAnimator().setAddDuration(0L);
+                taskListView2.getItemAnimator().setChangeDuration(0L);
+                taskListView2.getItemAnimator().setMoveDuration(0L);
+                taskListView2.getItemAnimator().setRemoveDuration(0L);
+            }
+            installDialog = new AlertDialog.Builder(context)
+                    .setTitle("正在安装整合包：" + targetName)
+                    .setView(dialogView2)
+                    .setCancelable(false)
+                    .create();
+            installDialog.show();
+
+            com.qcl.launcher.launcher.mod.modrinth.ModrinthInstallTask.setActivity(activity);
+            com.qcl.launcher.launcher.mod.modrinth.ModrinthInstallTask mTask =
+                    new com.qcl.launcher.launcher.mod.modrinth.ModrinthInstallTask(
+                            new File(selectedPath), modpack,
+                            (com.qcl.launcher.launcher.mod.modrinth.ModrinthManifest) modpack.getManifest(),
+                            targetName, installTaskAdapter);
+            mTask.setListener(new com.qcl.launcher.launcher.mod.modrinth.ModrinthInstallTask.ProgressListener() {
+                @Override
+                public void onProgress(int percent) {
+                    // 进度在任务列表里逐行体现 ✓ 这里不再另开进度条
+                }
+
+                @Override
+                public void onFinished(Exception error) {
+                    if (installDialog != null && installDialog.isShowing()) {
+                        installDialog.dismiss();
+                    }
+                    if (error != null) {
+                        new AlertDialog.Builder(context)
+                                .setTitle("安装失败")
+                                .setMessage(String.valueOf(error.getMessage()))
+                                .setPositiveButton(android.R.string.ok, null)
+                                .create().show();
+                        return;
+                    }
+                    new AlertDialog.Builder(context)
+                            .setTitle("安装完成")
+                            .setMessage("整合包 " + targetName + " 装好了 ✓\n"
+                                    + "到「版本列表」里选它就能启动 ✓")
+                            .setPositiveButton(android.R.string.ok,
+                                    (d, w) -> activity.backToLastUI())
+                            .create().show();
+                }
+            });
+            mTask.execute();
+            return;
+        }
+
         if (!(modpack.getManifest() instanceof MultiMCInstanceConfiguration)) {
             new AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.install_package_ui_title))
