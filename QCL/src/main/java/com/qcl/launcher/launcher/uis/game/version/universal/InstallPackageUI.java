@@ -232,6 +232,66 @@ public class InstallPackageUI extends BaseUI implements View.OnClickListener {
             return;
         }
 
+        // ★★★ 2.0.3：CurseForge 整合包现在也能装了 ✓
+        //   Curse 的 manifest.json 只给 projectID + fileID ✗ 没有下载地址 ✗
+        //   ⇒ 靠项目里**已内置的 CurseForge API key** 换地址 ✓（不用用户申请 ✓）
+        //   加载器同样只支持 Fabric ✓（Forge/NeoForge 明确说明 ✗）
+        if (modpack.getManifest() instanceof com.qcl.launcher.launcher.mod.curse.CurseManifest) {
+            View dialogViewC = View.inflate(context, R.layout.dialog_install_game, null);
+            RecyclerView taskListViewC = dialogViewC.findViewById(R.id.download_task_list);
+            taskListViewC.setLayoutManager(new LinearLayoutManager(context));
+            installTaskAdapter = new DownloadTaskListAdapter(context);
+            taskListViewC.setAdapter(installTaskAdapter);
+            if (taskListViewC.getItemAnimator() != null) {
+                taskListViewC.getItemAnimator().setAddDuration(0L);
+                taskListViewC.getItemAnimator().setChangeDuration(0L);
+                taskListViewC.getItemAnimator().setMoveDuration(0L);
+                taskListViewC.getItemAnimator().setRemoveDuration(0L);
+            }
+            installDialog = new AlertDialog.Builder(context)
+                    .setTitle("正在安装整合包：" + targetName)
+                    .setView(dialogViewC)
+                    .setCancelable(false)
+                    .create();
+            installDialog.show();
+
+            com.qcl.launcher.launcher.mod.curse.CurseInstallTask.setActivity(activity);
+            com.qcl.launcher.launcher.mod.curse.CurseInstallTask cTask =
+                    new com.qcl.launcher.launcher.mod.curse.CurseInstallTask(
+                            new File(selectedPath), modpack,
+                            (com.qcl.launcher.launcher.mod.curse.CurseManifest) modpack.getManifest(),
+                            targetName, installTaskAdapter);
+            cTask.setListener(new com.qcl.launcher.launcher.mod.curse.CurseInstallTask.ProgressListener() {
+                @Override
+                public void onProgress(int percent) {
+                }
+
+                @Override
+                public void onFinished(Exception error) {
+                    if (installDialog != null && installDialog.isShowing()) {
+                        installDialog.dismiss();
+                    }
+                    if (error != null) {
+                        new AlertDialog.Builder(context)
+                                .setTitle("安装失败")
+                                .setMessage(String.valueOf(error.getMessage()))
+                                .setPositiveButton(android.R.string.ok, null)
+                                .create().show();
+                        return;
+                    }
+                    new AlertDialog.Builder(context)
+                            .setTitle("安装完成")
+                            .setMessage("整合包 " + targetName + " 装好了 ✓\n"
+                                    + "到「版本列表」里选它就能启动 ✓")
+                            .setPositiveButton(android.R.string.ok,
+                                    (d, w) -> activity.backToLastUI())
+                            .create().show();
+                }
+            });
+            cTask.execute();
+            return;
+        }
+
         // ★★★ 2.0.2：Modrinth 整合包（.mrpack）现在能装了 ✓
         //   以前这里会把非 MultiMC 的包**全部拦下** ✗ —— 包括 Modrinth ✗
         //   而「适合你的手机」推荐的就是 Modrinth 包 ✗ ⇒ 推荐了装不了 ✗
@@ -296,9 +356,14 @@ public class InstallPackageUI extends BaseUI implements View.OnClickListener {
         if (!(modpack.getManifest() instanceof MultiMCInstanceConfiguration)) {
             new AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.install_package_ui_title))
-                    .setMessage("目前只支持 **MultiMC / Prism Launcher** 的整合包导入。\n\n"
-                            + "CurseForge / Modrinth / MCBBS / HMCL 这几种的安装逻辑在 QCL 里还没接通，"
-                            + "先用手动解压的方式吧。")
+                    // ★ 2.0.3：这条提示原来把 CurseForge / Modrinth 也列成「不支持」✗
+                    //   但这两个现在都接通了 ✓ 走到这里只剩 MCBBS / HMCL ✗
+                    .setMessage("目前支持这几种整合包：\n"
+                            + "　✓ MultiMC / Prism Launcher\n"
+                            + "　✓ Modrinth（.mrpack，Fabric 加载器）\n"
+                            + "　✓ CurseForge（Fabric 加载器）\n\n"
+                            + "MCBBS / HMCL 这几种的安装逻辑还没接通 ✗\n"
+                            + "先用手动解压的方式吧 —— 把包里的 mods/ 拷进游戏目录即可 ✓")
                     .setPositiveButton(android.R.string.ok, null)
                     .create().show();
             return;

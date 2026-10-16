@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20002,
-    "versionName": "2.0.2",
+    "versionCode": 20003,
+    "versionName": "2.0.3",
     "date": "2026-10-14",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.2/QCL-CE-v2.0.2-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.3/QCL-CE-v2.0.3-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.0.2</b><br/>· <b>Modrinth 整合包能装了</b>：从 18 行空壳补成完整实现（支持 Fabric，其余加载器明确说明）<br/>· 界面排版：13 个页面全部支持长按编辑<br/>· 插件市场：应用内一键安装 + sha256 校验<br/>· 适合你的手机：读本机配置分档推荐整合包<br/>· 装模组递归补全前置<br/>· 白天/黑夜背景<br/>· 修：CE 版独立日志目录、分享诊断报告闪退、构建 OOM<br/>· 插件 93 个"
+    "updateLog": "<b>QCL-CE 2.0.3</b><br/>· <b>CurseForge 整合包能装了</b>（Fabric 加载器；用内置 API key 换下载地址）<br/>· <b>Modrinth 整合包能装了</b>（.mrpack，Fabric 加载器）<br/>· 修：整合包安装的「不支持」提示已更新（原来把 Curse/Modrinth 也列成不支持）<br/>· 界面排版：13 个页面支持长按编辑<br/>· 插件市场：应用内一键安装 + sha256 校验<br/>· 适合你的手机：读本机配置分档推荐整合包<br/>· 装模组递归补全前置 / 白天黑夜背景<br/>· 插件 93 个"
   },
   "latestPrerelease": null
 }
