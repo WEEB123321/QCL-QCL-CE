@@ -126,7 +126,7 @@
   <main>
 
     <h1>QCL-CE 使用文档</h1>
-    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v2.0.1。</p>
+    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v2.0.3。</p>
 
     <h2 id="install">安装</h2>
 
@@ -139,16 +139,16 @@
     </div>
 
     <p><b>直接下载：</b>
-      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.1/QCL-CE-v2.0.1-arm64.apk">GitHub 直链</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.3/QCL-CE-v2.0.3-arm64.apk">GitHub 直链</a>
       ｜
-      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.1/QCL-CE-v2.0.1-arm64.apk">国内镜像（gh-proxy）</a>
+      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.3/QCL-CE-v2.0.3-arm64.apk">国内镜像（gh-proxy）</a>
     </p>
     <p>gh-proxy 只是把同一条 GitHub 直链转发一遍，下载到的文件完全一样。
       也可以到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">Releases 页面</a>查看全部发布：</p>
 
     <table>
       <tr><th>文件</th><th>用途</th></tr>
-      <tr><td><code>QCL-CE-v2.0.1-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
+      <tr><td><code>QCL-CE-v2.0.3-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
     </table>
 
     <h2 id="first">第一次启动</h2>
@@ -189,6 +189,21 @@
       <li>已经装过的会自动跳过，不会重复下载。</li>
       <li><b>整条依赖链都会拉下来</b> —— A 需要 B、B 又需要 C 时，C 也会被装上。</li>
     </ul>
+
+    <h3 id="modpack">装整合包</h3>
+    <p>「安装包」里选整合包文件即可。目前支持：</p>
+    <table>
+      <tr><th>格式</th><th>说明</th></tr>
+      <tr><td><b>MultiMC / Prism</b></td><td>✓ 完整支持</td></tr>
+      <tr><td><b>Modrinth</b>（<code>.mrpack</code>）</td><td>✓ 支持，限 <b>Fabric</b> 加载器</td></tr>
+      <tr><td><b>CurseForge</b></td><td>✓ 支持，限 <b>Fabric</b> 加载器</td></tr>
+      <tr><td>HMCL / MCBBS</td><td>✗ 还没接通，先手动解压把 <code>mods/</code> 拷进游戏目录</td></tr>
+    </table>
+    <div class="box warn">
+      <b>为什么只支持 Fabric？</b> Fabric 的官方 profile JSON 本身就是完整版本 JSON，
+      可以直接落盘，不用跑安装器。Forge / NeoForge 需要运行官方安装器，还没接。
+    </div>
+    <p>装整合包时会<b>自动下载游戏本体</b>，并逐条列出下载任务，能看到装到哪一步。</p>
 
     <h3 id="theme">深色模式</h3>
     <p>内置插件页 → <b>界面 → 深浅色模式</b>，三个选项：跟随系统 / 始终浅色 / 始终深色。</p>
