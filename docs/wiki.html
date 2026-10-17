@@ -270,6 +270,40 @@
     </ul>
     <p>判读方法写在报告末尾。把这段发出来即可定位。</p>
 
+    <h3 id="market-offline">插件市场连不上 / 网页打不开</h3>
+    <p><b>先看浏览器报什么错</b> —— 不同错误码指向完全不同的原因：</p>
+    <table>
+      <tr><th>浏览器报错</th><th>真正的原因</th><th>怎么办</th></tr>
+      <tr>
+        <td><code>ERR_PROXY_CONNECTION_FAILED</code></td>
+        <td><b>系统代理坏了</b>（最常见）</td>
+        <td>见下面的「关掉系统代理」</td>
+      </tr>
+      <tr>
+        <td><code>ERR_CONNECTION_TIMED_OUT</code> / 一直转圈</td>
+        <td>域名被拦 / 网络太慢</td>
+        <td>App 会自动换镜像重试，也可以挂代理</td>
+      </tr>
+      <tr>
+        <td>浏览器<b>能</b>打开，但 App 里不行</td>
+        <td>App 侧的问题</td>
+        <td>去「我的 → 启动诊断」把报告发出来</td>
+      </tr>
+    </table>
+
+    <div class="box warn">
+      <b>关掉系统代理</b>（最常见的原因）：
+      <ul style="margin-top:8px">
+        <li><b>Windows</b>：设置 → 网络和 Internet → 代理 → 关掉「使用代理服务器」</li>
+        <li><b>安卓</b>：设置 → WLAN → 长按当前网络 → 修改网络 → 代理 → 无</li>
+      </ul>
+      <p style="margin-top:8px">常见情况：某个代理 / VPN 客户端<b>已经关了</b>，
+      但系统代理设置还留着 —— 于是浏览器和 App 都往一个死掉的端口发请求。</p>
+    </div>
+
+    <p>2.0.5 起，App 里读市场索引会<b>先直连、失败再走系统代理</b>，
+    所以代理坏了也能读到 ✓ 但修好代理更彻底。</p>
+
     <h3 id="download-fail">下载失败</h3>
     <ul>
       <li>默认会走国内镜像。如果某个镜像挂了，会自动回退到官方源。</li>
