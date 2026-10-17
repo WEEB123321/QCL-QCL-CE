@@ -110,6 +110,26 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
     public void onCreate() {
         super.onCreate();
         mainUI = activity.findViewById(R.id.ui_main);
+        // ★★★ 2.0.9：**安全模式开着时，必须让用户知道** ✗
+        //   安全模式 = 上次启动没走完 → 本次跳过 bytehook / SDL3 的 native 加载
+        //   ★ 后果：**启动器能开，但游戏大概率起不来** ✗（那两个库是渲染/注入用的 ✗）
+        //   ★ 如果不提示：用户只会觉得「怎么游戏又跑不了」✗ 完全不知道是这个原因 ✗
+        //   ⇒ 弹一次 Toast，并指向诊断报告 ✓（不弹对话框 ✗ 不打断 ✓）
+        try {
+            if (com.qcl.launcher.launcher.StartupTrace.lastRunStartupIncomplete()) {
+                activity.runOnUiThread(() -> {
+                    try {
+                        android.widget.Toast.makeText(activity,
+                                "安全模式：上次启动没走完，本次跳过了原生库加载。\n"
+                                        + "启动器能开，但游戏可能起不来 —— "
+                                        + "去「我的 → 启动诊断」看详情并分享报告",
+                                android.widget.Toast.LENGTH_LONG).show();
+                    } catch (Throwable ignored) {
+                    }
+                });
+            }
+        } catch (Throwable ignored) {
+        }
 
         // ★★★ 1.9.6：界面排版 —— 主页接入（阶段 ③）
         //   ① 先把**已保存的排版**应用上 ✓（没有自定义时完全不动 ✓）
