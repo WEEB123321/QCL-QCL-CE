@@ -154,6 +154,15 @@ public class QCLApplication extends Application {
             try { System.loadLibrary("bytehook"); } catch (Throwable ignored) { }
             StartupTrace.mark("加载 SDL3（native，失败已被 catch）");
             try { System.loadLibrary("SDL3"); } catch (Throwable ignored) { }
+            // ★★★ 2.0.9：**「启动成功」必须在这里写** ✗
+            //   原来它只在 RuntimeInstallActivity 里写 ✗ —— 那只证明「那个页面显示了」✗
+            //   不证明「native 加载成功」✗
+            //   ⇒ 造成「无限震荡」✗：
+            //     第 1 次（无 OK）→ 安全模式跳过 native → 能开 → 页面写下 OK ✗
+            //     第 2 次（有 OK）→ 关掉安全模式 → 加载 native → 闪退 ✗
+            //     第 3 次（无 OK）→ 又能开 → 又写 OK ✗ …… 永远反复 ✗
+            //   ★ 写在这里 = 「这次 native 加载真的走完了」✓ 下次才允许关安全模式 ✓
+            StartupTrace.mark(StartupTrace.MARK_STARTUP_OK);
         }
         StartupTrace.mark("Application.onCreate 完成");
     }

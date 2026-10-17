@@ -360,8 +360,12 @@ implements View.OnClickListener {
         //   一个总在喊狼来了的提示，用户第三次就会直接无视它，那时它才真的没用。
         //   已交给主界面的情况不补记（见 handedOffToMain 的说明）。
         if (this.isFinishing() && !this.handedOffToMain) {
-            com.qcl.launcher.launcher.StartupTrace.mark(
-                    com.qcl.launcher.launcher.StartupTrace.MARK_STARTUP_OK);
+            // ★★★ 2.0.9：**不再在这里写「启动成功」** ✗
+            //   这里只证明「安装页显示了」✗ 不证明「native 加载成功」✗
+            //   写在 RuntimeInstallActivity 会造成「安全模式震荡」✗
+            //   （详见 QCLApplication 里 loadLibrary 之后那段注释）
+            // com.qcl.launcher.launcher.StartupTrace.mark(
+            //         com.qcl.launcher.launcher.StartupTrace.MARK_STARTUP_OK);
         }
         this.worker.shutdownNow();
         super.onDestroy();
