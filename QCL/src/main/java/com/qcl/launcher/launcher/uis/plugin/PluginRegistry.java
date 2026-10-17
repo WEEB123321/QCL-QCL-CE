@@ -434,6 +434,12 @@ public final class PluginRegistry {
                         + "版本清单来自 repo.cleanroommc.com 的 maven-metadata。",
                 PluginCleanroom::ui));
 
+        l.add(new PluginSpec("系统", "safety_mode",
+                "安全模式开关",
+                "安全模式开着时游戏跑不起来（跳过了 native 库）。这里能看到当前状态，"
+                        + "也可以手动关掉安全模式让下次正常加载。",
+                PluginSafetyMode::ui));
+
         return l;
     }
 
