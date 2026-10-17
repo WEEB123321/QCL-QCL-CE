@@ -428,6 +428,12 @@ public final class PluginRegistry {
                         + "对不上就拒装。市场网页：weeb123321.github.io/QCL-Plugins",
                 PluginMarket::ui));
 
+        l.add(new PluginSpec("资源", "plugin_cleanroom",
+                "Cleanroom 加载器",
+                "Minecraft 1.12.2 的 Forge 延续版。下载官方 MMC 实例包并用已有安装器装。"
+                        + "版本清单来自 repo.cleanroommc.com 的 maven-metadata。",
+                PluginCleanroom::ui));
+
         return l;
     }
 
