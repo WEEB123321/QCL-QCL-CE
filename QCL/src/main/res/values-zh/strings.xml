@@ -76,7 +76,7 @@
     <string name="account_offline_login">离线模式</string>
     <string name="account_mojang_login">Mojang 账号</string>
     <string name="account_microsoft_login">微软账户</string>
-    <string name="account_external_login">添加认证服务器</string>
+    <string name="account_external_login">第三方登录 / 外置登录</string>
     <string name="account_external_login_hint">外置登录</string>
 
     <string name="account_refresh_exception_network">刷新失败，请检查网络</string>

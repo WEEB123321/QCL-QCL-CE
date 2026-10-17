@@ -59,7 +59,7 @@
     <string name="account_offline_login">Ofline</string>
     <string name="account_mojang_login">Mojang</string>
     <string name="account_microsoft_login">Microsoft Nalog</string>
-    <string name="account_external_login">Add an Authentication Server</string>
+    <string name="account_external_login">Third-party login (external auth)</string>
     <string name="account_external_login_hint">eksterno ulogovanje</string>
     <string name="account_refresh_exception_network">Osvežavanje nije uspelo, proverite mrežu</string>
     <string name="account_server_type">Izaberite tip servera za autentifikaciju</string>

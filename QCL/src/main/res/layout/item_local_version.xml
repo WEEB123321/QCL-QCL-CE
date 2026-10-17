@@ -57,6 +57,18 @@
         android:layout_gravity="center"
         android:id="@+id/test_game"/>
 
+    <!-- ★★★ 2.0.7：照 FCL 版本列表 —— 「打开对应版本 wiki」的地球按钮
+         位置放在「启动」和「更多」之间 ✓ 和 FCL 一致 ✓
+         图标用项目里**已有但没人用**的 ic_qcl_globe_dark ✓ 不新增资源 ✗ -->
+    <ImageButton
+        android:layout_marginStart="10dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ic_qcl_globe_dark"
+        android:layout_gravity="center"
+        android:contentDescription="打开该版本的 Wiki"
+        android:id="@+id/version_wiki"/>
+
     <ImageButton
         android:layout_marginStart="10dp"
         android:layout_width="20dp"

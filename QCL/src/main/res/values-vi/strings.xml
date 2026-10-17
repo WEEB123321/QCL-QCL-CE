@@ -2,7 +2,7 @@
 <resources>
 
     <string name="account_auth_lib_injector">authlib-injector</string>
-    <string name="account_external_login">Thêm máy chủ xác thực</string>
+    <string name="account_external_login">Third-party login (external auth)</string>
     <string name="account_external_login_hint">Đăng nhập bên ngoài</string>
     <string name="account_microsoft_login">Tài khoản Microsoft</string>
     <string name="account_mojang_login">Mojang</string>

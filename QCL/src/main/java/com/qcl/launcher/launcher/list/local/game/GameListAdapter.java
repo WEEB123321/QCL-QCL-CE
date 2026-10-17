@@ -50,6 +50,7 @@ public class GameListAdapter extends BaseAdapter {
     /* JADX INFO: Access modifiers changed from: private */
     /* loaded from: classes2.dex */
     public class ViewHolder {
+        private ImageButton wiki;
         ImageView icon;
         LinearLayout item;
         ImageButton moreVert;
@@ -124,6 +125,8 @@ public class GameListAdapter extends BaseAdapter {
             viewHolder.version = (TextView) view2.findViewById(R.id.version_id);
             viewHolder.startGame = (ImageButton) view2.findViewById(R.id.test_game);
             viewHolder.moreVert = (ImageButton) view2.findViewById(R.id.more_vert);
+            // ★ 2.0.7：地球按钮（打开对应版本 wiki）
+            viewHolder.wiki = (ImageButton) view2.findViewById(R.id.version_wiki);
             this.activity.exteriorConfig.apply(viewHolder.radioButton);
             view2.setTag(viewHolder);
         } else {
@@ -178,6 +181,29 @@ public class GameListAdapter extends BaseAdapter {
                 GameListAdapter.this.m442x338b4e7e(i, view3);
             }
         });
+        // ★★★ 2.0.7：点地球 → 打开该版本的 MC Wiki
+        //   ★ 用**版本 id** 而不是显示名 ✗ —— 显示名可能被玩家改过 ✗
+        //   ★ 用**搜索页**而不是直接 /w/Java版<id> ✗ ——
+        //     直接页面对快照 / 远古版本经常 404 ✗ 搜索页一定能出结果 ✓
+        if (viewHolder.wiki != null) {
+            viewHolder.wiki.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        String vid = viewHolder.version.getText().toString().trim();
+                        if (vid.isEmpty()) {
+                            return;
+                        }
+                        String url = "https://zh.minecraft.wiki/?search="
+                                + java.net.URLEncoder.encode("Java版" + vid, "UTF-8");
+                        context.startActivity(new android.content.Intent(
+                                android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)));
+                    } catch (Throwable ignored) {
+                    }
+                }
+            });
+        }
+
         viewHolder.moreVert.setOnClickListener(new View.OnClickListener() { // from class: com.qcl.launcher.launcher.list.local.game.GameListAdapter$$ExternalSyntheticLambda7
             @Override // android.view.View.OnClickListener
             public final void onClick(View view3) {

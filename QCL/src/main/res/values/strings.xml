@@ -141,7 +141,7 @@
     <string name="account_offline_login">Offline</string>
     <string name="account_mojang_login">Mojang</string>
     <string name="account_microsoft_login">Microsoft Account</string>
-    <string name="account_external_login">Add an Authentication Server</string>
+    <string name="account_external_login">Third-party login (external auth)</string>
     <string name="account_external_login_hint">External login</string>
     <string name="account_refresh_exception_network">Refresh failed, please check the network</string>
     <string name="account_server_type">Select the authentication server type</string>

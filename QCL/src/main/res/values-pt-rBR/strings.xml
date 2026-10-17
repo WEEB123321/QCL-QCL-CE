@@ -59,7 +59,7 @@
     <string name="account_offline_login"></string>
     <string name="account_mojang_login">Mojang</string>
     <string name="account_microsoft_login">Conta Microsoft</string>
-    <string name="account_external_login">Adicionar um servidor de autenticação</string>
+    <string name="account_external_login">Third-party login (external auth)</string>
     <string name="account_external_login_hint">Login externo</string>
     <string name="account_refresh_exception_network">Falha na atualização, verifique a rede</string>
     <string name="account_server_type">Selecione o tipo de servidor de autenticação</string>

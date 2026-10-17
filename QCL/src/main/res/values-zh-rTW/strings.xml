@@ -64,7 +64,7 @@
     <string name="account_offline_login">離線模式</string>
     <string name="account_mojang_login">Mojang 賬號</string>
     <string name="account_microsoft_login">微軟賬戶</string>
-    <string name="account_external_login">添加認證服務器</string>
+    <string name="account_external_login">第三方登录 / 外置登录</string>
     <string name="account_external_login_hint">外置登錄</string>
     <string name="account_refresh_exception_network">刷新失敗，請檢查網絡</string>
     <string name="account_server_type">選擇認證服務器類型</string>

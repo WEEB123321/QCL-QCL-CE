@@ -243,6 +243,26 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         } catch (Throwable ignored) {
         }
 
+        // ★★★ 2.0.7：**点头像 = 快速切换账号** ✓
+        //   原来只有「长按账号按钮」✗ —— 注释说「刻意不做第二个入口，怕挤」✗
+        //   但用户明确要求「点主页的头像就能换」✓
+        //   ★ 头像本来就是「当前账号」的视觉代表 ✗ 点它切账号符合直觉 ✓
+        //   ★ 用 OnClickListener 而不是替换原有行为 ✓ 不影响头像的其它逻辑 ✓
+        try {
+            View.OnClickListener switchAcc = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    com.qcl.launcher.launcher.dialogs.QuickAccountSwitchDialog.show(context, activity);
+                }
+            };
+            if (accountModelContainer != null) {
+                accountModelContainer.setOnClickListener(switchAcc);
+            }
+            if (accountSkinFace != null) {
+                accountSkinFace.setOnClickListener(switchAcc);
+            }
+        } catch (Throwable ignored) {
+        }
         startAccountUI.setOnClickListener(this);
         // ★ 社区版新增：**长按**账号按钮 = 快速切换账号。
         //   刻意不做成长按之外的第二个入口 —— 主界面顶部已经排了 7 个按钮，
@@ -667,6 +687,11 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         }
         try {
             bigAvatar = activity.findViewById(R.id.account_avatar_big);
+            // ★ 2.0.7：大头像也可点 → 快速切换账号 ✓
+            if (bigAvatar != null) {
+                bigAvatar.setOnClickListener(v ->
+                        com.qcl.launcher.launcher.dialogs.QuickAccountSwitchDialog.show(context, activity));
+            }
             applyAdaptiveAvatarSize();
         } catch (Throwable t) {
             bigAvatar = null;
