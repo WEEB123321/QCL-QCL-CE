@@ -153,8 +153,13 @@ public final class PluginMarket {
                 if (fin == null) {
                     out.addView(PluginUiKit.sub(a, "读不到市场索引 ✗"));
                     out.addView(PluginUiKit.sub(a, "试过的地址：" + ferr));
-                    out.addView(PluginUiKit.sub(a, "★ 四个地址全失败 —— 多半是当前网络把这些域名都拦了"));
-                    out.addView(PluginUiKit.sub(a, "　可以点上面「在浏览器打开市场」用浏览器看 ✓"));
+                    out.addView(PluginUiKit.sub(a, "★ 四个地址全失败 ✗ 常见两种原因："));
+                    out.addView(PluginUiKit.sub(a, "① 系统代理坏了 ✗（最常见）"));
+                    out.addView(PluginUiKit.sub(a, "　Windows：设置 → 网络和 Internet → 代理 → 关掉「使用代理服务器」"));
+                    out.addView(PluginUiKit.sub(a, "　安卓：设置 → WLAN → 长按当前网络 → 修改网络 → 代理 → 无"));
+                    out.addView(PluginUiKit.sub(a, "② 当前网络把这些域名都拦了 ✗"));
+                    out.addView(PluginUiKit.sub(a, "　可以点上面「在浏览器打开市场」验证："));
+                    out.addView(PluginUiKit.sub(a, "　浏览器能开 = App 的问题；浏览器也报 ERR_PROXY_* = 就是代理坏了 ✓"));
                     return;
                 }
                 if (fin.isEmpty()) {
