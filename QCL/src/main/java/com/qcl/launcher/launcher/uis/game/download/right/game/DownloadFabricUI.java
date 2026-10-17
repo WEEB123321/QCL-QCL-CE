@@ -32,6 +32,13 @@ public class DownloadFabricUI extends BaseUI implements View.OnClickListener {
     private static final String BMCLAPI_LOADER_META_URL = "https://bmclapi2.bangbang93.com/fabric-meta/v2/versions/loader";
     private static final String OFFICIAL_GAME_META_URL = "https://meta.fabricmc.net/v2/versions/game";
     private static final String OFFICIAL_LOADER_META_URL = "https://meta.fabricmc.net/v2/versions/loader";
+    // ★★★ 2.0.8：**Legacy Fabric**（1.8~1.13 的 Fabric 分支）✓
+    //   它的 meta **结构和 Fabric 一模一样** ✓（已实测确认 ✓）
+    //   ⇒ 同一个界面、同一套解析，只换 base URL ✓
+    //   ★ 注意：它**没有 BMCL 镜像** ✗（bmclapi 只镜像了官方 fabric-meta ✗）
+    //     ⇒ Legacy 模式**只用官方地址** ✓ 不走镜像 ✗
+    private static final String LEGACY_GAME_META_URL = "https://meta.legacyfabric.net/v2/versions/game";
+    private static final String LEGACY_LOADER_META_URL = "https://meta.legacyfabric.net/v2/versions/loader";
     private TextView back;
     public LinearLayout downloadFabricUI;
     private ListView fabricListView;
@@ -41,8 +48,16 @@ public class DownloadFabricUI extends BaseUI implements View.OnClickListener {
     private ProgressBar progressBar;
     public String version;
 
+    /** ★ 2.0.8：true = Legacy Fabric（1.8~1.13 分支） */
+    private final boolean legacy;
+
     public DownloadFabricUI(Context context, MainActivity mainActivity) {
+        this(context, mainActivity, false);
+    }
+
+    public DownloadFabricUI(Context context, MainActivity mainActivity, boolean legacy) {
         super(context, mainActivity);
+        this.legacy = legacy;
         this.loadingHandler = new Handler() { // from class: com.qcl.launcher.launcher.uis.game.download.right.game.DownloadFabricUI.1
             @Override // android.os.Handler
             public void handleMessage(Message message) {
@@ -109,12 +124,16 @@ public class DownloadFabricUI extends BaseUI implements View.OnClickListener {
         String str;
         String str2;
         this.loadingHandler.sendEmptyMessage(0);
-        if (DownloadUrlSource.getSource(this.activity.launcherSetting.downloadUrlSource) == 0) {
-            str = "https://meta.fabricmc.net/v2/versions/loader";
-            str2 = "https://meta.fabricmc.net/v2/versions/game";
+        // ★ 2.0.8：Legacy 模式**只用官方地址** ✗（它没有 BMCL 镜像 ✗）
+        if (legacy) {
+            str = LEGACY_LOADER_META_URL;
+            str2 = LEGACY_GAME_META_URL;
+        } else if (DownloadUrlSource.getSource(this.activity.launcherSetting.downloadUrlSource) == 0) {
+            str = OFFICIAL_LOADER_META_URL;
+            str2 = OFFICIAL_GAME_META_URL;
         } else {
-            str = "https://bmclapi2.bangbang93.com/fabric-meta/v2/versions/loader";
-            str2 = "https://bmclapi2.bangbang93.com/fabric-meta/v2/versions/game";
+            str = BMCLAPI_LOADER_META_URL;
+            str2 = BMCLAPI_GAME_META_URL;
         }
         ArrayList arrayList = new ArrayList();
         ArrayList arrayList2 = new ArrayList();
