@@ -340,6 +340,7 @@
     <string name="install_game_ui_title">dodaj novu istancu - Add a New Instance</string>
     <string name="install_game_ui_name">Ime fajla</string>
     <string name="install_game_ui_none">Nije odabrano</string>
+    <string name="install_game_ui_legacy_fabric">Legacy Fabric</string>
     <string name="install_game_ui_forge_not_compatible">Nekompatibilno s Forge</string>
     <string name="install_game_ui_fabric_not_compatible">Nekompatibilno s Fabric</string>
     <string name="install_game_ui_optifine_not_compatible">Nekompatibilno sa OptiFine</string>

@@ -340,6 +340,7 @@
     <string name="install_game_ui_title">Add a New Instance - Add a New Instance</string>
     <string name="install_game_ui_name">Filename</string>
     <string name="install_game_ui_none">Not Selected</string>
+    <string name="install_game_ui_legacy_fabric">Legacy Fabric</string>
     <string name="install_game_ui_forge_not_compatible">Incompatible with Forge</string>
     <string name="install_game_ui_fabric_not_compatible">Incompatible with Fabric</string>
     <string name="install_game_ui_optifine_not_compatible">Incompatible with OptiFine</string>

@@ -342,6 +342,7 @@
     <string name="install_game_ui_title">安裝新遊戲版本 - 安裝新遊戲版本</string>
     <string name="install_game_ui_name">名稱</string>
     <string name="install_game_ui_none">不安裝</string>
+    <string name="install_game_ui_legacy_fabric">Legacy Fabric</string>
     <string name="install_game_ui_forge_not_compatible">與 Forge 不兼容</string>
     <string name="install_game_ui_fabric_not_compatible">與 Fabric 不兼容</string>
     <string name="install_game_ui_optifine_not_compatible">與 OptiFine 不兼容</string>

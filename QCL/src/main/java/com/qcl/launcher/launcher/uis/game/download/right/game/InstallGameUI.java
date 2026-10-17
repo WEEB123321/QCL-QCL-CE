@@ -66,6 +66,7 @@ public class InstallGameUI extends BaseUI implements View.OnClickListener, TextW
     private ImageView selectFabricAPI;
     private LinearLayout selectFabricAPIVersion;
     private LinearLayout selectFabricVersion;
+    private LinearLayout selectLegacyFabricVersion;
     private ImageView selectForge;
     private LinearLayout selectForgeVersion;
     private ImageView selectLiteLoader;
@@ -155,6 +156,11 @@ public class InstallGameUI extends BaseUI implements View.OnClickListener, TextW
         this.selectLiteLoaderVersion.setOnClickListener(this);
         this.selectOptiFineVersion.setOnClickListener(this);
         this.selectFabricVersion.setOnClickListener(this);
+        // ★ 2.0.8：Legacy Fabric 行
+        this.selectLegacyFabricVersion = (LinearLayout) this.activity.findViewById(R.id.select_legacy_fabric_version);
+        if (this.selectLegacyFabricVersion != null) {
+            this.selectLegacyFabricVersion.setOnClickListener(this);
+        }
         this.selectFabricAPIVersion.setOnClickListener(this);
         this.selectQuiltVersion.setOnClickListener(this);
         this.selectQuiltAPIVersion.setOnClickListener(this);
@@ -254,6 +260,13 @@ public class InstallGameUI extends BaseUI implements View.OnClickListener, TextW
             this.activity.uiManager.downloadOptifineUI.version = this.version.id;
             this.activity.uiManager.downloadOptifineUI.install = false;
             this.activity.uiManager.switchMainUI(this.activity.uiManager.downloadOptifineUI);
+        }
+        // ★ 2.0.8：点 Legacy Fabric → 同一个界面，legacy=true ✓
+        if (view == this.selectLegacyFabricVersion) {
+            this.activity.uiManager.downloadLegacyFabricUI.version = this.version.id;
+            this.activity.uiManager.downloadLegacyFabricUI.install = false;
+            this.activity.uiManager.switchMainUI(this.activity.uiManager.downloadLegacyFabricUI);
+            return;
         }
         if (view == this.selectFabricVersion && this.forgeVersion == null && this.optifineVersion == null && this.quiltVersion == null && this.neoForgeVersion == null) {
             this.activity.uiManager.downloadFabricUI.version = this.version.id;

@@ -437,7 +437,53 @@
                     android:layout_height="1px"
                     android:background="@color/colorGray"/>
 
+                                <!-- ★★★ 2.0.8：Legacy Fabric（1.8~1.13 的 Fabric 分支）
+                     照上面 fabric 那行写的 ✓ 图标复用 ic_fabric ✓ 不新增资源 ✗ -->
                 <LinearLayout
+                    android:background="@drawable/launcher_button_parent"
+                    android:id="@+id/select_legacy_fabric_version"
+                    android:padding="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:src="@drawable/ic_fabric"
+                        android:layout_gravity="center"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:scaleType="centerInside" />
+
+                    <TextView
+                        android:singleLine="true"
+                        android:layout_marginStart="12dp"
+                        android:layout_gravity="center"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/install_game_ui_legacy_fabric"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"/>
+
+                    <TextView
+                        android:singleLine="true"
+                        android:id="@+id/legacy_fabric_version_text"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/install_game_ui_none"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+<LinearLayout
                     android:background="@drawable/launcher_button_parent"
                     android:id="@+id/select_fabric_api_version"
                     android:padding="12dp"

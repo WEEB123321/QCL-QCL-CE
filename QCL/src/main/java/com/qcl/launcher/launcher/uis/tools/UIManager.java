@@ -83,6 +83,7 @@ public class UIManager {
     public DownloadForgeUI downloadForgeUI;
     public DownloadNeoForgeUI downloadNeoForgeUI;
     public DownloadFabricUI downloadFabricUI;
+    public DownloadFabricUI downloadLegacyFabricUI;
     public DownloadFabricAPIUI downloadFabricAPIUI;
     public DownloadLiteLoaderUI downloadLiteLoaderUI;
     public DownloadOptifineUI downloadOptifineUI;
@@ -135,6 +136,8 @@ public class UIManager {
         try { downloadForgeUI = new DownloadForgeUI(context, activity); } catch (Throwable t) { downloadForgeUI = null; recordBootFail("DownloadForgeUI", t); }
         try { downloadNeoForgeUI = new DownloadNeoForgeUI(context, activity); } catch (Throwable t) { downloadNeoForgeUI = null; recordBootFail("DownloadNeoForgeUI", t); }
         try { downloadFabricUI = new DownloadFabricUI(context, activity); } catch (Throwable t) { downloadFabricUI = null; recordBootFail("DownloadFabricUI", t); }
+        // ★ 2.0.8：Legacy Fabric（同一个类，legacy=true ✓）
+        try { downloadLegacyFabricUI = new DownloadFabricUI(context, activity, true); } catch (Throwable t) { downloadLegacyFabricUI = null; recordBootFail("DownloadLegacyFabricUI", t); }
         try { downloadFabricAPIUI = new DownloadFabricAPIUI(context, activity); } catch (Throwable t) { downloadFabricAPIUI = null; recordBootFail("DownloadFabricAPIUI", t); }
         try { downloadLiteLoaderUI = new DownloadLiteLoaderUI(context, activity); } catch (Throwable t) { downloadLiteLoaderUI = null; recordBootFail("DownloadLiteLoaderUI", t); }
         try { downloadOptifineUI = new DownloadOptifineUI(context, activity); } catch (Throwable t) { downloadOptifineUI = null; recordBootFail("DownloadOptifineUI", t); }
@@ -177,6 +180,7 @@ public class UIManager {
         bootUI("DownloadForgeUI", downloadForgeUI);
         bootUI("DownloadNeoForgeUI", downloadNeoForgeUI);
         bootUI("DownloadFabricUI", downloadFabricUI);
+        bootUI("DownloadLegacyFabricUI", downloadLegacyFabricUI);
         bootUI("DownloadFabricAPIUI", downloadFabricAPIUI);
         bootUI("DownloadLiteLoaderUI", downloadLiteLoaderUI);
         bootUI("DownloadOptifineUI", downloadOptifineUI);

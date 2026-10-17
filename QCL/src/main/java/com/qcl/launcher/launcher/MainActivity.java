@@ -833,6 +833,7 @@ implements View.OnClickListener {
         this.uiManager.removeUIIfExist(this.uiManager.installGameUI);
         this.uiManager.removeUIIfExist(this.uiManager.downloadForgeUI);
         this.uiManager.removeUIIfExist(this.uiManager.downloadFabricUI);
+        this.uiManager.removeUIIfExist(this.uiManager.downloadLegacyFabricUI);
         this.uiManager.removeUIIfExist(this.uiManager.downloadFabricAPIUI);
         this.uiManager.removeUIIfExist(this.uiManager.downloadLiteLoaderUI);
         this.uiManager.removeUIIfExist(this.uiManager.downloadOptifineUI);
@@ -862,6 +863,9 @@ implements View.OnClickListener {
         }
         if (this.uiManager.currentUI == this.uiManager.downloadFabricUI) {
             this.uiManager.downloadFabricUI.onStop();
+        }
+        if (this.uiManager.currentUI == this.uiManager.downloadLegacyFabricUI) {
+            this.uiManager.downloadLegacyFabricUI.onStop();
         }
         if (this.uiManager.currentUI == this.uiManager.downloadFabricAPIUI) {
             this.uiManager.downloadFabricAPIUI.onStop();
