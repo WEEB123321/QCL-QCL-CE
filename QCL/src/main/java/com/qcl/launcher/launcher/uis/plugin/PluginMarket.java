@@ -393,11 +393,43 @@ public final class PluginMarket {
         return new String(getBytes(url), "UTF-8");
     }
 
+    /**
+     * ★★★ 2.0.5：**先直连、失败再走系统代理**
+     *
+     * <p>为什么：用户报「连不上网页的插件市场」✗ 截图是浏览器的
+     * <b>{@code ERR_PROXY_CONNECTION_FAILED}</b> ✗ —— 不是站点挂了 ✗
+     * 是**系统代理指向了一个已经关掉的代理客户端** ✗
+     * <br>
+     * {@code HttpURLConnection} 默认走 {@code ProxySelector.getDefault()} ✓
+     * ⇒ 系统代理一坏，**市场就全废** ✗✓
+     * <br>
+     * 而市场索引在**公共 CDN** 上 ✓ **本来就不需要代理** ✗
+     * ⇒ 先 {@code Proxy.NO_PROXY} 直连 ✓ 失败再退回系统代理 ✓
+     * 这样「代理坏了」和「必须用代理」两种情况**都能通** ✓
+     */
     private static byte[] getBytes(String url) throws Exception {
         if (url == null || url.isEmpty()) {
             throw new java.io.IOException("没有下载地址");
         }
-        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        // ① 先直连（公共 CDN 不需要代理 ✓）
+        try {
+            return getBytes(url, java.net.Proxy.NO_PROXY);
+        } catch (Throwable direct) {
+            // ② 直连失败 → 退回系统代理（有些人确实必须走代理）
+            try {
+                return getBytes(url, null);
+            } catch (Throwable viaProxy) {
+                throw new java.io.IOException("直连：" + brief(direct)
+                        + "；系统代理：" + brief(viaProxy));
+            }
+        }
+    }
+
+    /** @param proxy null = 用系统默认代理；NO_PROXY = 直连 */
+    private static byte[] getBytes(String url, java.net.Proxy proxy) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) (proxy == null
+                ? new URL(url).openConnection()
+                : new URL(url).openConnection(proxy));
         c.setConnectTimeout(8000);    // ★ 8s —— 多镜像轮询，单个不能等太久
         c.setReadTimeout(20000);
         c.setInstanceFollowRedirects(true);

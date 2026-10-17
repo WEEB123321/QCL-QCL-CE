@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20004,
-    "versionName": "2.0.4",
+    "versionCode": 20005,
+    "versionName": "2.0.5",
     "date": "2026-10-14",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.4/QCL-CE-v2.0.4-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.5/QCL-CE-v2.0.5-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.0.4</b><br/>· <b>修插件市场连不上</b>：加 jsDelivr 镜像并放第一位（github.io / raw 在国内常不通）<br/>· <b>插件市场排版压缩</b>：每个插件从 5 行压成 2 行<br/>· 市场改成 4 个地址轮询 + 超时 8s + 失败列出试过哪些<br/>· CurseForge / Modrinth 整合包（Fabric）<br/>· 界面排版 13 页 / 插件 93 个"
+    "updateLog": "<b>QCL-CE 2.0.5</b><br/>· <b>修插件市场连不上</b>：改成<b>先直连、失败再走系统代理</b>（原来系统代理一坏市场就全废）<br/>· 加 jsDelivr 镜像并放第一位 / 4 个地址轮询 / 超时 8s<br/>· 插件市场排版：每个插件 5 行压成 2 行<br/>· CurseForge / Modrinth 整合包（Fabric）<br/>· 界面排版 13 页 / 插件 93 个"
   },
   "latestPrerelease": null
 }
