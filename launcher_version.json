@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20008,
-    "versionName": "2.0.8",
+    "versionCode": 20009,
+    "versionName": "2.0.9",
     "date": "2026-10-14",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.8/QCL-CE-v2.0.8-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.9/QCL-CE-v2.0.9-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.0.8</b><br/>· <b>版本列表加地球按钮</b>：点一下打开该版本的 Minecraft Wiki<br/>· <b>点主页头像就能切换账号</b>（原来只有长按账号按钮）<br/>· 「添加认证服务器」改名 <b>第三方登录 / 外置登录</b>（功能早就有，只是名字没人看懂）<br/>· <b>新增 Legacy Fabric</b>（1.8~1.13 的 Fabric，安装游戏页多一行）<br/>· <b>新增 Cleanroom 插件</b>（1.12.2 的 Forge 延续版，插件页搜 Cleanroom）<br/>· 插件市场：先直连再走代理 + jsDelivr 镜像 + 排版压缩<br/>· 插件 94 个"
+    "updateLog": "<b>QCL-CE 2.0.9</b><br/>· <b>修「打开闪退」（时好时坏）</b>：安全模式的「启动成功」路标写错了地方，造成「能开→闪退→能开→闪退」无限循环。现在改到 native 加载之后写<br/>· 版本列表地球按钮 / 点头像切换账号 / 第三方登录改名<br/>· Legacy Fabric / Cleanroom 插件<br/>· 插件 94 个"
   },
   "latestPrerelease": null
 }
