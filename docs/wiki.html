@@ -104,6 +104,8 @@
     <h4>使用</h4>
     <a href="#launch">启动游戏</a>
     <a href="#version">装版本</a>
+    <a href="#switch-account">切换账号</a>
+    <a href="#third-party-login">第三方登录</a>
     <a href="#mod">装模组</a>
     <a href="#theme">深色模式</a>
     <a href="#menu">菜单排版</a>
@@ -172,6 +174,22 @@
       <li>启动日志会实时显示在弹窗里 —— 出问题就看那里。</li>
     </ol>
 
+    <h3 id="switch-account">切换账号</h3>
+    <p><b>点主页的头像</b>就能切换 ✓（2.0.8 起）。也可以长按顶部的账号按钮。</p>
+    <p>会弹出一个账号列表，点哪个就切到哪个。</p>
+
+    <h3 id="third-party-login">第三方登录（外置登录）</h3>
+    <p>账号页第 4 个按钮 <b>「第三方登录 / 外置登录」</b> —— 支持 <b>authlib-injector</b> 的服务器 ✓</p>
+    <ul>
+      <li>点它 → 选服务器类型 → 填服务器地址</li>
+      <li>支持 Blessing Skin、LittleSkin 这类外置登录皮肤站</li>
+      <li>登录后皮肤和披风都走那个服务器 ✓</li>
+    </ul>
+    <div class="box warn">
+      <b>这个功能一直都有</b> —— 2.0.8 之前它叫「添加认证服务器」，
+      名字不容易看懂，所以很多人以为没有。现在改成了「第三方登录 / 外置登录」。
+    </div>
+
     <h3 id="version">装版本</h3>
     <ol>
       <li>左侧「≡ 菜单」→ <b>下载</b>，或直接进<b>版本列表</b>。</li>
@@ -180,6 +198,25 @@
     <div class="box warn">
       <b>注意</b>：远古版本（很老的 alpha/beta）需要额外的中文补丁，QCL-CE 会自动处理。
     </div>
+
+    <p id="version-wiki"><b>版本列表每一行右边有个地球图标</b> ——
+    点一下会打开<b>这个版本的 Minecraft Wiki 页面</b> ✓ 想查某个版本加了什么内容时很方便。</p>
+
+    <h3 id="legacy-fabric">Legacy Fabric（1.8 ~ 1.13）</h3>
+    <p>「下载 → 安装游戏」页里多了一行 <b>Legacy Fabric</b> ✓</p>
+    <p>它是 Fabric 给 <b>1.8 ~ 1.13</b> 这些老版本用的分支 —— 界面和普通 Fabric 一模一样，
+    只是版本列表来自 <code>meta.legacyfabric.net</code>。</p>
+    <p><b>Legacy Fabric API</b> 是个<b>模组</b>，不是加载器 —— 到「下载 → 模组」里搜
+    <code>legacy-fabric-api</code> 就能找到。</p>
+
+    <h3 id="cleanroom">Cleanroom（1.12.2 的 Forge 延续版）</h3>
+    <p>插件页搜 <b>Cleanroom</b> ✓</p>
+    <ul>
+      <li>它是 <b>Minecraft 1.12.2</b> 上 Forge 的延续版（不是 fork，是逐步独立的现代化版本）</li>
+      <li><b>只支持 1.12.2</b> —— 模组也要用 1.12.2 的</li>
+      <li>运行时要 <b>Java 25</b>，启动器里已经内置了</li>
+      <li>版本列表来自官方 Maven 仓库，装了会自动用 MultiMC 的安装流程</li>
+    </ul>
 
     <h3 id="mod">装模组</h3>
     <p>在<b>下载 → 模组</b>里搜索并安装。安装时 QCL-CE 会<b>自动把前置也一起装上</b>：</p>
