@@ -49,12 +49,19 @@ public final class PluginMarket {
     private PluginMarket() {
     }
 
-    /** 市场索引（GitHub Pages ✓）。 */
-    private static final String INDEX_URL =
-            "https://weeb123321.github.io/QCL-Plugins/index.json";
-    /** 索引的镜像（Pages 挂的时候用 raw + gh-proxy ✓）。 */
-    private static final String INDEX_MIRROR =
-            "https://gh-proxy.com/https://raw.githubusercontent.com/WEEB123321/QCL-Plugins/main/index.json";
+    // ★★★ 2.0.4：索引地址加 jsDelivr 并放第一位
+    //   用户反馈「连不上网页的插件市场」—— 用能出网的工具实测：
+    //   https://weeb123321.github.io/QCL-Plugins/index.json 是活的（返回完整 JSON）
+    //   ⇒ 站点没挂，是**可达性**问题
+    //   ★ github.io 和 raw.githubusercontent.com 在国内经常不通
+    //     而原来的回退链正好只有这两个
+    //   ⇒ 加 jsDelivr（中国有 CDN）并放第一个
+    private static final String[] INDEX_URLS = {
+            "https://cdn.jsdelivr.net/gh/WEEB123321/QCL-Plugins@main/index.json",
+            "https://weeb123321.github.io/QCL-Plugins/index.json",
+            "https://gh-proxy.com/https://raw.githubusercontent.com/WEEB123321/QCL-Plugins/main/index.json",
+            "https://raw.githubusercontent.com/WEEB123321/QCL-Plugins/main/index.json",
+    };
 
     /** 市场网页（给「在浏览器打开」用 ✓）。 */
     private static final String WEB_URL = "https://weeb123321.github.io/QCL-Plugins/";
@@ -87,11 +94,8 @@ public final class PluginMarket {
             LinearLayout col = PluginUiKit.column(a);
 
             col.addView(PluginUiKit.text(a, "插件市场"));
-            col.addView(PluginUiKit.sub(a, "★ 市场里的插件是**资源型**的（控键布局 / 界面排版）✓"
-                    + " —— 启动器没有插件运行时，所以不加载代码 ✗"));
-            col.addView(PluginUiKit.sub(a, "★ 每个包都会**校验 sha256** ✓ 对不上就拒装 ✗"));
-            col.addView(PluginUiKit.sub(a, " "));
-            col.addView(PluginUiKit.sub(a, "市场地址：" + WEB_URL));
+            col.addView(PluginUiKit.sub(a, "★ 资源型插件（控键 / 排版）✓ 不加载代码 ✗"
+                    + "　每个包都校验 sha256 ✓ 对不上拒装 ✗"));
 
             final LinearLayout list = PluginUiKit.column(a);
             PluginUiKit.row(a, "在浏览器打开市场", v -> openWeb(a));
@@ -124,25 +128,33 @@ public final class PluginMarket {
         new Thread(() -> {
             List<Item> items = null;
             String err = null;
-            try {
-                String body;
+            // ★ 按顺序试，第一个成功的就用；全都失败才报错
+            StringBuilder tried = new StringBuilder();
+            for (String u : INDEX_URLS) {
                 try {
-                    body = get(INDEX_URL);
-                } catch (Throwable t1) {
-                    body = get(INDEX_MIRROR);   // Pages 挂了就走镜像 ✓
+                    String body = get(u);
+                    if (body != null && body.trim().length() > 0) {
+                        items = parse(body);
+                        if (items != null && !items.isEmpty()) {
+                            break;
+                        }
+                    }
+                } catch (Throwable t) {
+                    tried.append("\n  ✗ ").append(shortUrl(u)).append(" —— ").append(brief(t));
                 }
-                items = parse(body);
-            } catch (Throwable t) {
-                err = String.valueOf(t);
+            }
+            if (items == null || items.isEmpty()) {
+                err = tried.length() == 0 ? "所有地址都返回空" : tried.toString();
             }
             final List<Item> fin = items;
             final String ferr = err;
             a.runOnUiThread(() -> {
                 out.removeAllViews();
                 if (fin == null) {
-                    out.addView(PluginUiKit.sub(a, "读不到市场索引 ✗：" + ferr));
-                    out.addView(PluginUiKit.sub(a, "★ 这多半是网络问题 —— "
-                            + "索引在 GitHub Pages，读不到时自动回退镜像 ✓"));
+                    out.addView(PluginUiKit.sub(a, "读不到市场索引 ✗"));
+                    out.addView(PluginUiKit.sub(a, "试过的地址：" + ferr));
+                    out.addView(PluginUiKit.sub(a, "★ 四个地址全失败 —— 多半是当前网络把这些域名都拦了"));
+                    out.addView(PluginUiKit.sub(a, "　可以点上面「在浏览器打开市场」用浏览器看 ✓"));
                     return;
                 }
                 if (fin.isEmpty()) {
@@ -159,21 +171,25 @@ public final class PluginMarket {
 
     private static void renderItem(MainActivity a, LinearLayout out, Item it) {
         boolean tooOld = it.minCode > 0 && it.minCode > currentVersionCode(a);
-        out.addView(PluginUiKit.sub(a, "· " + it.name + "  " + it.version
-                + "　[" + ("layout".equals(it.type) ? "界面排版" : "控键布局") + "]"));
-        if (it.description != null && !it.description.isEmpty()) {
-            out.addView(PluginUiKit.sub(a, "　" + it.description));
-        }
-        out.addView(PluginUiKit.sub(a, "　" + (it.size / 1024) + " KB"
-                + (it.author == null ? "" : "　by " + it.author)
-                + (it.tags == null ? "" : "　#" + it.tags)));
+        // ★★★ 2.0.4：排版压缩
+        //   用户反馈「每次都要翻好久」—— 原来每个插件占 5 行（名称/简介/元信息/按钮/空行）
+        //   5 个插件就要翻一屏多
+        //   ⇒ 压成 **2 行**：第 1 行「名称 版本 类型 大小」整行可点（点它安装）
+        //     第 2 行「简介 + 标签」小字；去掉空行
+        String head = "· " + it.name + "　" + it.version + "　"
+                + ("layout".equals(it.type) ? "排版" : "控键") + "　" + (it.size / 1024) + "KB";
         if (tooOld) {
-            out.addView(PluginUiKit.sub(a, "　✗ 这个插件要求启动器版本 ≥ "
-                    + it.minCode + "，当前是 " + currentVersionCode(a) + " —— 先升级启动器 ✗"));
+            out.addView(PluginUiKit.sub(a, head + "　✗ 需启动器 ≥" + it.minCode));
         } else {
-            PluginUiKit.row(a, "　安装「" + it.name + "」", v -> install(a, it));
+            PluginUiKit.row(a, head, v -> install(a, it));
         }
-        out.addView(PluginUiKit.sub(a, " "));
+        String tail = (it.description == null ? "" : it.description);
+        if (it.tags != null && it.tags.length() > 0) {
+            tail = tail + "　#" + it.tags.replace(' ', '/');
+        }
+        if (tail.length() > 0) {
+            out.addView(PluginUiKit.sub(a, "　" + tail));
+        }
     }
 
     private static int currentVersionCode(MainActivity a) {
@@ -382,8 +398,8 @@ public final class PluginMarket {
             throw new java.io.IOException("没有下载地址");
         }
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-        c.setConnectTimeout(15000);
-        c.setReadTimeout(60000);
+        c.setConnectTimeout(8000);    // ★ 8s —— 多镜像轮询，单个不能等太久
+        c.setReadTimeout(20000);
         c.setInstanceFollowRedirects(true);
         c.setRequestProperty("User-Agent", "QCL-CE/1.10.1 (Android)");
         try (InputStream in = c.getInputStream();
@@ -400,6 +416,27 @@ public final class PluginMarket {
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    /** 报错里只显示域名 + 最后一段，避免一长串 URL 撑爆界面 */
+    private static String shortUrl(String u) {
+        try {
+            java.net.URL x = new java.net.URL(u);
+            String pth = x.getPath();
+            int slash = pth.lastIndexOf('/');
+            return x.getHost() + (slash >= 0 ? "/…" + pth.substring(slash) : pth);
+        } catch (Throwable t) {
+            return u;
+        }
+    }
+
+    /** 异常压成一句话（不要堆栈） */
+    private static String brief(Throwable t) {
+        if (t == null) {
+            return "未知错误";
+        }
+        String m = t.getMessage();
+        return t.getClass().getSimpleName() + (m == null ? "" : (": " + m));
     }
 
     private static String sha256(byte[] data) throws Exception {
