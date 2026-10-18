@@ -103,6 +103,37 @@ public final class PluginSafetyMode {
                     col.addView(PluginUiKit.sub(a, "　" + lines[i]));
                 }
             }
+            // ★★★ 2.0.13：**系统记录的退出原因** ✓ —— 比路标更关键 ✗
+            //   路标只说「执行到哪一步」✗
+            //   系统还记着「**怎么死的**」✓：SIGSEGV（native 段错误 ✗）
+            //   还是 Java 异常（有堆栈 ✓）还是 OOM / ANR ✓
+            //   ★ 这两种的修法完全不同 ✗ 必须先分清 ✗
+            col.addView(PluginUiKit.label(a, "系统记录的退出原因（更关键）"));
+            try {
+                String ex = com.qcl.launcher.launcher.ProcessExitDiagnostics
+                        .describeLastExit(a);
+                if (ex == null || ex.trim().isEmpty()) {
+                    col.addView(PluginUiKit.sub(a, "（读不到 —— 可能系统没记录）"));
+                } else {
+                    String[] els = ex.split("\n");
+                    int n = 0;
+                    for (String line : els) {
+                        if (line.trim().isEmpty()) {
+                            continue;
+                        }
+                        col.addView(PluginUiKit.sub(a, "　" + line));
+                        if (++n >= 12) {
+                            break;
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                col.addView(PluginUiKit.sub(a, "（读不到：" + t + "）"));
+            }
+            col.addView(PluginUiKit.sub(a, "★ 出现 **SIGSEGV / SIGABRT** ⇒ native 崩 ✗"));
+            col.addView(PluginUiKit.sub(a, "★ 出现 **Exception / Error** ⇒ Java 崩 ✓（有堆栈）"));
+            col.addView(PluginUiKit.sub(a, " "));
+
             col.addView(PluginUiKit.sub(a, "★ **最后一行**就是崩溃前停住的地方 ✗"));
             col.addView(PluginUiKit.sub(a, "　比如停在「加载 SDL3」后面 ⇒ 崩在 SDL3 ✗"));
             col.addView(PluginUiKit.sub(a, " "));

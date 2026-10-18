@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20012,
-    "versionName": "2.0.12",
+    "versionCode": 20013,
+    "versionName": "2.0.13",
     "date": "2026-10-14",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.12/QCL-CE-v2.0.12-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.0.13/QCL-CE-v2.0.13-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.0.12</b><br/>· <b>「安全模式」插件现在直接显示上次崩在哪一步</b>（截图给开发者就能定位）<br/>· 修「打开闪退」：安全模式的路标写错了地方（第一次崩后一直卡在安全模式）<br/>· 安全模式开着时主页会提示<br/>· 版本列表地球按钮 / 点头像切换账号 / 第三方登录改名 / Legacy Fabric / Cleanroom<br/>· 插件 95 个"
+    "updateLog": "<b>QCL-CE 2.0.13</b><br/>· <b>「安全模式」插件现在显示两样决定性信息</b>：上次崩溃停在哪一步 + 系统记录的退出原因（SIGSEGV / Java 异常）<br/>· 修「打开闪退」：安全模式的路标写错了地方<br/>· 版本列表地球按钮 / 点头像切换账号 / 第三方登录改名 / Legacy Fabric / Cleanroom<br/>· 插件 95 个"
   },
   "latestPrerelease": null
 }
