@@ -77,6 +77,36 @@ public final class PluginSafetyMode {
             col.addView(PluginUiKit.sub(a, "　（写一次「启动成功」路标 ✓ 下次就会加载 native ✓）"));
             col.addView(PluginUiKit.sub(a, " "));
 
+            // ★★★ 2.0.12：**把上次崩在哪直接显示出来** ✓
+            //   用户报「第一次打开崩，之后再进就不崩」✗ —— 这是「第一次加载 native 崩了，
+            //   之后一直走安全模式」的典型特征 ✗
+            //   ⇒ 但**崩在哪一步**必须看路标 ✗ 猜不出来 ✗
+            //   ★ 这里直接显示 `lastRunTail()`（上次路标的最后 14 行 ✓）
+            //     —— 用户点进来截个图就行 ✓ 不用去翻 /sdcard ✓
+            col.addView(PluginUiKit.label(a, "上次崩溃停在哪（截图给开发者）"));
+            String tail = null;
+            try {
+                tail = StartupTrace.lastRunTail();
+            } catch (Throwable ignored) {
+            }
+            if (tail == null || tail.trim().isEmpty()) {
+                col.addView(PluginUiKit.sub(a, "（读不到上次路标 —— 可能是第一次安装，"
+                        + "或者路标文件被清掉了）"));
+            } else {
+                // 一行一条 ✓ 只留最后 10 行（太多看不清 ✗）
+                String[] lines = tail.split("\n");
+                int from = Math.max(0, lines.length - 10);
+                for (int i = from; i < lines.length; i++) {
+                    if (lines[i].trim().isEmpty()) {
+                        continue;
+                    }
+                    col.addView(PluginUiKit.sub(a, "　" + lines[i]));
+                }
+            }
+            col.addView(PluginUiKit.sub(a, "★ **最后一行**就是崩溃前停住的地方 ✗"));
+            col.addView(PluginUiKit.sub(a, "　比如停在「加载 SDL3」后面 ⇒ 崩在 SDL3 ✗"));
+            col.addView(PluginUiKit.sub(a, " "));
+
             col.addView(PluginUiKit.label(a, "说明"));
             col.addView(PluginUiKit.sub(a, "★ 为什么安全模式会「一直开着」✗："));
             col.addView(PluginUiKit.sub(a, "　「启动成功」只在 native **真的加载完** 时才写 ✓"));
