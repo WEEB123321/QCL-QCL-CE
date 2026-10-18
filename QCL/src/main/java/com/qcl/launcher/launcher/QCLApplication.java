@@ -151,9 +151,17 @@ public class QCLApplication extends Application {
             android.util.Log.w("QCLStartup", "安全模式：跳过 bytehook / SDL3 加载");
         } else {
             StartupTrace.mark("加载 bytehook（native，失败已被 catch）");
-            try { System.loadLibrary("bytehook"); } catch (Throwable ignored) { }
+            // ★★★★ 2.1.4：**不再在这里提前加载 native** ✗
+            //   ★ 证据：PojavLauncher:452-458 写着「必须由启动器侧先完成 libSDL3.so 的首次加载
+            //     ……否则之后 dalvik 侧再触发 JNI_OnLoad 即 SIGSEGV」
+            //     ⇒ **「启动游戏」时 SdlBridge.preloadSdl3() 已经做了** ✓ 那才是正确时机 ✓
+            //   ★ bytehook 由 QCLHooks.initializeHooks() → loadLibrary("pojavexec") 带起来 ✓
+            //   ★ 吻合用户报的「第一次打开崩、之后不崩」✗：
+            //     第 1 次：这里加载 native → 崩 ✗；第 2 次起：安全模式跳过 → 能开 ✓
+            //   ⚠️ 安全模式仍保留作兜底 ✓
+            // try { System.loadLibrary("bytehook"); } catch (Throwable ignored) { }
             StartupTrace.mark("加载 SDL3（native，失败已被 catch）");
-            try { System.loadLibrary("SDL3"); } catch (Throwable ignored) { }
+            // try { System.loadLibrary("SDL3"); } catch (Throwable ignored) { }
             // ★★★ 2.0.9：**「启动成功」必须在这里写** ✗
             //   原来它只在 RuntimeInstallActivity 里写 ✗ —— 那只证明「那个页面显示了」✗
             //   不证明「native 加载成功」✗
