@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
@@ -104,7 +106,7 @@ public final class GlassApplier {
     private static float strengthDp() {
         return 2f * bandDp();
     }
-    /** 统一圆角（dp）—— Drawable 不暴露 corner，只能统一给。 */
+    /** 统一圆角（dp）—— **只在读不到面板真实圆角时才用**（v3.5 起不再是硬编码值）。 */
     private static final float RADIUS_DP = 14f;
 
     private static final Handler sMain = new Handler(Looper.getMainLooper());
@@ -379,7 +381,7 @@ public final class GlassApplier {
         }
 
         GlassDrawable glass = new GlassDrawable(v)
-                .radiusDp(RADIUS_DP)
+                .radiusPx(radiusOfBackground(bg, RADIUS_DP * d))
                 .band(bandDp())
                 .strength(strengthDp())
                 .depthEffect(true);
@@ -391,6 +393,96 @@ public final class GlassApplier {
         v.setBackground(glass);
         v.setTag(TAG_APPLIED, "v31");
         sApplied.put(v, glass);
+    }
+
+    /**
+     * ★★★ v3.5：读面板背景**真实的圆角**（像素），读不到才用 fallback。
+     *
+     * <h3>为什么必须读，不能统一给 14dp</h3>
+     * 玻璃的 SDF 是圆角矩形，它画出来的那一圈**就是面板可见的边**
+     * （原背景已被 GlassDrawable 替换）。圆角对不上时：
+     * <ul>
+     *   <li>面板圆角比玻璃**小**（如 {@code launcher_button_white_blue} 是 3dp）⇒
+     *       玻璃的 14dp 圆角比面板更圆，四角处玻璃往里缩 ⇒ 看起来「面板的角被切掉了」；</li>
+     *   <li>面板圆角比玻璃**大**（如 {@code qcl_button_gray} 是 16dp）⇒
+     *       玻璃圈跑到面板边以内 ⇒ 边缘多出一道 2dp 的错位亮线。</li>
+     * </ul>
+     * 本项目的面板圆角实测有 3 / 5 / 12 / 14 / 16dp 好几种，硬编码任何一个都不对。
+     *
+     * <h3>为什么优先用 {@code getOutline}</h3>
+     * 它能**穿透** StateListDrawable（{@code launcher_button_parent} 就是 selector）、
+     * LayerDrawable、RippleDrawable 这些包装，一步拿到最终形状；
+     * 而 {@code GradientDrawable} 只覆盖「直接就是 shape」的那一半。
+     * ★ {@code radius == 0} 是**有效答案**（面板本来就是直角），不能当成「读不到」。
+     */
+    private static float radiusOfBackground(Drawable bg, float fallbackPx) {
+        if (bg == null) {
+            return fallbackPx;
+        }
+        // ① 通用路径：让 Drawable 自己报它的外轮廓
+        try {
+            android.graphics.Outline outline = new android.graphics.Outline();
+            bg.getOutline(outline);
+            if (!outline.isEmpty()) {
+                return Math.max(0f, outline.getRadius());
+            }
+        } catch (Throwable ignored) {
+        }
+        // ② 兜底：自己挖 shape 的 corners（per-corner 写法时 getCornerRadius() 返回 0）
+        float r = maxCornerRadius(bg, 0);
+        return r >= 0f ? r : fallbackPx;
+    }
+
+    /** 递归取各种 Drawable 里的最大圆角；返回 -1 = 挖不到（与「圆角为 0」区分开）。 */
+    private static float maxCornerRadius(Drawable d, int depth) {
+        if (d == null || depth > 4) {
+            return -1f;
+        }
+        try {
+            if (d instanceof GradientDrawable) {
+                GradientDrawable gd = (GradientDrawable) d;
+                float r = gd.getCornerRadius();
+                if (r > 0f) {
+                    return r;
+                }
+                float[] radii = gd.getCornerRadii();
+                if (radii != null) {
+                    float m = 0f;
+                    for (float v : radii) {
+                        if (v > m) {
+                            m = v;
+                        }
+                    }
+                    return m;
+                }
+                return 0f; // 明确没设圆角 = 直角
+            }
+            if (d instanceof LayerDrawable) {
+                // ★ RippleDrawable 也走这里（它继承 LayerDrawable）
+                LayerDrawable ld = (LayerDrawable) d;
+                float m = -1f;
+                for (int i = 0; i < ld.getNumberOfLayers(); i++) {
+                    float v = maxCornerRadius(ld.getDrawable(i), depth + 1);
+                    if (v > m) {
+                        m = v;
+                    }
+                }
+                return m;
+            }
+            if (d instanceof android.graphics.drawable.InsetDrawable) {
+                return maxCornerRadius(
+                        ((android.graphics.drawable.InsetDrawable) d).getDrawable(), depth + 1);
+            }
+            if (d instanceof DrawableContainer) {
+                // StateListDrawable / AnimationDrawable 等：看当前那一层
+                Drawable cur = ((DrawableContainer) d).getCurrent();
+                if (cur != null && cur != d) {
+                    return maxCornerRadius(cur, depth + 1);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return -1f;
     }
 
     /** 背景本身是不是「要显示的图片」（那种不能被玻璃盖住）。 */
