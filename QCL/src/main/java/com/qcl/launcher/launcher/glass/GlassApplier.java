@@ -64,21 +64,46 @@ public final class GlassApplier {
     private static final int TAG_ORIGINAL_BG = 0x7C1A5502;
 
     /**
-     * 折射带宽度（dp）。v3.2 起 16dp。
+     * 折射带宽度（dp）—— **v3.3 起由「折射强度」百分比算出来，不再是常量**。
      *
-     * <p>★ 数值来自参考实现（kyant0 的 Backdrop 库）：它在按钮上用 12dp、
-     * 在底部导航和对话框上用 16~24dp。本项目面板尺寸跨度大（62dp 的导航条到整屏对话框），
-     * 取 16dp 是折中 —— 再宽会把小面板的整个宽度都吃掉（只剩畸变没有内容）。
+     * <p>★ 数值区间参考 kyant0 的 Backdrop 库：它在按钮上用 12dp、底部导航和对话框上用 16~24dp。
+     * 本项目面板尺寸跨度大（62dp 的导航条到整屏对话框），所以给一段 10~22dp 的可调区间，
+     * 默认 50% ⇒ 16dp，与 v3.2 的定值完全一致（老用户升级后观感不变）。
      */
-    private static final float BAND_DP = 16f;
+    private static final float BAND_DP_MIN = 10f;
+    private static final float BAND_DP_MAX = 22f;
+
     /**
-     * 最大偏移（dp）。v3.2 起 32dp。
+     * ★★★ v3.3：折射强度百分比（0~100，默认 50）。
      *
-     * <p>★★★ 这个值必须**明显大于带宽**（参考实现是 1.5~2 倍）。
-     * v3.1 用的是 9dp（比带宽还小），结果是「边缘只是有点模糊」，完全不像玻璃 ——
-     * 因为折射的本质就是「把远处的东西搬到边缘来」，搬得不够远就等于没搬。
+     * <p>为什么做成可调：带宽和偏移量合不合适**完全取决于背景图的纹理密度** ——
+     * 纯色背景上再强也看不出来，花哨壁纸上太强会像水波纹。这个数没法替所有人定。
      */
-    private static final float STRENGTH_DP = 32f;
+    private static volatile int sStrengthPercent = 50;
+
+    public static void setStrength(int percent) {
+        sStrengthPercent = Math.max(0, Math.min(100, percent));
+    }
+
+    public static int getStrength() {
+        return sStrengthPercent;
+    }
+
+    /** 百分比 → 带宽 dp。p=0 → 10dp，p=50 → 16dp（v3.2 的定值），p=100 → 22dp。 */
+    private static float bandDp() {
+        return BAND_DP_MIN + (BAND_DP_MAX - BAND_DP_MIN) * (sStrengthPercent / 100f);
+    }
+
+    /**
+     * 百分比 → 最大偏移 dp。
+     *
+     * <p>★★★ 固定取带宽的 **2 倍**，不单独暴露 —— 这是 v3.2 得出的硬结论：
+     * 偏移必须明显大于带宽（参考实现 1.5~2 倍）。v3.1 用 9dp 偏移配 14dp 带宽（0.64 倍），
+     * 折射根本搬不动，观感只是「边缘发虚」。把两者绑在一起，用户怎么调都不会调出那个死区。
+     */
+    private static float strengthDp() {
+        return 2f * bandDp();
+    }
     /** 统一圆角（dp）—— Drawable 不暴露 corner，只能统一给。 */
     private static final float RADIUS_DP = 14f;
 
@@ -355,8 +380,8 @@ public final class GlassApplier {
 
         GlassDrawable glass = new GlassDrawable(v)
                 .radiusDp(RADIUS_DP)
-                .band(BAND_DP)
-                .strength(STRENGTH_DP)
+                .band(bandDp())
+                .strength(strengthDp())
                 .depthEffect(true);
 
         // ★★★ 必须先存原背景再替换 —— 关掉开关时才能原样还原。

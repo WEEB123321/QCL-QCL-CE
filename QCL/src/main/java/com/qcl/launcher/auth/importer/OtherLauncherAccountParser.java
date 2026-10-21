@@ -89,10 +89,15 @@ public final class OtherLauncherAccountParser {
 
     // ────────────────────────────── 别名表 ──────────────────────────────
     // ★ 全部小写、去掉下划线后比较，这样 userName / user_name / USERNAME 都能命中。
+    // ★★ 数组的**顺序就是优先级**（见 shallowGet 的注释），不是随便排的。
 
     private static final String[] NAME_KEYS = {
-            "authplayername", "username", "playername", "displayname", "profilename",
-            "name", "nickname", "selectedprofilename", "playernamecn",
+            // ① 明确的「角色名」字段优先
+            "authplayername", "displayname", "playername", "profilename",
+            "selectedprofilename", "playernamecn",
+            // ② 其次才是「登录名」—— 外置登录里 username 是登录账号，
+            //    displayName 才是游戏内角色名，两者可能不同，所以不能排前面
+            "username", "name", "nickname",
     };
     private static final String[] UUID_KEYS = {
             "authuuid", "playeruuid", "profileid", "uuid", "id", "userid",
@@ -107,15 +112,19 @@ public final class OtherLauncherAccountParser {
             "refreshtoken", "msrefreshtoken", "msarefreshtoken", "oauthtoken",
     };
     private static final String[] SERVER_KEYS = {
-            "loginserver", "authlibinjectorserver", "apiroot", "authserver",
-            "serverurl", "yggdrasilurl", "yggdrasilapi", "authlibserver",
+            // ★ serverbaseurl 是 FCL 的实际字段名（AuthlibInjectorAccountFactory.fromStorage
+            //   里读的就是 storage.get("serverBaseURL")），漏了它外置账户会丢服务器地址，
+            //   导入进来就成了「有账号但连不上」。
+            "serverbaseurl", "loginserver", "authlibinjectorserver", "apiroot",
+            "authserver", "serverurl", "yggdrasilurl", "yggdrasilapi", "authlibserver",
     };
     private static final String[] SKIN_B64_KEYS = {
             "texture", "avatar", "avatarbase64", "skinbase64", "headimage",
             "profileimage", "skinimage", "avatarimage", "faceimage",
     };
     private static final String[] SKIN_PATH_KEYS = {
-            "skinpath", "localskinpath", "localskin", "skinfile", "skinfiledir", "capeskin",
+            // ★ localskinpath 是 FCL 的字段名（Skin.toStorage 里 localSkinPath）
+            "localskinpath", "skinpath", "localskin", "skinfile", "skinfiledir", "capeskin",
     };
     private static final String[] TYPE_KEYS = {
             "logintype", "accounttype", "authtype", "type", "authenticationtype", "authservertype",
@@ -251,22 +260,28 @@ public final class OtherLauncherAccountParser {
         return null;
     }
 
+    /**
+     * 按别名表的**顺序**取值 —— 第一个命中的键优先。
+     *
+     * <p>★★★ 为什么必须按别名表顺序、而不是按 JSON 里的字段顺序：
+     * FCL 的外置账户同时有 {@code username}（登录账号）和 {@code displayName}（游戏内角色名），
+     * 两者可能不同。如果按 JSON 字段顺序遍历，谁先出现就用谁 —— 那等于让**文件的键序**
+     * 决定用哪个名字，同一个账户换个序列化库导出就可能变成另一个名字。
+     * 所以这里反过来：外层循环走别名表（优先级），内层找字段。
+     */
     private static String shallowGet(JsonObject obj, String[] keys) {
-        for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
-            String k = normalize(e.getKey());
-            for (String want : keys) {
-                if (!k.equals(want)) {
+        for (String want : keys) {
+            for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
+                if (!normalize(e.getKey()).equals(want)) {
                     continue;
                 }
                 JsonElement v = e.getValue();
-                if (v == null || v.isJsonNull()) {
+                if (v == null || v.isJsonNull() || !v.isJsonPrimitive()) {
                     continue;
                 }
-                if (v.isJsonPrimitive()) {
-                    String s = v.getAsString();
-                    if (s != null && !s.isEmpty() && !"null".equals(s)) {
-                        return s;
-                    }
+                String s = v.getAsString();
+                if (s != null && !s.isEmpty() && !"null".equals(s)) {
+                    return s;
                 }
             }
         }
@@ -292,7 +307,12 @@ public final class OtherLauncherAccountParser {
     // ────────────────────────────── 类型推断 ──────────────────────────────
 
     private static int inferType(JsonObject obj, Imported a) {
-        String raw = deepGet(obj, TYPE_KEYS);
+        // ★★★ 类型字段只在本层找，**不往下钻**。
+        //   踩过的坑：FCL 的离线账户带一个 skin 子对象
+        //     "skin": {"type": "local_file", "localSkinPath": "..."}
+        //   往下钻的话会把 skin.type 当成账户类型，"local_file" 含 "local"
+        //   ⇒ 一个微软账户被推断成「离线」。只读本层就不会撞上。
+        String raw = shallowGet(obj, TYPE_KEYS);
         if (raw != null) {
             String t = normalize(raw);
             if (t.contains("microsoft") || t.contains("msa") || t.contains("xbox")) {

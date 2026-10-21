@@ -791,6 +791,7 @@
     <string name="exterior_setting_ui_transparent_bg">透明界面背景（关闭恢复灰色）</string>
     <string name="exterior_setting_liquid_glass">液态玻璃</string>
     <string name="exterior_setting_liquid_glass_hint">打开后，面板边缘会折射背后的背景；默认关闭</string>
+    <string name="exterior_setting_liquid_glass_strength">折射强度</string>
     <string name="exterior_layout_style_title">排版风格</string>
     <string name="exterior_layout_style_qcl">经典</string>
     <string name="exterior_layout_style_fcl">FCL</string>

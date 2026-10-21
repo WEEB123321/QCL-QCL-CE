@@ -84,7 +84,22 @@ public class PojavLauncher {
             String libraryPath = PojavLauncher.buildFclLibraryPath(context, javaPath) + ":" + JREUtils.LD_LIBRARY_PATH;
             boolean qclNeed333 = Lwjgl333Helper.needs(gameLaunchSetting.currentVersion);
             boolean qclNeed341 = !qclNeed333 && Lwjgl333Helper.needs341(gameLaunchSetting.currentVersion);
-            boolean qclNeedsLwjglX = !qclNeed333 && !qclNeed341 && Lwjgl333Helper.needsLwjglX(gameLaunchSetting.currentVersion);
+            // ★★★ 2026-10-21：「要不要 LWJGL2 兼容层」与「用哪套 lwjgl」是**两个独立问题**。
+            //   前者由游戏代码决定（MC < 1.13 调 org.lwjgl.input.*），后者由版本 json 决定。
+            //   旧代码用 `!qclNeed333 && !qclNeed341 &&` 把它绑在后两者上 ⇒ 只要 json 里
+            //   检测到 lwjgl 3.x，老版本就拿不到 shim ⇒ org.lwjgl.input.Mouse/Keyboard
+            //   落到真 LWJGL2 类上 ⇒ **游戏起来了但按什么都没反应**。
+            boolean qclLwjgl2Era = Lwjgl333Helper.needsLwjglX(gameLaunchSetting.currentVersion);
+            boolean qclNeedsLwjglX = !qclNeed333 && !qclNeed341 && qclLwjgl2Era;
+            try {
+                Logger.getInstance((Context)context).appendToLog("LWJGL \u9009\u62e9: need333="
+                        + qclNeed333 + " need341=" + qclNeed341
+                        + " lwjgl2Era=" + qclLwjgl2Era
+                        + "\uff08lwjgl2Era=true \u65f6\u5fc5\u987b\u6302 lwjgl-lwjglx.jar\uff0c\u5426\u5219\u8f93\u5165\u5168\u5931\u6548\uff09");
+            }
+            catch (Throwable ignoredLwjglDiag) {
+                // 诊断日志失败不影响启动
+            }
             try {
                 System.setProperty("qcl.pojavexec.lib", "pojavexec");
                 System.setProperty("qcl.pojavexec.libfile", "libpojavexec.so");
@@ -120,12 +135,15 @@ public class PojavLauncher {
             boolean useCacio17 = !isJava8;
             String classPath = version.getClassPath(gameLaunchSetting.gameFileDirectory, GameLaunchSetting.isHighVersion(gameLaunchSetting), useCacio17);
             if (qclNeed333) {
-                String j333 = Lwjgl333Helper.jarsClassPath(context);
+                // ★★★ 2026-10-21：老版本走 LWJGL 3.3.3 时**也要**把 lwjglx 排在最前。
+                //   否则 org.lwjgl.input.* 落到真 LWJGL2 类上（classpath 里还留着模板带的
+                //   lwjgl-2.9.x），而 LWJGL2 原生库在 Android 上没初始化 ⇒ 输入全死。
+                String j333 = Lwjgl333Helper.jarsClassPath(context, qclLwjgl2Era);
                 if (j333.length() > 0) {
                     classPath = j333 + ":" + classPath;
                 }
             } else if (qclNeed341) {
-                String j341 = Lwjgl333Helper.jarsClassPath341(context);
+                String j341 = Lwjgl333Helper.jarsClassPath341(context, qclLwjgl2Era);
                 if (j341.length() > 0) {
                     classPath = j341 + ":" + classPath;
                 }
@@ -134,6 +152,18 @@ public class PojavLauncher {
                 qclLwjglXDiag = "len=" + jx.length() + " | " + (jx.length() > 300 ? jx.substring(0, 300) : jx);
                 if (jx.length() > 0) {
                     classPath = jx + ":" + classPath;
+                }
+            }
+            // ★★★ 2026-10-21：lwjgl2Era 却拿不到 shim 时，输入必死 —— 明确记一行，
+            //   免得下次又要在几百行日志里猜「到底挂没挂上」。
+            if (qclLwjgl2Era) {
+                try {
+                    boolean hasShim = Lwjgl333Helper.hasLwjglXJar(context);
+                    Logger.getInstance((Context)context).appendToLog("LWJGL2 \u517c\u5bb9\u5c42 lwjgl-lwjglx.jar "
+                            + (hasShim ? "\u5df2\u5c31\u4f4d" : "\u7f3a\u5931\uff08\u8001\u7248\u672c\u4f1a\u51fa\u73b0\u300c\u6309\u4ec0\u4e48\u90fd\u6ca1\u53cd\u5e94\u300d\uff09"));
+                }
+                catch (Throwable ignoredShimDiag) {
+                    // 忽略
                 }
             }
             // ★★★ 1.4.0：远古 applet 版本画面尺寸修复。

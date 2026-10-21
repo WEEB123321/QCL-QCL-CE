@@ -404,6 +404,60 @@
                         android:textColor="@color/colorGray"
                         android:textSize="@dimen/text_size_small"/>
 
+                    <!-- ★★★ v3.3：折射强度（0~100，默认 50）。
+                         只在玻璃开着时显示 —— 关着的时候它没有任何意义，
+                         摆在那里只会让人以为「拖了没用」。
+                         带宽与偏移由同一个值换算（偏移固定 = 带宽 × 2），
+                         这样用户怎么调都不会掉进 v3.1 那个「偏移比带宽还小」的死区。 -->
+                    <LinearLayout
+                        android:id="@+id/liquid_glass_strength_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:paddingBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="@string/exterior_setting_liquid_glass_strength"
+                                android:textColor="@color/colorPureBlack"
+                                android:textSize="@dimen/text_size_small"/>
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:id="@+id/liquid_glass_strength_value"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textColor="@color/colorGray"
+                                android:textSize="@dimen/text_size_small"/>
+
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/seek_liquid_glass_strength"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:progress="50"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="0dp"/>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <!-- ★★★ v3.1：排版风格（FCL / HMCL 电脑端 / ZL2）。

@@ -515,6 +515,10 @@ implements View.OnClickListener {
                     ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF
                     : this.launcherSetting.liquidGlassMode;
             com.qcl.launcher.launcher.glass.GlassApplier.setMode(mode);
+            // ★ v3.3：把「折射强度」也交给挂载器。0 = 未设置 → 用 50（标准），
+            //   与 v3.2 的定值等价，老用户升级后观感不变。
+            int pct = this.launcherSetting == null ? 0 : this.launcherSetting.liquidGlassStrength;
+            com.qcl.launcher.launcher.glass.GlassApplier.setStrength(pct > 0 ? pct : 50);
             if (mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 return; // ★ 默认路径：什么都不做
             }
@@ -544,6 +548,29 @@ implements View.OnClickListener {
                 return;
             }
             com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+            rescanLiquidGlass();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ v3.3：设置里拖动「折射强度」时调这个。
+     *
+     * <p>★ 为什么必须 detachAll 再重扫，而不能只改静态字段：
+     * 带宽和偏移量是在 {@code maybeApply()} 里**构造 GlassDrawable 时**写进实例的，
+     * 已经挂在 View 上的那批 Drawable 不会因为静态字段变了就跟着变。
+     * 而且每个 View 都打了 {@code TAG_APPLIED}，不先摘掉的话重扫会直接跳过它们 ——
+     * 表现就是「拖了滑块没反应，得重启才生效」。
+     */
+    public void setLiquidGlassStrength(int percent) {
+        try {
+            com.qcl.launcher.launcher.glass.GlassApplier.setStrength(percent);
+            if (com.qcl.launcher.launcher.glass.GlassApplier.getMode()
+                    == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                return; // 没开玻璃，只记住数值即可
+            }
+            com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
             com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
             rescanLiquidGlass();
         } catch (Throwable ignored) {

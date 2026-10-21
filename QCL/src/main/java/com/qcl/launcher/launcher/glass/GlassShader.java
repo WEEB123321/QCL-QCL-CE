@@ -241,6 +241,11 @@ public final class GlassShader {
             + "    vec2 uv = clamp((uPanelOrigin + refracted) / max(uScreenSize, vec2(1.0)),\n"
             + "                    vec2(0.0), vec2(1.0));\n"
             + "    vec3 c = uBg.eval(uv * uBgSize).rgb;\n"
-            + "    return half4(half3(c), 1.0);\n"
+            // ★ v3.3 抗锯齿：外缘 sd 在 (-1,0) 这一像素里把 alpha 从 0 渐变到 1。
+            //   之前是硬切（sd >= 0 直接丢弃），在圆角上会看到明显锯齿 ——
+            //   因为面板原来的背景已被玻璃替换，这一圈就是面板**可见的边**，
+            //   硬切的锯齿直接暴露成「毛边」。
+            + "    float aa = clamp(-sd, 0.0, 1.0);\n"
+            + "    return half4(half3(c), half(aa));\n"
             + "}\n";
 }

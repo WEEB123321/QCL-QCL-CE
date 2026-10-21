@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20200,
-    "versionName": "2.2.0",
+    "versionCode": 20201,
+    "versionName": "2.2.1",
     "date": "2026-10-21",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.0/QCL-CE-v2.2.0-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.1/QCL-CE-v2.2.1-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.2.0</b><br/>· <b>新增：从其它启动器导入账户</b>——可读取 FCL / ZL2 / HMCL-PE 留下的 accounts.json，微软正版、外置登录、离线账户都能搬过来，<b>头像（皮肤）一起带过来</b><br/>· 导入全程只读，不会改动你原来的启动器<br/>· 入口：账号页 →「从其它启动器导入」（自动扫常见目录，扫不到可手动选文件）<br/>· 液态玻璃折射数学重写：四分之一圆剖面 + 径向深度感，边缘出现真实的「光学压缩带」<br/>· 折射强度调到「带宽 16dp / 偏移 32dp」，不再是发虚的模糊边<br/>· 面板内部依然完全透明，只保留边缘一圈；无模糊、无白边、无投影<br/>· <b>液态玻璃默认关闭</b>，在「设置 → 外观」手动打开<br/>· 修掉切排版后导航条逐次上飘、列表刷新时反复遍历界面<br/>· 版本号 2.1.9 → 2.2.0"
+    "updateLog": "<b>QCL-CE 2.2.1</b><br/>· <b>修：老版本进游戏后按什么都没反应</b>——要不要 LWJGL2 兼容层，改成按 Minecraft 版本判断（低于 1.13 就需要），不再看版本 json 里写的 lwjgl 库版本。从 FCL 导入的实例、精简过的 json 现在也能正确挂上 lwjgl-lwjglx.jar<br/>· <b>液态玻璃提速</b>：只绘制边缘四条带，不再整块面板跑着色器，全屏面板的片元调用少 86%<br/>· 液态玻璃外缘加 1px 抗锯齿，圆角不再有锯齿毛边<br/>· 新增「折射强度」滑块（0~100，默认 50）：设置 → 外观 → 液态玻璃<br/>· 小面板的折射带自动收窄，不再被边带吃光<br/>· <b>修：从其它启动器导入账户</b>——补上 FCL 的 serverBaseURL（外置登录不再丢服务器地址）、角色名优先取 displayName（不再显示成邮箱）、微软账户不再被误判成离线<br/>· 版本号 2.2.0 → 2.2.1"
   },
   "latestPrerelease": null
 }

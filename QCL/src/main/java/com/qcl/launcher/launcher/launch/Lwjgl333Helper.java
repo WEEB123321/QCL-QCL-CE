@@ -99,7 +99,17 @@ public class Lwjgl333Helper {
     }
 
     public static String jarsClassPath341(Context context) {
+        return jarsClassPath341(context, false);
+    }
+
+    /**
+     * @param lwjgl2Era MC &lt; 1.13 ⇒ 需要 {@code lwjgl-lwjglx.jar} 提供 LWJGL 2 API
+     *                 （理由见 {@link #needsLwjglX(String)}）。3.4.1 这套平时只给现代版本用，
+     *                 但同一个实例目录被改写过的老版本也可能落到这里，所以照样要能挂 shim。
+     */
+    public static String jarsClassPath341(Context context, boolean lwjgl2Era) {
         File merged;
+        File lwjglx;
         File dir = Lwjgl333Helper.jarsDir341(context);
         File[] files = dir.listFiles();
         if (files == null) {
@@ -109,6 +119,9 @@ public class Lwjgl333Helper {
         File core = new File(dir, "lwjgl.jar");
         if (core.isFile()) {
             ordered.add(core);
+        }
+        if (lwjgl2Era && (lwjglx = new File(dir, "lwjgl-lwjglx.jar")).isFile()) {
+            ordered.add(lwjglx);
         }
         if ((merged = new File(dir, "lwjgl-3.4.1-merged-modules.jar")).isFile()) {
             ordered.add(merged);
@@ -369,12 +382,70 @@ public class Lwjgl333Helper {
         }
     }
 
+    /**
+     * ★★★ 这个版本要不要 **LWJGL 2 兼容层**（{@code lwjgl-lwjglx.jar}）。
+     *
+     * <h3>为什么判据必须是「MC 版本 < 1.13」而不是「json 里的 lwjgl 库版本」</h3>
+     * MC 1.13 之前调的是 LWJGL 2 的 API：{@code org.lwjgl.input.Mouse/Keyboard}、
+     * {@code org.lwjgl.opengl.Display}；1.13 起才改成直接用 GLFW。
+     * 所以「要不要 shim」是**游戏代码决定**的，和 classpath 上放的是哪套 lwjgl 无关。
+     *
+     * <p>旧实现（{@code detectLwjglVersion(...)[0] < 3}）把这两件事混为一谈，有三个坑：
+     * <ol>
+     *   <li>版本 json 里**没有** {@code lwjgl:x.y.z} 字样时（导入的 FCL 实例、精简过的 json、
+     *       被自动修复重写过的 json）⇒ 返回 null ⇒ 判定「不需要」⇒ 不加载 shim
+     *       ⇒ {@code org.lwjgl.input.Mouse/Keyboard} 落到**真 LWJGL 2 的类**上，
+     *       而 LWJGL 2 的原生库在 Android 上根本没初始化
+     *       ⇒ <b>游戏能起来，但按什么都没反应</b>（本函数的由来就是这个 bug）。</li>
+     *   <li>反过来，json 里写着 lwjgl 3.3.3 但游戏其实是 1.12 的（被改写过的老实例）
+     *       ⇒ 判定「不需要」⇒ 同样没有输入。</li>
+     *   <li>json 里写 {@code org.lwjgl.lwjgl:lwjgl_util:2.9.x} 而**没有**裸 {@code lwjgl}
+     *       条目时，旧正则也匹配不上（{@code lwjgl_util} 后面是下划线，不是 {@code /} 或 {@code :}）。</li>
+     * </ol>
+     */
     public static boolean needsLwjglX(String versionPath) {
-        String v = Lwjgl333Helper.detectLwjglVersion(versionPath);
-        if (v == null) {
+        if (versionPath == null || versionPath.isEmpty()) {
             return false;
         }
-        return Lwjgl333Helper.parseVer(v)[0] < 3;
+        // ① 版本目录名就是 MC 版本 id —— 最可靠的一手信息
+        String id = new File(versionPath).getName();
+        long mc = RendererCompat.parseVer(id);
+        if (mc > 0L) {
+            // 11300 = 1.13.0；低于它就必须有 LWJGL2 兼容层
+            return mc < 11300L;
+        }
+        // ② 版本名里没有 x.y 形式（inf-20100618 / rd-132211 / 纯代号整合包）⇒ 只能看 json 的老式标记
+        String content = readVersionJson(versionPath);
+        if (content == null) {
+            return false;
+        }
+        return content.contains("net.minecraft.launchwrapper.Launch")
+                || content.contains("pre-1.6")
+                || content.contains(":lwjgl:2.")
+                || content.contains("lwjgl/2.");
+    }
+
+    /** 解压出来的 lwjglx 兼容层在不在（缺了它老版本就没有输入）。 */
+    public static boolean hasLwjglXJar(Context context) {
+        try {
+            return new File(jarsDir(context), "lwjgl-lwjglx.jar").isFile();
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    /** 读版本目录下的 {@code <id>.json}，读不到返回 null。 */
+    private static String readVersionJson(String versionPath) {
+        try {
+            File dir = new File(versionPath);
+            File json = new File(dir, dir.getName() + ".json");
+            if (!json.isFile()) {
+                return null;
+            }
+            return Lwjgl333Helper.readText(new FileInputStream(json));
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 }
 

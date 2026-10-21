@@ -85,7 +85,8 @@ import com.qcl.launcher.R;
 public class ExteriorSettingUI
 extends BaseUI
 implements View.OnClickListener,
-CompoundButton.OnCheckedChangeListener {
+CompoundButton.OnCheckedChangeListener,
+android.widget.SeekBar.OnSeekBarChangeListener {
     private static final int PICK_BACKGROUND_REQUEST = 4000;
     public LinearLayout exteriorSettingUI;
     private LinearLayout selectTheme;
@@ -103,6 +104,10 @@ CompoundButton.OnCheckedChangeListener {
     /** ★ v3.1：液态玻璃（边缘畸变）开关，默认关。 */
     private SwitchCompat liquidGlassSwitch;
     private LinearLayout liquidGlassLayout;
+    /** ★ v3.3：折射强度（0~100，0 = 未设置 → 按 50 处理）。 */
+    private LinearLayout liquidGlassStrengthRow;
+    private android.widget.SeekBar liquidGlassStrengthSeek;
+    private TextView liquidGlassStrengthValue;
     private LinearLayout fullscreenSetting;
     private RadioButton defaultRadio;
     private RadioButton classicRadio;
@@ -157,6 +162,13 @@ CompoundButton.OnCheckedChangeListener {
         this.transBgSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_transparent_bg);
         this.liquidGlassSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_liquid_glass);
         this.liquidGlassLayout = (LinearLayout)this.activity.findViewById(R.id.liquid_glass_layout);
+        // ★ v3.3：折射强度（0~100）。只在玻璃开着时可见。
+        this.liquidGlassStrengthRow = (LinearLayout)this.activity.findViewById(R.id.liquid_glass_strength_row);
+        this.liquidGlassStrengthSeek = (android.widget.SeekBar)this.activity.findViewById(R.id.seek_liquid_glass_strength);
+        this.liquidGlassStrengthValue = (TextView)this.activity.findViewById(R.id.liquid_glass_strength_value);
+        if (this.liquidGlassStrengthSeek != null) {
+            this.liquidGlassStrengthSeek.setOnSeekBarChangeListener((android.widget.SeekBar.OnSeekBarChangeListener)this);
+        }
         this.fullscreenSetting = (LinearLayout)this.activity.findViewById(R.id.fullscreen_layout);
         this.defaultRadio = (RadioButton)this.activity.findViewById(R.id.select_bg_default);
         this.classicRadio = (RadioButton)this.activity.findViewById(R.id.select_bg_classic);
@@ -320,6 +332,8 @@ CompoundButton.OnCheckedChangeListener {
             this.liquidGlassSwitch.setChecked(this.activity.launcherSetting.liquidGlassMode != 0);
             this.liquidGlassSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
         }
+        // ★ v3.3：强度滑块的初始值 + 可见性（关着玻璃时整行隐藏，避免「拖了没用」的困惑）
+        refreshLiquidGlassStrength();
         this.refreshColorEditable();
         this.refreshLayoutStyleSelection();
         if (Build.VERSION.SDK_INT < 28) {
@@ -333,6 +347,70 @@ CompoundButton.OnCheckedChangeListener {
      * <p>用背景 drawable 区分选中/未选（与「主题方案」那三个按钮同一套做法），
      * 不额外引入新的 drawable。
      */
+    /**
+     * ★★★ v3.3：刷新「折射强度」滑块的显示。
+     *
+     * <p>★ 0 在这里是**未设置**（老配置没有这个字段，Gson 会落到 0），
+     * 一律按 50 显示 —— 否则老用户一进设置页就看到滑块在最左端，
+     * 会以为自己的玻璃被改弱了。
+     */
+    private void refreshLiquidGlassStrength() {
+        try {
+            boolean on = this.activity.launcherSetting != null
+                    && this.activity.launcherSetting.liquidGlassMode != 0;
+            if (this.liquidGlassStrengthRow != null) {
+                this.liquidGlassStrengthRow.setVisibility(on ? View.VISIBLE : View.GONE);
+            }
+            if (this.liquidGlassStrengthSeek == null) {
+                return;
+            }
+            int pct = this.activity.launcherSetting == null
+                    ? 0 : this.activity.launcherSetting.liquidGlassStrength;
+            if (pct <= 0) {
+                pct = 50;
+            }
+            this.liquidGlassStrengthSeek.setProgress(Math.max(0, Math.min(100, pct)));
+            if (this.liquidGlassStrengthValue != null) {
+                this.liquidGlassStrengthValue.setText(pct + "%");
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ 拖动过程中**只更新数字，不重铺玻璃**。
+     *
+     * <p>为什么：{@code setLiquidGlassStrength} 会 detachAll + 全树重扫 + 重建所有 Drawable。
+     * 拖一次滑块会回调几十次，每次都全树重扫 = 主线程卡死、滑块跟手性极差。
+     * 所以拖动时只改文字，**松手（onStopTrackingTouch）才真正应用**。
+     */
+    @Override
+    public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+        if (seekBar == this.liquidGlassStrengthSeek && this.liquidGlassStrengthValue != null) {
+            this.liquidGlassStrengthValue.setText(progress + "%");
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(android.widget.SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
+        if (seekBar != this.liquidGlassStrengthSeek) {
+            return;
+        }
+        try {
+            int pct = seekBar.getProgress();
+            // ★ 存进去时把 0 抬到 1：0 是「未设置」的哨兵值，真存 0 下次读回来会被当成 50。
+            this.activity.launcherSetting.liquidGlassStrength = Math.max(1, pct);
+            GsonUtils.saveLauncherSetting(this.activity.launcherSetting,
+                    AppManifest.SETTING_DIR + "/launcher_setting.json");
+            this.activity.setLiquidGlassStrength(pct);
+        } catch (Throwable ignored) {
+        }
+    }
+
     private void refreshLayoutStyleSelection() {
         try {
             int cur = this.activity.launcherSetting == null ? 0 : this.activity.launcherSetting.layoutStyle;
@@ -1012,6 +1090,8 @@ CompoundButton.OnCheckedChangeListener {
             this.activity.launcherSetting.liquidGlassMode = mode;
             GsonUtils.saveLauncherSetting(this.activity.launcherSetting, AppManifest.SETTING_DIR + "/launcher_setting.json");
             this.activity.setLiquidGlassMode(mode);
+            // ★ v3.3：开关一动，强度那一行的可见性跟着变
+            refreshLiquidGlassStrength();
         }
         if (buttonView == this.defaultRadio && isChecked) {
             this.classicRadio.setChecked(false);
