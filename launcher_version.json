@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20202,
-    "versionName": "2.2.2",
+    "versionCode": 20203,
+    "versionName": "2.2.3",
     "date": "2026-10-21",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.2/QCL-CE-v2.2.2-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.3/QCL-CE-v2.2.3-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.2.2</b><br/>· <b>液态玻璃新增「覆盖范围」</b>：轻量（只给导航栏、返回栏、大卡片）/ 标准（中等面板也参与折射）。设置 → 外观 → 液态玻璃<br/>· 覆盖范围与开关分开保存，关掉再打开不会退回轻量<br/>· 切换范围立刻生效，不用重启<br/>· 版本号 2.2.1 → 2.2.2"
+    "updateLog": "<b>QCL-CE 2.2.3</b><br/>· <b>玻璃圆角跟随面板真实圆角</b>——以前一律按 14dp 画，而面板实际有 3/5/12/14/16dp 好几种，导致小圆角面板的角看起来被切掉、大圆角面板边缘错位<br/>· <b>玻璃面板恢复按压反馈</b>——按住时边缘折射略微加强（光学响应，不涂色、不加白边），不再点下去毫无反应<br/>· 版本号 2.2.2 → 2.2.3"
   },
   "latestPrerelease": null
 }

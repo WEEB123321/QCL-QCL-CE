@@ -105,6 +105,28 @@ public final class GlassDrawable extends Drawable {
     /** 是否叠加「指向圆心的径向分量」—— 这一项是「玻璃有厚度」的观感来源。 */
     private boolean depthEffect = true;
 
+    /**
+     * ★★★ v3.5：当前是否被按住。
+     *
+     * <p><b>为什么必须自己做这件事</b>：{@link GlassApplier} 把面板原来的背景
+     * （很多是带 {@code state_pressed} 的 selector / ripple）换成了这个 Drawable。
+     * 原来「按下去变亮一点」的反馈就**跟着原背景一起消失了** —— 用户点设置页的每一行，
+     * 手指按下去到页面切换之间没有任何视觉变化，体感就是「点不动」。
+     *
+     * <p>★ 不打算用「涂一层半透明色」来补：用户明确要求面板内部透明、不要白边，
+     * 涂色会把设计推翻。这里用**光学响应**代替：按住时折射偏移略微加大，
+     * 边缘那圈「被撑开」得更明显 —— 像手指压在一块软玻璃上。
+     */
+    private boolean pressed = false;
+
+    /**
+     * 按住时折射偏移的放大倍数。
+     *
+     * <p>★ 只放大**偏移**、不动带宽：带宽一变，边缘带的宽度就跳一下，
+     * 看起来像面板尺寸变了。1.4 是「能感觉到但不夸张」的量级。
+     */
+    private static final float PRESS_GAIN = 1.4f;
+
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fallbackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] locBuf = new int[2];
@@ -231,7 +253,8 @@ public final class GlassDrawable extends Drawable {
         //   视觉上仍然连续，不会出现带子宽过半、内外边界打架的怪相。
         float band = Math.min(bandDp * d, Math.min(w, h) * 0.5f);
         // ★ v3.2：传负值（与参考实现一致）。法线朝外，负偏移 = 向内采样 = 放大镜观感。
-        float strength = -strengthDp * d;
+        // ★ v3.5：按住时把偏移放大 —— 这就是「按压反馈」，见 pressed 字段注释。
+        float strength = -(pressed ? strengthDp * PRESS_GAIN : strengthDp) * d;
         float depth = depthEffect ? 1f : 0f;
 
         // ★ 只设变化的那几个 —— 见字段注释
@@ -381,6 +404,35 @@ public final class GlassDrawable extends Drawable {
     protected void onBoundsChange(Rect bounds) {
         magW = -1;
         magH = -1;
+    }
+
+    /**
+     * ★★★ v3.5：必须是 {@code true}，否则 {@code View.drawableStateChanged()}
+     * 根本不会把按下状态转给我们（它只在 {@code bg.isStateful()} 时才
+     * {@code bg.setState(...)}）。
+     */
+    @Override
+    public boolean isStateful() {
+        return true;
+    }
+
+    @Override
+    protected boolean onStateChange(int[] stateSet) {
+        boolean p = false;
+        if (stateSet != null) {
+            for (int s : stateSet) {
+                if (s == android.R.attr.state_pressed) {
+                    p = true;
+                    break;
+                }
+            }
+        }
+        if (p != pressed) {
+            pressed = p;
+            invalidateSelf();
+            return true;
+        }
+        return false;
     }
 
     @Override
