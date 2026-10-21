@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★ 地区选择「确定」按钮：未解锁 / 已解锁两态。
+     ★★★ 为什么两态写成一个 selector 由代码切 selected：
+     5 次解锁的过程要能看见「还没到」，否则用户只会觉得按钮坏了。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 已解锁（第 5 次点完之后，按下时的反馈） -->
+    <item android:state_enabled="true" android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#D96A3C"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+    <!-- 已解锁（常态） -->
+    <item android:state_enabled="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorAccent"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+    <!-- 未解锁：半透明，看得见但明显「还不能按」 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#4DB0552F"/>
+            <corners android:radius="14dp"/>
+        </shape>
+    </item>
+</selector>

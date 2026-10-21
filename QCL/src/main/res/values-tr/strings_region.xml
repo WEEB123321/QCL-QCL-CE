@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Hangi ülkedensin?</string>
+    <string name="region_gate_desc">Bölgen, başlatıcının orijinal Minecraft paketlerini indirip indiremeyeceğini belirler. Daha sonra Ayarlar → İndirme bölümünden değiştirebilirsin.</string>
+    <string name="region_gate_cn">Çin anakarası</string>
+    <string name="region_gate_other">Diğer bölgeler</string>
+    <string name="region_gate_warn_cn">Çin anakarası kullanıcıları burada orijinal Minecraft\'ı indiremez.</string>
+    <string name="region_gate_warn_cn_sub">Başlatıcı, Minecraft dosyalarını resmi kanallardan almayacak. Yüklü oyunlar yine de başlatılabilir.</string>
+    <string name="region_gate_confirm">Onayla</string>
+    <string name="region_gate_confirm_hint">%1$d kez daha Onayla\'ya dokun</string>
+    <string name="region_gate_confirm_ready">Onayla</string>
+    <string name="region_gate_locked_title">İndirme kullanılamıyor</string>
+    <string name="region_gate_locked_msg">Çin anakarası bölgesi seçildiği için orijinal Minecraft indirmesi devre dışı. Yüklü oyunlar yine de başlatılabilir.</string>
+    <string name="region_gate_locked_go_setting">Bölgeyi değiştir</string>
+    <string name="region_gate_setting_title">Bölge</string>
+    <string name="region_gate_setting_cn">Çin anakarası</string>
+    <string name="region_gate_setting_other">Diğer bölgeler</string>
+</resources>

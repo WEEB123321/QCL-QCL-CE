@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Aus welchem Land kommst du?</string>
+    <string name="region_gate_desc">Deine Region entscheidet, ob der Launcher die originalen Minecraft-Pakete laden darf. Du kannst sie später unter Einstellungen → Download ändern.</string>
+    <string name="region_gate_cn">Festlandchina</string>
+    <string name="region_gate_other">Andere Regionen</string>
+    <string name="region_gate_warn_cn">Nutzer aus Festlandchina können das originale Minecraft hier nicht herunterladen.</string>
+    <string name="region_gate_warn_cn_sub">Der Launcher lädt keine Minecraft-Dateien über offizielle Kanäle. Bereits installierte Spiele lassen sich weiterhin starten.</string>
+    <string name="region_gate_confirm">Bestätigen</string>
+    <string name="region_gate_confirm_hint">Noch %1$d Mal auf Bestätigen tippen</string>
+    <string name="region_gate_confirm_ready">Bestätigen</string>
+    <string name="region_gate_locked_title">Downloads nicht verfügbar</string>
+    <string name="region_gate_locked_msg">Die Region Festlandchina ist ausgewählt, daher ist der Download des originalen Minecraft deaktiviert. Bereits installierte Spiele lassen sich weiterhin starten.</string>
+    <string name="region_gate_locked_go_setting">Region ändern</string>
+    <string name="region_gate_setting_title">Region</string>
+    <string name="region_gate_setting_cn">Festlandchina</string>
+    <string name="region_gate_setting_other">Andere Regionen</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">من أي بلد أنت؟</string>
+    <string name="region_gate_desc">تحدد المنطقة ما إذا كان بإمكان المشغّل جلب حزم Minecraft الأصلية لك. يمكنك تغييرها لاحقًا من الإعدادات ← التنزيل.</string>
+    <string name="region_gate_cn">الصين القارية</string>
+    <string name="region_gate_other">مناطق أخرى</string>
+    <string name="region_gate_warn_cn">لا يمكن لمستخدمي الصين القارية تنزيل Minecraft الأصلي هنا.</string>
+    <string name="region_gate_warn_cn_sub">لن يجلب المشغّل ملفات Minecraft من القنوات الرسمية. لا يزال بإمكانك تشغيل الألعاب المثبّتة مسبقًا.</string>
+    <string name="region_gate_confirm">تأكيد</string>
+    <string name="region_gate_confirm_hint">اضغط تأكيد %1$d مرة أخرى</string>
+    <string name="region_gate_confirm_ready">تأكيد</string>
+    <string name="region_gate_locked_title">التنزيل غير متاح</string>
+    <string name="region_gate_locked_msg">تم اختيار منطقة الصين القارية، لذا تم تعطيل تنزيل Minecraft الأصلي. لا تزال الألعاب المثبّتة قابلة للتشغيل.</string>
+    <string name="region_gate_locked_go_setting">تغيير المنطقة</string>
+    <string name="region_gate_setting_title">المنطقة</string>
+    <string name="region_gate_setting_cn">الصين القارية</string>
+    <string name="region_gate_setting_other">مناطق أخرى</string>
+</resources>

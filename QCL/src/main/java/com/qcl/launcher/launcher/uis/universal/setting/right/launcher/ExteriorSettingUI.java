@@ -100,6 +100,9 @@ CompoundButton.OnCheckedChangeListener {
     private SwitchCompat grassUiSwitch;
     private SwitchCompat showAccountModelSwitch;
     private SwitchCompat transBgSwitch;
+    /** ★ v3.1：液态玻璃（边缘畸变）开关，默认关。 */
+    private SwitchCompat liquidGlassSwitch;
+    private LinearLayout liquidGlassLayout;
     private LinearLayout fullscreenSetting;
     private RadioButton defaultRadio;
     private RadioButton classicRadio;
@@ -114,6 +117,12 @@ CompoundButton.OnCheckedChangeListener {
     private TextView themePresetAmoled;
     private TextView themeExport;
     private TextView themeImport;
+
+    /** ★ v3.1：排版风格四选一（经典 / FCL / HMCL 电脑端 / ZL2）。 */
+    private TextView layoutStyleQcl;
+    private TextView layoutStyleFcl;
+    private TextView layoutStyleHmcl;
+    private TextView layoutStyleZl2;
 
     /** ★ 社区版新增：安全区避让（刘海 / 挖孔 / 大圆角） */
     private LinearLayout safeAreaLayout;
@@ -146,6 +155,8 @@ CompoundButton.OnCheckedChangeListener {
         this.grassUiSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_grass_ui);
         this.showAccountModelSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_show_account_model);
         this.transBgSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_transparent_bg);
+        this.liquidGlassSwitch = (SwitchCompat)this.activity.findViewById(R.id.switch_liquid_glass);
+        this.liquidGlassLayout = (LinearLayout)this.activity.findViewById(R.id.liquid_glass_layout);
         this.fullscreenSetting = (LinearLayout)this.activity.findViewById(R.id.fullscreen_layout);
         this.defaultRadio = (RadioButton)this.activity.findViewById(R.id.select_bg_default);
         this.classicRadio = (RadioButton)this.activity.findViewById(R.id.select_bg_classic);
@@ -162,6 +173,17 @@ CompoundButton.OnCheckedChangeListener {
         this.themeImport = (TextView)this.activity.findViewById(R.id.theme_import);
         for (TextView tv : new TextView[]{this.themePresetDefault, this.themePresetDark,
                 this.themePresetAmoled, this.themeExport, this.themeImport}) {
+            if (tv != null) {
+                tv.setOnClickListener((View.OnClickListener)this);
+            }
+        }
+        // ★ v3.1：排版风格四选一
+        this.layoutStyleQcl = (TextView)this.activity.findViewById(R.id.layout_style_qcl);
+        this.layoutStyleFcl = (TextView)this.activity.findViewById(R.id.layout_style_fcl);
+        this.layoutStyleHmcl = (TextView)this.activity.findViewById(R.id.layout_style_hmcl);
+        this.layoutStyleZl2 = (TextView)this.activity.findViewById(R.id.layout_style_zl2);
+        for (TextView tv : new TextView[]{this.layoutStyleQcl, this.layoutStyleFcl,
+                this.layoutStyleHmcl, this.layoutStyleZl2}) {
             if (tv != null) {
                 tv.setOnClickListener((View.OnClickListener)this);
             }
@@ -223,6 +245,10 @@ CompoundButton.OnCheckedChangeListener {
         }
         if (this.transBgSwitch != null) {
             this.transBgSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
+        }
+        // ★ v3.1：液态玻璃开关
+        if (this.liquidGlassSwitch != null) {
+            this.liquidGlassSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
         }
         this.defaultRadio.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
         this.classicRadio.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
@@ -286,9 +312,49 @@ CompoundButton.OnCheckedChangeListener {
                 this.transBgSwitch.setChecked(this.activity.launcherSetting.transparentBackground);
             }
         }
+        // ★ v3.1：液态玻璃开关的初始状态。
+        //   ★ 必须先摘掉监听再 setChecked —— 否则 setChecked 会触发 onCheckedChanged，
+        //     在「打开设置页」这个动作里就把玻璃重新铺一遍（明明设置没变），白花一次全树扫描。
+        if (this.liquidGlassSwitch != null) {
+            this.liquidGlassSwitch.setOnCheckedChangeListener(null);
+            this.liquidGlassSwitch.setChecked(this.activity.launcherSetting.liquidGlassMode != 0);
+            this.liquidGlassSwitch.setOnCheckedChangeListener((CompoundButton.OnCheckedChangeListener)this);
+        }
         this.refreshColorEditable();
+        this.refreshLayoutStyleSelection();
         if (Build.VERSION.SDK_INT < 28) {
             this.fullscreenSetting.setVisibility(8);
+        }
+    }
+
+    /**
+     * ★ v3.1：刷新排版风格按钮的选中态。
+     *
+     * <p>用背景 drawable 区分选中/未选（与「主题方案」那三个按钮同一套做法），
+     * 不额外引入新的 drawable。
+     */
+    private void refreshLayoutStyleSelection() {
+        try {
+            int cur = this.activity.launcherSetting == null ? 0 : this.activity.launcherSetting.layoutStyle;
+            TextView[] all = {this.layoutStyleQcl, this.layoutStyleFcl,
+                    this.layoutStyleHmcl, this.layoutStyleZl2};
+            int[] values = {
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_QCL,
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_FCL,
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_HMCL,
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2};
+            for (int i = 0; i < all.length; i++) {
+                if (all[i] == null) {
+                    continue;
+                }
+                all[i].setBackgroundResource(values[i] == cur
+                        ? R.drawable.launcher_button_white_blue
+                        : R.drawable.launcher_button_gray);
+                all[i].setTextColor(values[i] == cur
+                        ? this.context.getColor(R.color.colorAccent)
+                        : this.context.getColor(R.color.colorPureBlack));
+            }
+        } catch (Throwable ignored) {
         }
     }
 
@@ -408,14 +474,37 @@ CompoundButton.OnCheckedChangeListener {
     }
 
     public static void applyPanelTint(Context context, View root, int color2, boolean transparent) {
-        Drawable bg;
-        if (root == null) {
+        applyPanelTint(context, root, color2, transparent, 0);
+    }
+
+    /**
+     * ★ 给整棵树重新着色，**玻璃面板跳过**。
+     *
+     * <p><b>为什么要跳过</b>：这个方法的终点是 {@code d.setTintList(...)}，
+     * 只对「背景的 constantState 等于那 4 个 drawable 之一」的控件生效。
+     * 玻璃面板的背景是 {@code GlassDrawable}，constantState 是 null —— 比不中，
+     * 本来就不会被着色，不需要额外处理。
+     *
+     * <p>★ v3.1 删掉了 3.0 的 {@code tintGlass}：玻璃面板内部现在是**完全透明**的
+     * （只画边缘一圈畸变），给它上色等于把「露出真实背景」这个设计推翻。
+     * 所以「面板颜色」这个设置对玻璃面板**不生效**，这是设计选择，不是遗漏。
+     *
+     * @param depth 递归深度保护
+     */
+    public static void applyPanelTint(Context context, View root, int color2, boolean transparent,
+                                      int depth) {
+        if (root == null || depth > 32) {
             return;
         }
+        // ★ 玻璃面板：直接跳过（原因见方法注释）
+        if (com.qcl.launcher.launcher.glass.GlassApplier.isGlass(root.getBackground())) {
+            return;
+        }
+        Drawable bg;
         if (root instanceof ViewGroup) {
             ViewGroup g = (ViewGroup)root;
             for (int i = 0; i < g.getChildCount(); ++i) {
-                ExteriorSettingUI.applyPanelTint(context, g.getChildAt(i), color2, transparent);
+                ExteriorSettingUI.applyPanelTint(context, g.getChildAt(i), color2, transparent, depth + 1);
             }
         }
         if ((bg = root.getBackground()) == null || bg.getConstantState() == null) {
@@ -756,6 +845,22 @@ CompoundButton.OnCheckedChangeListener {
     }
 
     public void onClick(View v) {
+        // ★ v3.1：排版风格（经典 / FCL / HMCL 电脑端 / ZL2）
+        if (v == this.layoutStyleQcl || v == this.layoutStyleFcl
+                || v == this.layoutStyleHmcl || v == this.layoutStyleZl2) {
+            int style = v == this.layoutStyleFcl
+                    ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_FCL
+                    : (v == this.layoutStyleHmcl
+                        ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_HMCL
+                        : (v == this.layoutStyleZl2
+                            ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2
+                            : com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_QCL));
+            this.activity.launcherSetting.layoutStyle = style;
+            GsonUtils.saveLauncherSetting(this.activity.launcherSetting, AppManifest.SETTING_DIR + "/launcher_setting.json");
+            this.activity.applyLayoutStyle();
+            refreshLayoutStyleSelection();
+            return;
+        }
         // ★ 社区版新增：主题方案（预设 / 导出 / 导入）。放在最前面 —— 与下面两处
         //   ColorSelectorDialog 分支无关，早返回避免互相干扰。
         if (v == this.themePresetDefault) {
@@ -895,6 +1000,18 @@ CompoundButton.OnCheckedChangeListener {
                         ? android.graphics.Color.TRANSPARENT
                         : android.graphics.Color.parseColor("#C8EDEDED"));
             }
+        }
+        // ★★★ v3.1：液态玻璃（边缘畸变）开关。
+        //   开 → 轻量档（只给大面板），关 → 立刻把已套的面板全部摘掉。
+        //   ★ 关的时候必须 detachAll：只「不再套新的」的话，已经套上的会留在界面上，
+        //     用户看到的就是「关了还在」。
+        if (this.liquidGlassSwitch != null && buttonView == this.liquidGlassSwitch) {
+            int mode = isChecked
+                    ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_LIGHT
+                    : com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF;
+            this.activity.launcherSetting.liquidGlassMode = mode;
+            GsonUtils.saveLauncherSetting(this.activity.launcherSetting, AppManifest.SETTING_DIR + "/launcher_setting.json");
+            this.activity.setLiquidGlassMode(mode);
         }
         if (buttonView == this.defaultRadio && isChecked) {
             this.classicRadio.setChecked(false);

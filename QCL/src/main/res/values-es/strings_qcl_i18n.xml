@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Aplicar</string>
     <string name="stats_reset">Restablecer</string>
     <string name="transfer_next">Siguiente</string>
+    <string name="exterior_setting_liquid_glass">Vidrio líquido</string>
+    <string name="exterior_setting_liquid_glass_hint">Los bordes de los paneles refractan el fondo. Desactivado por defecto.</string>
+    <string name="exterior_layout_style_title">Diseño</string>
+    <string name="exterior_layout_style_qcl">Clásico</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

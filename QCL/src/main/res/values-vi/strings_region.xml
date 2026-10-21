@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Bạn đến từ quốc gia nào?</string>
+    <string name="region_gate_desc">Khu vực quyết định trình khởi chạy có thể tải gói Minecraft gốc hay không. Bạn có thể đổi sau trong Cài đặt → Tải xuống.</string>
+    <string name="region_gate_cn">Trung Quốc đại lục</string>
+    <string name="region_gate_other">Khu vực khác</string>
+    <string name="region_gate_warn_cn">Người dùng Trung Quốc đại lục không thể tải Minecraft gốc tại đây.</string>
+    <string name="region_gate_warn_cn_sub">Trình khởi chạy sẽ không tải tệp Minecraft từ kênh chính thức. Bạn vẫn có thể khởi chạy các trò chơi đã cài đặt.</string>
+    <string name="region_gate_confirm">Xác nhận</string>
+    <string name="region_gate_confirm_hint">Nhấn Xác nhận thêm %1$d lần</string>
+    <string name="region_gate_confirm_ready">Xác nhận</string>
+    <string name="region_gate_locked_title">Không thể tải xuống</string>
+    <string name="region_gate_locked_msg">Đã chọn khu vực Trung Quốc đại lục nên tính năng tải Minecraft gốc đã bị tắt. Các trò chơi đã cài vẫn khởi chạy được.</string>
+    <string name="region_gate_locked_go_setting">Đổi khu vực</string>
+    <string name="region_gate_setting_title">Khu vực</string>
+    <string name="region_gate_setting_cn">Trung Quốc đại lục</string>
+    <string name="region_gate_setting_other">Khu vực khác</string>
+</resources>

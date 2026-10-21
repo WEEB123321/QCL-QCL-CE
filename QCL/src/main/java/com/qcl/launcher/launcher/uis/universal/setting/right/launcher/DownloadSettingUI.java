@@ -31,6 +31,10 @@ public class DownloadSettingUI extends BaseUI implements CompoundButton.OnChecke
     private LinearLayout legacyCnLangRow;
     private TextView legacyCnLangValue;
 
+    /** ★ 2.0.12：地区（下载页首次进入时的那一问，这里可改） */
+    private LinearLayout regionRow;
+    private TextView regionValue;
+
     public static final String CN_PREF = "qcl_legacy_cn";
     public static final String CN_KEY_LANG = "lang";
 
@@ -46,6 +50,40 @@ public class DownloadSettingUI extends BaseUI implements CompoundButton.OnChecke
         }
         boolean en = com.qcl.launcher.launcher.download.game.LegacyChinesePack.LANG_EN.equals(getLegacyLang(this.context));
         this.legacyCnLangValue.setText(en ? "English" : "简体中文");
+    }
+
+    // ─────────────────── ★ 2.0.12：地区 ───────────────────
+
+    /** 把当前地区显示在设置行上。没选过就留空（正常流程下进不来，因为下载页会先问）。 */
+    private void refreshRegion() {
+        if (this.regionValue == null) {
+            return;
+        }
+        String r = com.qcl.launcher.launcher.uis.game.download.RegionGate.getRegion(this.context);
+        if (com.qcl.launcher.launcher.uis.game.download.RegionGate.REGION_CN.equals(r)) {
+            this.regionValue.setText(R.string.region_gate_setting_cn);
+        } else if (com.qcl.launcher.launcher.uis.game.download.RegionGate.REGION_OTHER.equals(r)) {
+            this.regionValue.setText(R.string.region_gate_setting_other);
+        } else {
+            this.regionValue.setText("");
+        }
+    }
+
+    /**
+     * 重选地区。
+     * ★ 故意不做「一键切到其它地区」的捷径 —— 改这一项要连点 5 次「确定」，
+     *   和首次选择保持同一套手续，否则「改一下就能下载」会变成绕过话术。
+     */
+    private void showRegionDialog() {
+        com.qcl.launcher.launcher.uis.game.download.RegionGate.showDialog(
+                this.activity,
+                this.context.getString(R.string.region_gate_setting_title),
+                new com.qcl.launcher.launcher.uis.game.download.RegionGate.OnRegionPicked() {
+                    @Override
+                    public void onPicked(String region) {
+                        DownloadSettingUI.this.refreshRegion();
+                    }
+                });
     }
 
     private void showLegacyCnLangDialog() {
@@ -165,6 +203,18 @@ public class DownloadSettingUI extends BaseUI implements CompoundButton.OnChecke
         this.legacyCnLangRow = (LinearLayout) this.activity.findViewById(R.id.legacy_cn_lang_row);
         this.legacyCnLangValue = (TextView) this.activity.findViewById(R.id.legacy_cn_lang_value);
         this.refreshLegacyCnLang();
+        // ★ 2.0.12：地区 —— 下载页那一问的「事后修改入口」
+        this.regionRow = (LinearLayout) this.activity.findViewById(R.id.download_region_row);
+        this.regionValue = (TextView) this.activity.findViewById(R.id.download_region_value);
+        this.refreshRegion();
+        if (this.regionRow != null) {
+            this.regionRow.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    DownloadSettingUI.this.showRegionDialog();
+                }
+            });
+        }
         if (this.legacyCnLangRow != null) {
             this.legacyCnLangRow.setOnClickListener(new View.OnClickListener(){
                 @Override

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Из које земље сте?</string>
+    <string name="region_gate_desc">Регион одређује да ли покретач може да преузме оригиналне Minecraft пакете. Касније можете променити у Подешавања → Преузимање.</string>
+    <string name="region_gate_cn">Копнена Кина</string>
+    <string name="region_gate_other">Други региони</string>
+    <string name="region_gate_warn_cn">Корисници из копнене Кине не могу овде да преузму оригинални Minecraft.</string>
+    <string name="region_gate_warn_cn_sub">Покретач неће преузимати Minecraft датотеке са званичних канала. Већ инсталиране игре можете и даље покренути.</string>
+    <string name="region_gate_confirm">Потврди</string>
+    <string name="region_gate_confirm_hint">Додирните Потврди још %1$d пута</string>
+    <string name="region_gate_confirm_ready">Потврди</string>
+    <string name="region_gate_locked_title">Преузимање није доступно</string>
+    <string name="region_gate_locked_msg">Изабран је регион Копнена Кина, па је преузимање оригиналног Minecraft-а онемогућено. Већ инсталиране игре можете и даље покренути.</string>
+    <string name="region_gate_locked_go_setting">Промени регион</string>
+    <string name="region_gate_setting_title">Регион</string>
+    <string name="region_gate_setting_cn">Копнена Кина</string>
+    <string name="region_gate_setting_other">Други региони</string>
+</resources>

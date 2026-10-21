@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Uygula</string>
     <string name="stats_reset">Sıfırla</string>
     <string name="transfer_next">İleri</string>
+    <string name="exterior_setting_liquid_glass">Sıvı cam</string>
+    <string name="exterior_setting_liquid_glass_hint">Panel kenarları arka planı kırar. Varsayılan olarak kapalı.</string>
+    <string name="exterior_layout_style_title">Düzen</string>
+    <string name="exterior_layout_style_qcl">Klasik</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

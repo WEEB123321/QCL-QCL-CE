@@ -63,4 +63,11 @@
     <string name="skin_library_apply">ใช้งาน</string>
     <string name="stats_reset">รีเซ็ต</string>
     <string name="transfer_next">ถัดไป</string>
+    <string name="exterior_setting_liquid_glass">กระจกเหลว</string>
+    <string name="exterior_setting_liquid_glass_hint">ขอบแผงหักเหพื้นหลัง ปิดไว้เป็นค่าเริ่มต้น</string>
+    <string name="exterior_layout_style_title">เลย์เอาต์</string>
+    <string name="exterior_layout_style_qcl">คลาสสิก</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

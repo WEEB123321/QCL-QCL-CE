@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Terapkan</string>
     <string name="stats_reset">Setel ulang</string>
     <string name="transfer_next">Berikutnya</string>
+    <string name="exterior_setting_liquid_glass">Kaca cair</string>
+    <string name="exterior_setting_liquid_glass_hint">Tepi panel membiaskan latar belakang. Nonaktif secara bawaan.</string>
+    <string name="exterior_layout_style_title">Tata letak</string>
+    <string name="exterior_layout_style_qcl">Klasik</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

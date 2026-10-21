@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">你是哪一個國家的人？</string>
+    <string name="region_gate_desc">地區會決定啟動器能不能替你取得原版《當個創世神》的檔案。之後可以在「設定 → 下載」裡修改。</string>
+    <string name="region_gate_cn">中國大陸</string>
+    <string name="region_gate_other">其它地區</string>
+    <string name="region_gate_warn_cn">中國使用者不可以下載原版 MC</string>
+    <string name="region_gate_warn_cn_sub">啟動器不會從官方管道取得《當個創世神》的檔案；已經安裝在裝置上的遊戲仍然可以正常啟動。</string>
+    <string name="region_gate_confirm">確定</string>
+    <string name="region_gate_confirm_hint">再點 %1$d 次「確定」</string>
+    <string name="region_gate_confirm_ready">確定</string>
+    <string name="region_gate_locked_title">下載已被限制</string>
+    <string name="region_gate_locked_msg">目前地區為中國大陸，原版 MC 的下載功能已依要求關閉。已經安裝好的遊戲可以照常啟動。</string>
+    <string name="region_gate_locked_go_setting">去設定修改地區</string>
+    <string name="region_gate_setting_title">地區</string>
+    <string name="region_gate_setting_cn">中國大陸</string>
+    <string name="region_gate_setting_other">其它地區</string>
+</resources>

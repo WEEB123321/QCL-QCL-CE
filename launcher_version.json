@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20104,
-    "versionName": "2.1.4",
-    "date": "2026-10-14",
+    "versionCode": 20108,
+    "versionName": "2.1.8",
+    "date": "2026-10-21",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.1.4/QCL-CE-v2.1.4-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.1.8/QCL-CE-v2.1.8-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.1.4</b><br/>· <b>修「第一次打开闪退」</b>：不再在 Application.onCreate 里提前加载 SDL3 / bytehook —— 那两个只在「启动游戏」时才需要，提前加载多了一个崩溃点<br/>· 「安全模式」插件显示上次崩溃停在哪 + 系统退出原因<br/>· 版本列表地球按钮 / 点头像切换账号 / 第三方登录改名 / Legacy Fabric / Cleanroom<br/>· 插件 95 个"
+    "updateLog": "<b>QCL-CE 2.1.8</b><br/>· <b>修掉「选地区界面不出现」</b>——下载页对象构造时因布局根节点类型变更抛异常被静默吞掉，导致整个下载页为 null；现在已修正并让地区层置顶<br/>· 液态玻璃：修正畸变圈位置偏移（控件有内边距时圈会画歪）<br/>· 液态玻璃：合并同一帧内的重复全树扫描，列表刷新时不再反复遍历界面<br/>· 排版风格切换后自动重新套用玻璃，不会再出现「换了排版玻璃没跟上」<br/>· 切换排版时导航条不再逐次上飘（安全区边距改为写绝对值）<br/>· <b>液态玻璃默认关闭</b>，需在「设置 → 外观」手动打开<br/>· 新增排版风格：<b>FCL</b>（底部导航）/ <b>HMCL 电脑端</b>（左侧窄栏）/ <b>ZL2</b>（底部大圆角）<br/>· 版本号 2.1.7 → 2.1.8"
   },
   "latestPrerelease": null
 }

@@ -121,17 +121,22 @@ public class DynamicBackground {
         if (next == null) {
             return;
         }
-        // ★★★ 社区版：把当前这张背景图交给液态玻璃着色器当**折射输入**。
+        // ★★★ 社区版：把当前这张背景图交给液态玻璃当**折射输入**。
         //   玻璃要「透过它折射出背景」，就必须知道当前显示的是哪张图。
         //   ★ 直接拿轮播自己的位图，而不是去截屏 ——
         //     截屏会把玻璃自己截进去（递归），而且慢得多。
         try {
             if (next instanceof BitmapDrawable) {
-                Bitmap bm = ((BitmapDrawable) next).getBitmap();
+                final Bitmap bm = ((BitmapDrawable) next).getBitmap();
                 if (bm != null && !bm.isRecycled()) {
-                    android.util.DisplayMetrics dm = this.activity.getResources().getDisplayMetrics();
-                    com.qcl.launcher.launcher.glass.LiquidGlassDrawable.setBackdrop(
-                            bm, dm.widthPixels, dm.heightPixels, null);
+                    // ★★★ v3.1：**主线程直接调**，不再开线程。
+                    //   v3.0 必须开线程是因为它要做两次降采样 + 一次全尺寸放大（30~60ms）；
+                    //   v3.1 不做模糊了，set() 只存一个引用，成本接近 0。
+                    //   留着线程反而有副作用：后台线程改了 GlassBackdrop 之后，
+                    //   主线程的 View 不知道要重绘 → 玻璃边缘还显示上一张背景的折射。
+                    com.qcl.launcher.launcher.glass.GlassBackdrop.set(bm);
+                    // ★ 通知所有已套玻璃的 View 重绘 —— 否则换了图，边缘折射还是旧的。
+                    com.qcl.launcher.launcher.glass.GlassApplier.invalidateApplied(this.target);
                 }
             }
         } catch (Throwable ignored) {

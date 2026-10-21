@@ -63,4 +63,11 @@
     <string name="skin_library_apply">適用</string>
     <string name="stats_reset">リセット</string>
     <string name="transfer_next">次へ</string>
+    <string name="exterior_setting_liquid_glass">リキッドガラス</string>
+    <string name="exterior_setting_liquid_glass_hint">パネルの縁が背景を屈折させます。既定ではオフです。</string>
+    <string name="exterior_layout_style_title">レイアウト</string>
+    <string name="exterior_layout_style_qcl">クラシック</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

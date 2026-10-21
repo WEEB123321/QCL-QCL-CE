@@ -99,7 +99,20 @@ public class UIManager {
     /** 与 brokenPages 同步，用于对象级快速判定（mainUIs 过滤 / 派发守卫） */
     private final java.util.LinkedHashSet<BaseUI> brokenUIs = new java.util.LinkedHashSet<>();
 
+    /**
+     * ★★★ 3.0：持有主界面引用，供切换后补扫液态玻璃用（见 {@link #rescanGlass()}）。
+     * 用 WeakReference 而不是强引用：UIManager 与 MainActivity 本来互相持有，
+     * 这里再加一条强引用不会造成新的泄漏，但弱引用更稳妥 —— 换 Activity 时自动失效。
+     */
+    private java.lang.ref.WeakReference<MainActivity> lastActivityRef =
+            new java.lang.ref.WeakReference<>(null);
+
+    private MainActivity getLastActivity() {
+        return lastActivityRef == null ? null : lastActivityRef.get();
+    }
+
     public UIManager (Context context, MainActivity activity){
+        lastActivityRef = new java.lang.ref.WeakReference<>(activity);
         try { mainUI = new MainUI(context, activity); } catch (Throwable t) { mainUI = null; recordBootFail("MainUI", t); }
         try { accountUI = new AccountUI(context, activity); } catch (Throwable t) { accountUI = null; recordBootFail("AccountUI", t); }
         try { gameManagerUI = new GameManagerUI(context, activity); } catch (Throwable t) { gameManagerUI = null; recordBootFail("GameManagerUI", t); }
@@ -375,6 +388,9 @@ public class UIManager {
             } catch (Throwable ignored) {
             }
         }
+        // ★★★ 3.0：切完再扫玻璃。★ 必须在切换**之后**：被切进来的页面此刻才可见，
+        //   之前它是 GONE，尺寸为 0（原因详见 MainActivity.rescanLiquidGlass 注释）。
+        rescanGlass();
         System.out.println("-----------------------------------------------------------------------------------------------------------------------------switch to new ui");
     }
 
@@ -410,6 +426,26 @@ public class UIManager {
                 ui.onStart();
             }
         }, true);
+        // ★★★ 3.0：切 Tab 同样补扫玻璃（语义同 switchMainUI 末尾那次）
+        rescanGlass();
+    }
+
+    /**
+     * ★★★ 3.0：页面切换后的玻璃补扫。
+     *
+     * <p>为什么不让 {@code UIManager} 直接 import {@code GlassApplier}：
+     * 保持「UI 管理器不认识具体视觉效果」的分层 —— 关掉玻璃只需要删掉 MainActivity
+     * 里那一个方法体，不用动导航代码。同时这里统一包 try/catch，
+     * 视觉效果出任何问题都不能影响导航（导航抛异常 = 整机闪退）。
+     */
+    private void rescanGlass() {
+        try {
+            MainActivity activity = getLastActivity();
+            if (activity != null) {
+                activity.rescanLiquidGlass();
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     // ★★★ 续 6：下面三个派发循环原先**完全没有保护** —— 它们由 MainActivity 的生命周期

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Kamu dari negara mana?</string>
+    <string name="region_gate_desc">Wilayah menentukan apakah peluncur boleh mengunduh paket Minecraft asli untukmu. Bisa diubah nanti di Pengaturan → Unduhan.</string>
+    <string name="region_gate_cn">Tiongkok Daratan</string>
+    <string name="region_gate_other">Wilayah lain</string>
+    <string name="region_gate_warn_cn">Pengguna Tiongkok Daratan tidak dapat mengunduh Minecraft asli di sini.</string>
+    <string name="region_gate_warn_cn_sub">Peluncur tidak akan mengambil berkas Minecraft dari saluran resmi. Game yang sudah terpasang tetap bisa dijalankan.</string>
+    <string name="region_gate_confirm">Konfirmasi</string>
+    <string name="region_gate_confirm_hint">Ketuk Konfirmasi %1$d kali lagi</string>
+    <string name="region_gate_confirm_ready">Konfirmasi</string>
+    <string name="region_gate_locked_title">Unduhan tidak tersedia</string>
+    <string name="region_gate_locked_msg">Wilayah Tiongkok Daratan dipilih, jadi unduhan Minecraft asli dinonaktifkan. Game yang sudah terpasang tetap bisa dijalankan.</string>
+    <string name="region_gate_locked_go_setting">Ubah wilayah</string>
+    <string name="region_gate_setting_title">Wilayah</string>
+    <string name="region_gate_setting_cn">Tiongkok Daratan</string>
+    <string name="region_gate_setting_other">Wilayah lain</string>
+</resources>

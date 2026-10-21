@@ -11,7 +11,20 @@ import com.qcl.launcher.utils.animation.CustomAnimationUtils;
 import com.qcl.launcher.R;
 /* loaded from: classes2.dex */
 public class DownloadUI extends BaseUI implements View.OnClickListener {
-    public LinearLayout downloadUI;
+    /**
+     * ★★★ 必须是 {@code View}，**不能**是 {@code LinearLayout}。
+     *
+     * <p>2.0.12 为了放「地区选择」覆盖层，把 {@code ui_download} 的根节点从
+     * LinearLayout 换成了 FrameLayout（覆盖层必须是根级最后一个子节点才能盖住整页）。
+     * 但字段类型一直没跟着改，构造时 {@code (LinearLayout) findViewById(...)}
+     * 直接抛 {@code ClassCastException} —— 而 UIManager 的构造又是
+     * {@code try { downloadUI = new DownloadUI(...) } catch (Throwable) { downloadUI = null }}，
+     * 于是异常被**静默吞掉**，表现为「点下载页什么都不发生 / 地区界面永远不出现」。
+     *
+     * <p>★ 教训：给 View 换根类型时，必须把所有 {@code findViewById} 的强转一起改，
+     * 否则错误会被上一层 try/catch 吃掉，连堆栈都看不到。
+     */
+    public View downloadUI;
     public DownloadUIManager downloadUIManager;
     public LinearLayout startDownloadGameUI;
     public LinearLayout startDownloadModUI;
@@ -27,7 +40,8 @@ public class DownloadUI extends BaseUI implements View.OnClickListener {
     @Override // com.qcl.launcher.launcher.uis.tools.BaseUI, com.qcl.launcher.launcher.uis.tools.UILifecycleCallbacks
     public void onCreate() {
         super.onCreate();
-        this.downloadUI = (LinearLayout) this.activity.findViewById(R.id.ui_download);
+        // ★ 根节点是 FrameLayout（见字段注释），**不要强转**
+        this.downloadUI = this.activity.findViewById(R.id.ui_download);
         // ★★★ 1.9.8：界面排版 —— 下载 页接入
         //   ① 先 apply 已保存的排版 ✓（没自定义过就完全不动 ✓）
         //   ② 再挂「长按进编辑」✓
@@ -59,6 +73,8 @@ public class DownloadUI extends BaseUI implements View.OnClickListener {
         this.activity.showBarTitle(this.context.getResources().getString(R.string.download_ui_title), canGoBackToLast(), true);
         CustomAnimationUtils.showViewFromLeft(this.downloadUI, this.activity, this.context, true);
         init();
+        // ★★★ 2.0.12：还没选过地区就先问地区，选完才放行页面
+        showRegionGateIfNeeded();
     }
 
     @Override // com.qcl.launcher.launcher.uis.tools.BaseUI, com.qcl.launcher.launcher.uis.tools.UILifecycleCallbacks
@@ -88,6 +104,42 @@ public class DownloadUI extends BaseUI implements View.OnClickListener {
     private void init() {
         this.downloadUIManager.downloadModUI.refreshGameList();
         this.downloadUIManager.downloadResourcePackUI.refreshGameList();
+    }
+
+    /**
+     * ★★★ 2.0.12：地区选择层。
+     *
+     * <p>★ 为什么放在 onStart 而不是 onCreate：这份 UI 是**预加载**的（activity_main 里 include），
+     * onCreate 在 App 启动时就跑完了，那时候用户还没进下载页 —— 提前弹会盖到首页上。
+     * onStart 才是「用户真的进了这一页」的时刻。
+     *
+     * <p>★ 从不缓存 View 引用，每次都重新 findViewById：LayoutEditor.apply 会
+     * removeView/addView 重排子节点，缓存的那份可能已经不在树上了。
+     */
+    private void showRegionGateIfNeeded() {
+        try {
+            View gate = this.activity.findViewById(R.id.download_region_gate);
+            if (gate == null) {
+                return;
+            }
+            // ★ 强制置顶：LayoutEditor.apply 在「用户自定义过下载页排版」时会按保存的
+            //   顺序重排子节点，可能把地区层排到中间 → 被其他页面盖住。
+            //   bringToFront() 把它移到父容器最后一个，FrameLayout 按子节点顺序绘制，
+            //   最后一个就在最上层。
+            try {
+                gate.bringToFront();
+            } catch (Throwable ignored) {
+            }
+            RegionGate.bindOverlay(this.activity, gate, new Runnable() {
+                @Override
+                public void run() {
+                    // 确认后：若选的是中国大陆，当前默认子页是「游戏」，
+                    // 那个页面上的下载入口已由 onClick 拦下，这里不用额外处理。
+                    DownloadUI.this.init();
+                }
+            });
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override // android.view.View.OnClickListener

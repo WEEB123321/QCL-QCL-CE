@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Anwenden</string>
     <string name="stats_reset">Zurücksetzen</string>
     <string name="transfer_next">Weiter</string>
+    <string name="exterior_setting_liquid_glass">Flüssigglas</string>
+    <string name="exterior_setting_liquid_glass_hint">Die Ränder der Bereiche brechen den Hintergrund. Standardmäßig aus.</string>
+    <string name="exterior_layout_style_title">Layout</string>
+    <string name="exterior_layout_style_qcl">Klassisch</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Zastosuj</string>
     <string name="stats_reset">Resetuj</string>
     <string name="transfer_next">Dalej</string>
+    <string name="exterior_setting_liquid_glass">Płynne szkło</string>
+    <string name="exterior_setting_liquid_glass_hint">Krawędzie paneli załamują tło. Domyślnie wyłączone.</string>
+    <string name="exterior_layout_style_title">Układ</string>
+    <string name="exterior_layout_style_qcl">Klasyczny</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

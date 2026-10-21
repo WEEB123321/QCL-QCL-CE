@@ -931,4 +931,11 @@
     <string name="world_menu_open_dir">Tiết lộ trong Explorer</string>
     <string name="feedback_ui_join_discord">Tham gia Discord</string>
 
+    <string name="exterior_setting_liquid_glass">Kính lỏng</string>
+    <string name="exterior_setting_liquid_glass_hint">Viền bảng khúc xạ nền. Mặc định tắt.</string>
+    <string name="exterior_layout_style_title">Bố cục</string>
+    <string name="exterior_layout_style_qcl">Cổ điển</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

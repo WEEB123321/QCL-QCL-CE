@@ -63,6 +63,11 @@ public class SettingUIManager {
         while (true) {
             BaseUI[] baseUIArr = this.settingUIs;
             if (i >= baseUIArr.length) {
+                // ★★★ 3.0：设置页 8 个子页切换后补扫液态玻璃。
+                //   这一层**不能**靠 UIManager 兜住 —— 子页全部挂在 ui_setting 内部的
+                //   同一个 RelativeLayout 里，切换只是 setVisibility，不走 switchMainUI。
+                //   不接这里，8 个设置子页就只有「第一次进」那一屏是玻璃。
+                rescanGlass(baseUI);
                 return;
             }
             if (baseUIArr[i] == baseUI) {
@@ -71,6 +76,17 @@ public class SettingUIManager {
                 baseUIArr[i].onStop();
             }
             i++;
+        }
+    }
+
+    /** 主界面的玻璃补扫（延到下一帧，原因见 MainActivity.rescanLiquidGlass 注释）。 */
+    private void rescanGlass(BaseUI ui) {
+        try {
+            MainActivity activity = ui != null ? ui.activity : null;
+            if (activity != null) {
+                activity.rescanLiquidGlass();
+            }
+        } catch (Throwable ignored) {
         }
     }
 

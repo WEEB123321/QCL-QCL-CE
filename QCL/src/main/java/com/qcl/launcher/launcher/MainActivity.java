@@ -184,6 +184,9 @@ implements View.OnClickListener {
                 }
                 StartupTrace.mark("MainActivity：applyUiTheme");
                 MainActivity.this.applyUiTheme();
+                // ★★★ v3.1：排版风格（FCL / HMCL / ZL2）。★ 必须在玻璃之前 ——
+                //   排版会改导航栏位置和内容区 padding，玻璃扫描要按**最终**的尺寸来套。
+                MainActivity.this.applyLayoutStyle();
                 // ★★★ 社区版：液态玻璃（真折射）。逻辑见 applyLiquidGlass()。
                 MainActivity.this.applyLiquidGlass();
                 // ★ 社区版路标：走到这里说明启动全流程走通了。路标文件最后一行若是它，
@@ -491,36 +494,90 @@ implements View.OnClickListener {
      * 由 {@code DynamicBackground} 自己在切换时更新，这里跳过。
      */
     /**
-     * ★★★ 社区版：给「悬在背景之上」的那两块套上**真·液态玻璃**（AGSL 折射）。
+     * ★★★ v3.1：液态玻璃（**边缘畸变**，默认关闭）。
      *
-     * <p>★ 只挑这两块：**左侧导航 + 返回栏** —— 它们浮在照片上，折射最明显；
-     * 内容区的卡片上要压大量文字，边缘乱窜的色散反而干扰阅读。
+     * <h3>★ v3.1 相对 3.0 改了什么（全部来自真机反馈）</h3>
+     * <ol>
+     *   <li><b>默认关</b> —— 用户要求「在设置里开，默认是关的」。{@link #applyLiquidGlass()}
+     *       先读 {@code launcherSetting.liquidGlassMode}，为 0 就什么都不做。</li>
+     *   <li><b>只画边缘一圈</b> —— 面板内部完全透明，露出真实背景。这同时修掉了
+     *       「图片粘在板块上滑动」（3.0 在面板里画了背景副本）。</li>
+     *   <li><b>不要模糊 / 不要白边</b> —— 见 {@code GlassShader} 与 {@code GlassDrawable}。</li>
+     * </ol>
      *
-     * <p>★ 这个方法是**幂等**的，启动时调一次、每次回到前台再调一次。
-     * 为什么要重复调：外观设置里的「面板颜色」会遍历控件重新给背景着色
-     * （{@code ExteriorSettingUI.applyPanelTint}），一旦它在玻璃之后跑，
-     * 就会把玻璃背景替换掉 —— 表现就是「玻璃莫名其妙没了，重启又有了」。
-     * 每次 onResume 重套一遍，不管被谁覆盖都能自愈。
-     *
-     * <p>着色器不可用（系统 &lt; 13 / 驱动编译失败）时 {@code applyTo} 内部自动退化，不会崩。
+     * <p>★ 这个方法是**幂等**的：启动时一次、每次回前台一次、每次切页一次。
+     * 重复调没有副作用，反而能自愈 —— 外观设置里的「面板颜色」会遍历控件重设背景，
+     * 万一它把玻璃覆盖掉了，下一次重扫就会补回来。
      */
     public void applyLiquidGlass() {
         try {
-            // 先把「当前背景图」喂给着色器当折射输入。
-            //   ⚠️ 这一步以前漏了，症状就是「液态玻璃完全看不出来」：
-            //     DynamicBackground 只在「网络（动态轮播）」模式下才跑，
-            //     而它的 apply() 才是唯一喂背景的地方 ——
-            //     所以背景模式一旦不是「网络」，着色器就没有输入，
-            //     每一块都静默走了降级路径（半透明白），看起来跟没做一样。
-            //   现在不管什么模式，都从 launcherLayout 当前的实际背景里取位图。
-            this.pushBackdropFromCurrentBackground();
-            com.qcl.launcher.launcher.glass.LiquidGlass.applyTo(
-                    this.findViewById(R.id.qcl_bottom_nav), 18f, 0.12f, 22f);
-            com.qcl.launcher.launcher.glass.LiquidGlass.applyTo(
-                    this.findViewById(R.id.qcl_back_bar), 18f, 0.12f, 22f);
+            int mode = this.launcherSetting == null
+                    ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF
+                    : this.launcherSetting.liquidGlassMode;
+            com.qcl.launcher.launcher.glass.GlassApplier.setMode(mode);
+            if (mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                return; // ★ 默认路径：什么都不做
+            }
+            // ★ 顺序很重要：
+            //   ① attachToWindow —— 装「新页面自动接管」的整窗监听（幂等，只装一次）；
+            //   ② refreshBackdrop —— 把背景位图交给 GlassBackdrop（v3.1 起零成本，主线程可调）；
+            //   ③ apply —— 立刻扫一遍，否则首帧是「没有玻璃」再突然变。
+            com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+            // ★ 延一帧补扫：init() 跑在后台线程，apply() 那一刻布局可能还没完成（尺寸 0）。
+            rescanLiquidGlass();
         } catch (Throwable ignored) {
         }
     }
+
+    /**
+     * ★★★ v3.1：设置里拨动开关时调这个 —— 立刻生效，不用重启。
+     *
+     * <p>★ 关闭时必须 {@code detachAll}：只「不再套新的」的话，已经套上的面板会留在界面上，
+     * 用户看到的就是「关了还在」。
+     */
+    public void setLiquidGlassMode(int mode) {
+        try {
+            com.qcl.launcher.launcher.glass.GlassApplier.setMode(mode);
+            if (mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
+                return;
+            }
+            com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+            rescanLiquidGlass();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ 社区版：**页面切换后**补扫一次玻璃。
+     *
+     * <p>为什么必须延到下一帧：被切进来的页面在这一刻刚 {@code setVisibility(VISIBLE)}，
+     * 还没 measure/layout，尺寸是 0。给尺寸 0 的控件造玻璃之后不会重来（tag 已打上），
+     * 结果就是「这一页永远没有玻璃，切走再切回来才有」。
+     *
+     * <p>★ v3.1：模式为关时直接跳过，不做无谓的全树遍历。
+     */
+    public void rescanLiquidGlass() {
+        try {
+            if (com.qcl.launcher.launcher.glass.GlassApplier.getMode()
+                    == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                return;
+            }
+            this.getWindow().getDecorView().post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        com.qcl.launcher.launcher.glass.GlassApplier.apply(MainActivity.this);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            });
+        } catch (Throwable ignored) {
+        }
+    }
+
 
     private void pushBackdropFromCurrentBackground() {
         try {
@@ -528,48 +585,18 @@ implements View.OnClickListener {
                 return;
             }
             android.graphics.drawable.Drawable d = this.launcherLayout.getBackground();
-            android.graphics.Bitmap bmp = null;
-            // ★★★ 3.0：**必须处理 TransitionDrawable** ——
-            //   轮播模式下 launcherLayout 的背景就是一个 TransitionDrawable（淡入淡出用），
-            //   而这里原来只认 BitmapDrawable / LayerDrawable，直接把它跳过了
-            //   → 着色器拿不到 uBg 输入 → 每块玻璃静默走降级路径。
-            //   真机表现正是用户描述的：「有反光（降级里的亮边），但边缘没有畸变」。
-            if (d instanceof android.graphics.drawable.TransitionDrawable) {
-                // ★ TransitionDrawable 和 LayerDrawable 都没有 getLayers()，
-                //   只有 getNumberOfLayers() + getDrawable(i)。
-                android.graphics.drawable.TransitionDrawable td =
-                        (android.graphics.drawable.TransitionDrawable) d;
-                int n = td.getNumberOfLayers();
-                // 取最后一层 —— 淡入完成时显示的就是它
-                for (int i = n - 1; i >= 0; i--) {
-                    android.graphics.drawable.Drawable one = td.getDrawable(i);
-                    if (one instanceof android.graphics.drawable.BitmapDrawable) {
-                        bmp = ((android.graphics.drawable.BitmapDrawable) one).getBitmap();
-                        break;
-                    }
-                }
-            } else if (d instanceof android.graphics.drawable.BitmapDrawable) {
-                bmp = ((android.graphics.drawable.BitmapDrawable) d).getBitmap();
-            } else if (d instanceof android.graphics.drawable.LayerDrawable) {
-                // 有些主题会把位图包在 LayerDrawable 里，往下找一层
-                android.graphics.drawable.LayerDrawable ld =
-                        (android.graphics.drawable.LayerDrawable) d;
-                int n = ld.getNumberOfLayers();
-                for (int i = 0; i < n; i++) {
-                    android.graphics.drawable.Drawable one = ld.getDrawable(i);
-                    if (one instanceof android.graphics.drawable.BitmapDrawable) {
-                        bmp = ((android.graphics.drawable.BitmapDrawable) one).getBitmap();
-                        break;
-                    }
-                }
-            }
+            // ★★★ 3.0：位图提取逻辑收进 GlassApplier.extractBitmap() ——
+            //   原来这里和 DynamicBackground 各有一份「TransitionDrawable / BitmapDrawable /
+            //   LayerDrawable」的遍历，改一处漏一处。现在只有一份实现。
+            android.graphics.Bitmap bmp =
+                    com.qcl.launcher.launcher.glass.GlassApplier.extractBitmap(d);
             if (bmp == null || bmp.isRecycled()) {
                 return;
             }
-            android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-            com.qcl.launcher.launcher.glass.LiquidGlassDrawable.setBackdrop(
-                    bmp, dm.widthPixels, dm.heightPixels, null);
-            StartupTrace.mark("社区版：液态玻璃背景已就绪 " + bmp.getWidth() + "x" + bmp.getHeight());
+            // ★ v3.1：主线程直接调（只存引用，零成本），并让已套玻璃重绘。
+            com.qcl.launcher.launcher.glass.GlassBackdrop.set(bmp);
+            com.qcl.launcher.launcher.glass.GlassApplier.invalidateApplied(this.launcherLayout);
+            StartupTrace.mark("液态玻璃背景已就绪 " + bmp.getWidth() + "x" + bmp.getHeight());
         } catch (Throwable ignored) {
         }
     }
@@ -629,6 +656,26 @@ implements View.OnClickListener {
         }
         catch (Throwable throwable) {
             // empty catch block
+        }
+    }
+
+    /**
+     * ★★★ v3.1：应用排版风格（FCL / HMCL 电脑端 / ZL2）。
+     *
+     * <p>幂等：启动时一次，设置里切换时再调一次。
+     * 全部逻辑在 {@code LauncherLayoutStyle} 里 —— 这里只负责把设置值传下去，
+     * 这样「排版怎么变」和「什么时候变」是分开的，改排版不用碰 Activity。
+     */
+    public void applyLayoutStyle() {
+        try {
+            int style = this.launcherSetting == null ? 0 : this.launcherSetting.layoutStyle;
+            com.qcl.launcher.launcher.ui.LauncherLayoutStyle.apply(this, style);
+            // ★ 排版变了 ⇒ 控件尺寸变了 ⇒ 玻璃面板的「是否够大」判定可能翻盘。
+            //   补扫一次（它自己会延到下一帧，此时 measure 已完成）。
+            //   已套上的面板不需要重做 —— GlassDrawable 每帧都从 getBounds() 取位置，
+            //   会自动跟着新尺寸走。
+            rescanLiquidGlass();
+        } catch (Throwable ignored) {
         }
     }
 

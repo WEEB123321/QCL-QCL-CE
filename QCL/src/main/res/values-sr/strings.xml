@@ -929,4 +929,11 @@
     <string name="dialog_hin2n_help_text">Prvo morate da pokrenete igru, unesete arhivu kao onlajn svet, a zatim jela u igri Izaberite opciju otvaranja za LAN, zapamtite broj porta, a zatim otvorite QCL Control Panel, otvorite onlajn modula, kliknite da biste kreirali sobu, potvrdite prikazani broj porta i obiđite. Scena će biti dosledna, a zatim potvrdite sobu i otvorite sobu. Nakon što se soba otvori, moći ćete da kliknete na informacije o sobi Da biste videli svoj pozivni kod i IP+port, potrebno je da ih pošaljete svom onlajn partneru. Napomena Znači, nemojte reći šifru pozivnice, ip, port da kažete bilo kom strancu.\n\nČlan plejera: Morate da zamolite igrača domaćina da zatraži kod za pozivnicu i IP+port, a zatim otvorite HMCL-PE kontrolu panel, uključite meni modula na mreži, kliknite da biste se pridružili prostoriji, unesite svoj pozivni kod, kliknite Samo odredi, započnite sledeću igru, dodajte server u sektor igre za više igrača i poslužite Ime servisnog uređaja je proizvoljno, a adresa servera se popunjava u IP+portu koji je obezbedio vlasnik kuće, a server se može dodati.</string>
     <string name="drawer_custom_menu_warn">Prvo morate da kreirate ili izaberete podizgled</string>
     <string name="feedback_ui_join_discord">Pridruži nam se na Discord-u</string>
+    <string name="exterior_setting_liquid_glass">Течно стакло</string>
+    <string name="exterior_setting_liquid_glass_hint">Ивице панели преламају позадину. Подразумевано искључено.</string>
+    <string name="exterior_layout_style_title">Распоред</string>
+    <string name="exterior_layout_style_qcl">Класично</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">De quel pays venez-vous ?</string>
+    <string name="region_gate_desc">Votre région détermine si le launcher peut vous fournir les paquets Minecraft d\'origine. Modifiable plus tard dans Paramètres → Téléchargement.</string>
+    <string name="region_gate_cn">Chine continentale</string>
+    <string name="region_gate_other">Autres régions</string>
+    <string name="region_gate_warn_cn">Les utilisateurs de Chine continentale ne peuvent pas télécharger le Minecraft original ici.</string>
+    <string name="region_gate_warn_cn_sub">Le launcher ne récupérera pas les fichiers Minecraft via les canaux officiels. Les jeux déjà installés restent lançables.</string>
+    <string name="region_gate_confirm">Confirmer</string>
+    <string name="region_gate_confirm_hint">Appuyez encore %1$d fois sur Confirmer</string>
+    <string name="region_gate_confirm_ready">Confirmer</string>
+    <string name="region_gate_locked_title">Téléchargements indisponibles</string>
+    <string name="region_gate_locked_msg">La région Chine continentale est sélectionnée, le téléchargement du Minecraft original est donc désactivé. Les jeux déjà installés restent lançables.</string>
+    <string name="region_gate_locked_go_setting">Changer de région</string>
+    <string name="region_gate_setting_title">Région</string>
+    <string name="region_gate_setting_cn">Chine continentale</string>
+    <string name="region_gate_setting_other">Autres régions</string>
+</resources>

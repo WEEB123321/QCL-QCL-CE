@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">あなたはどこの国の人ですか？</string>
+    <string name="region_gate_desc">地域によって、ランチャーがオリジナルの Minecraft を取得できるかが決まります。後で「設定 → ダウンロード」から変更できます。</string>
+    <string name="region_gate_cn">中国本土</string>
+    <string name="region_gate_other">その他の地域</string>
+    <string name="region_gate_warn_cn">中国本土のユーザーはここでオリジナルの Minecraft をダウンロードできません。</string>
+    <string name="region_gate_warn_cn_sub">ランチャーは公式チャンネルから Minecraft のファイルを取得しません。インストール済みのゲームは引き続き起動できます。</string>
+    <string name="region_gate_confirm">確定</string>
+    <string name="region_gate_confirm_hint">あと %1$d 回「確定」をタップ</string>
+    <string name="region_gate_confirm_ready">確定</string>
+    <string name="region_gate_locked_title">ダウンロードは利用できません</string>
+    <string name="region_gate_locked_msg">中国本土が選択されているため、オリジナルの Minecraft のダウンロードは無効です。インストール済みのゲームは引き続き起動できます。</string>
+    <string name="region_gate_locked_go_setting">地域を変更</string>
+    <string name="region_gate_setting_title">地域</string>
+    <string name="region_gate_setting_cn">中国本土</string>
+    <string name="region_gate_setting_other">その他の地域</string>
+</resources>

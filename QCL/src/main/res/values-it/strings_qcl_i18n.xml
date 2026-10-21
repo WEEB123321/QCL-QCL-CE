@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Applica</string>
     <string name="stats_reset">Reimposta</string>
     <string name="transfer_next">Avanti</string>
+    <string name="exterior_setting_liquid_glass">Vetro liquido</string>
+    <string name="exterior_setting_liquid_glass_hint">I bordi dei pannelli rifrangono lo sfondo. Disattivato per impostazione predefinita.</string>
+    <string name="exterior_layout_style_title">Layout</string>
+    <string name="exterior_layout_style_qcl">Classico</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

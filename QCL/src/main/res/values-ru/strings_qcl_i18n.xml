@@ -63,4 +63,11 @@
     <string name="skin_library_apply">Применить</string>
     <string name="stats_reset">Сбросить</string>
     <string name="transfer_next">Далее</string>
+    <string name="exterior_setting_liquid_glass">Жидкое стекло</string>
+    <string name="exterior_setting_liquid_glass_hint">Края панелей преломляют фон. По умолчанию выключено.</string>
+    <string name="exterior_layout_style_title">Макет</string>
+    <string name="exterior_layout_style_qcl">Классический</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

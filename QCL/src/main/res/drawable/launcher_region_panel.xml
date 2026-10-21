@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★ 地区选择遮罩层。★★★ 为什么给不透明度 0.92 的深色底而不是纯透明：
+       这一层是「必须先回答」的遮挡，若底部列表还透过来，用户会去点下面的东西。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F20E1B2B"/>
+    <corners android:radius="18dp"/>
+</shape>

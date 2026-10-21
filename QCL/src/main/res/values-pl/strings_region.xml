@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Z jakiego kraju pochodzisz?</string>
+    <string name="region_gate_desc">Region decyduje, czy launcher może pobierać oryginalne paczki Minecrafta. Możesz go zmienić w Ustawienia → Pobieranie.</string>
+    <string name="region_gate_cn">Chiny kontynentalne</string>
+    <string name="region_gate_other">Inne regiony</string>
+    <string name="region_gate_warn_cn">Użytkownicy z Chin kontynentalnych nie mogą tu pobrać oryginalnego Minecrafta.</string>
+    <string name="region_gate_warn_cn_sub">Launcher nie będzie pobierał plików Minecrafta z kanałów oficjalnych. Zainstalowane gry nadal można uruchamiać.</string>
+    <string name="region_gate_confirm">Potwierdź</string>
+    <string name="region_gate_confirm_hint">Dotknij Potwierdź jeszcze %1$d raz(y)</string>
+    <string name="region_gate_confirm_ready">Potwierdź</string>
+    <string name="region_gate_locked_title">Pobieranie niedostępne</string>
+    <string name="region_gate_locked_msg">Wybrano region Chiny kontynentalne, więc pobieranie oryginalnego Minecrafta jest wyłączone. Zainstalowane gry nadal można uruchamiać.</string>
+    <string name="region_gate_locked_go_setting">Zmień region</string>
+    <string name="region_gate_setting_title">Region</string>
+    <string name="region_gate_setting_cn">Chiny kontynentalne</string>
+    <string name="region_gate_setting_other">Inne regiony</string>
+</resources>

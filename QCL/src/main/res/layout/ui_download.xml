@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:visibility="gone"
+<!-- ★★★ 2.0.12：根节点从 LinearLayout 换成 FrameLayout
+     为什么换：地区选择要「盖住整页」并且拦住底下所有点击。
+     盖在 LinearLayout 里的某个子节点上做不到 —— 只能占一格，会挤压布局；
+     做成根级 FrameLayout 的最后一个子节点才是真正的覆盖层。
+     ★ 子节点顺序即层级：Tab 条 + 子页容器在前，地区层在最后（最上面）。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ui_download"
-    android:background="@color/launcher_ui_background"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/launcher_ui_background"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -255,4 +264,14 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <!-- ★★★ 地区选择层：进入下载页时若还没选过地区，这一层盖在整页之上。
+         选过之后代码把它 setVisibility(GONE)。
+         放在根 FrameLayout 的最后一个子节点 = 永远在最上层。 -->
+    <include
+        layout="@layout/ui_region_gate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</FrameLayout>

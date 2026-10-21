@@ -63,4 +63,11 @@
     <string name="skin_library_apply">적용</string>
     <string name="stats_reset">초기화</string>
     <string name="transfer_next">다음</string>
+    <string name="exterior_setting_liquid_glass">리퀴드 글라스</string>
+    <string name="exterior_setting_liquid_glass_hint">패널 가장자리가 배경을 굴절시킵니다. 기본값은 꺼짐입니다.</string>
+    <string name="exterior_layout_style_title">레이아웃</string>
+    <string name="exterior_layout_style_qcl">클래식</string>
+    <string name="exterior_layout_style_fcl">FCL</string>
+    <string name="exterior_layout_style_hmcl">HMCL</string>
+    <string name="exterior_layout_style_zl2">ZL2</string>
 </resources>

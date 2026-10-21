@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Which country are you from?</string>
+    <string name="region_gate_desc">Your region decides whether this launcher can fetch the original Minecraft packages for you. You can change it later in Settings → Download.</string>
+    <string name="region_gate_cn">Mainland China</string>
+    <string name="region_gate_other">Other regions</string>
+    <string name="region_gate_warn_cn">Mainland China users cannot download the original Minecraft here.</string>
+    <string name="region_gate_warn_cn_sub">The launcher will not fetch Minecraft files from official channels. You can still start games that are already installed.</string>
+    <string name="region_gate_confirm">Confirm</string>
+    <string name="region_gate_confirm_hint">Tap Confirm %1$d more time(s)</string>
+    <string name="region_gate_confirm_ready">Confirm</string>
+    <string name="region_gate_locked_title">Downloads unavailable</string>
+    <string name="region_gate_locked_msg">Mainland China region is selected, so original Minecraft downloads are disabled. Games you already installed can still be started.</string>
+    <string name="region_gate_locked_go_setting">Change region</string>
+    <string name="region_gate_setting_title">Region</string>
+    <string name="region_gate_setting_cn">Mainland China</string>
+    <string name="region_gate_setting_other">Other regions</string>
+</resources>

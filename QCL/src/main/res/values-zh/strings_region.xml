@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">你是哪一个国家的人？</string>
+    <string name="region_gate_desc">地区会决定启动器能不能替你获取原版《我的世界》的文件。之后可以在「设置 → 下载」里修改。</string>
+    <string name="region_gate_cn">中国大陆</string>
+    <string name="region_gate_other">其它地区</string>
+    <string name="region_gate_warn_cn">中国用户不可以下载原版 MC</string>
+    <string name="region_gate_warn_cn_sub">启动器不会从官方渠道获取《我的世界》的文件；已经装在设备上的游戏仍然可以正常启动。</string>
+    <string name="region_gate_confirm">确定</string>
+    <string name="region_gate_confirm_hint">再点 %1$d 次「确定」</string>
+    <string name="region_gate_confirm_ready">确定</string>
+    <string name="region_gate_locked_title">下载已被限制</string>
+    <string name="region_gate_locked_msg">当前地区为中国大陆，原版 MC 的下载功能已按要求关闭。已经安装好的游戏可以照常启动。</string>
+    <string name="region_gate_locked_go_setting">去设置修改地区</string>
+    <string name="region_gate_setting_title">地区</string>
+    <string name="region_gate_setting_cn">中国大陆</string>
+    <string name="region_gate_setting_other">其它地区</string>
+</resources>

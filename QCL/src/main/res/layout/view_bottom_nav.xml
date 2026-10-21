@@ -25,6 +25,7 @@
     <!-- ★★★ 侧栏顶部：品牌印记（参考图里那个「方框 + 字母」+ 下方小字）。
          参考图把它放在**侧栏顶部**，而不是顶部页眉 —— 这里照做。 -->
     <LinearLayout
+        android:id="@+id/nav_brand"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:paddingBottom="18dp"

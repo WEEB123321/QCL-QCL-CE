@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">คุณมาจากประเทศไหน</string>
+    <string name="region_gate_desc">ภูมิภาคของคุณเป็นตัวกำหนดว่าโปรแกรมเปิดเกมจะดึงแพ็กเกจ Minecraft ต้นฉบับได้หรือไม่ เปลี่ยนภายหลังได้ที่ การตั้งค่า → ดาวน์โหลด</string>
+    <string name="region_gate_cn">จีนแผ่นดินใหญ่</string>
+    <string name="region_gate_other">ภูมิภาคอื่น</string>
+    <string name="region_gate_warn_cn">ผู้ใช้ในจีนแผ่นดินใหญ่ไม่สามารถดาวน์โหลด Minecraft ต้นฉบับได้ที่นี่</string>
+    <string name="region_gate_warn_cn_sub">โปรแกรมจะไม่ดึงไฟล์ Minecraft จากช่องทางทางการ เกมที่ติดตั้งไว้แล้วยังเปิดเล่นได้ตามปกติ</string>
+    <string name="region_gate_confirm">ยืนยัน</string>
+    <string name="region_gate_confirm_hint">แตะยืนยันอีก %1$d ครั้ง</string>
+    <string name="region_gate_confirm_ready">ยืนยัน</string>
+    <string name="region_gate_locked_title">ไม่สามารถดาวน์โหลดได้</string>
+    <string name="region_gate_locked_msg">เลือกภูมิภาคจีนแผ่นดินใหญ่แล้ว การดาวน์โหลด Minecraft ต้นฉบับจึงถูกปิด เกมที่ติดตั้งไว้แล้วยังเปิดเล่นได้</string>
+    <string name="region_gate_locked_go_setting">เปลี่ยนภูมิภาค</string>
+    <string name="region_gate_setting_title">ภูมิภาค</string>
+    <string name="region_gate_setting_cn">จีนแผ่นดินใหญ่</string>
+    <string name="region_gate_setting_other">ภูมิภาคอื่น</string>
+</resources>

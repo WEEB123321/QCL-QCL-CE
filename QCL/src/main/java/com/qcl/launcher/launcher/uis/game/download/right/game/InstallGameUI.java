@@ -189,6 +189,20 @@ public class InstallGameUI extends BaseUI implements View.OnClickListener, TextW
     @Override // com.qcl.launcher.launcher.uis.tools.BaseUI, com.qcl.launcher.launcher.uis.tools.UILifecycleCallbacks
     public void onStart() {
         super.onStart();
+        // ★★★ 2.0.12：合规闸门 —— 所有「装 MC」的路径最后都汇到这一页
+        //   （版本列表点条目、模组页/整合包页的「安装」按钮…），
+        //   所以卡在这里是单点拦截，不会漏。
+        //   ★ 硬拦不是软拦：直接 return，不显示安装面板 —— 给个「仍然继续」的按钮
+        //     等于把用户在地区选择里做的决定作废。
+        if (com.qcl.launcher.launcher.uis.game.download.RegionGate.isDownloadRestricted(this.context)) {
+            if (!this.activity.isLoaded) {
+                // 加载期预热的调用不算用户意图，静默返回
+                return;
+            }
+            this.activity.showBarTitle(this.context.getResources().getString(R.string.install_game_ui_title), false, true);
+            com.qcl.launcher.launcher.uis.game.download.RegionGate.showRestrictedDialog(this.activity, null);
+            return;
+        }
         this.activity.showBarTitle(this.context.getResources().getString(R.string.install_game_ui_title), false, true);
         CustomAnimationUtils.showViewFromLeft(this.installGameUI, this.activity, this.context, true);
         init();

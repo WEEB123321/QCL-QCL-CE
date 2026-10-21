@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="region_gate_title">Из какой вы страны?</string>
+    <string name="region_gate_desc">Регион определяет, может ли лаунчер получать оригинальные пакеты Minecraft. Его можно изменить в Настройки → Загрузки.</string>
+    <string name="region_gate_cn">Материковый Китай</string>
+    <string name="region_gate_other">Другие регионы</string>
+    <string name="region_gate_warn_cn">Пользователи из материкового Китая не могут скачать оригинальный Minecraft здесь.</string>
+    <string name="region_gate_warn_cn_sub">Лаунчер не будет получать файлы Minecraft через официальные каналы. Установленные игры по-прежнему можно запускать.</string>
+    <string name="region_gate_confirm">Подтвердить</string>
+    <string name="region_gate_confirm_hint">Нажмите «Подтвердить» ещё %1$d раз</string>
+    <string name="region_gate_confirm_ready">Подтвердить</string>
+    <string name="region_gate_locked_title">Загрузка недоступна</string>
+    <string name="region_gate_locked_msg">Выбран регион «Материковый Китай», поэтому загрузка оригинального Minecraft отключена. Установленные игры по-прежнему можно запускать.</string>
+    <string name="region_gate_locked_go_setting">Изменить регион</string>
+    <string name="region_gate_setting_title">Регион</string>
+    <string name="region_gate_setting_cn">Материковый Китай</string>
+    <string name="region_gate_setting_other">Другие регионы</string>
+</resources>
