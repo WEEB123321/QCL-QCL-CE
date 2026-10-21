@@ -10,37 +10,55 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 
 /**
- * ★★★ 液态玻璃 · **纯边缘畸变**着色器（v3.1）。
+ * ★★★ 液态玻璃 · **边缘折射**着色器（v3.2）。
  *
- * <h3>★ 这一版为什么砍到只剩「一圈畸变」</h3>
- * 3.0 的版本把整块面板都画出来：背景模糊 + 色调 + 菲涅尔亮边 + 高光 + 投影 + RGB 色散。
- * 真机反馈有三个问题，根因都在「画得太多」：
- * <ol>
- *   <li><b>性能差</b> —— 整块面板每像素都要算折射 + 采样，几百块面板叠加就是幻灯片。</li>
- *   <li><b>「图片被贴在板块上」</b> —— 面板里画了一份背景副本，面板一滚动，
- *       副本跟着面板走，看起来像图片粘在板块上滑。这不是 bug，是「画了副本」的必然结果。</li>
- *   <li><b>白色边太抢眼</b> —— 菲涅尔 + 高光在深色背景上是一圈发光的白线，很假。</li>
- * </ol>
+ * <h3>v3.2 的折射数学来自 kyant0 的 Backdrop 库（Apache-2.0）</h3>
+ * 参考实现：{@code D:\A\AndroidLiquidGlass-2.0.1\AndroidLiquidGlass-2.0.1}
+ * （{@code backdrop/src/commonMain/.../internal/Shaders.kt} 的
+ * {@code RoundedRectRefractionShaderString}）。
  *
- * <p>v3.1 的取舍：<b>面板内部一律返回完全透明</b>，让真正的背景原样透出来；
- * 只有靠近边缘的 {@code uBand} 像素宽的一条带子里，才做折射位移采样。
- * 于是：
+ * <p><b>为什么不能直接依赖那个库</b>：它是 Compose Multiplatform 工程
+ * （{@code io.github.kyant0:backdrop}），依赖 Compose Runtime / Skiko；
+ * QCL 是传统 View 体系，没有任何 Compose。引入 Compose 只为一个背景效果，
+ * 会让包体、启动时间和构建复杂度都上一个台阶，收益不成比例。
+ * ⇒ 只移植**着色器数学**（纯 AGSL 字符串，无依赖），适配成 View 背景 Drawable 能用的形式。
+ *
+ * <h3>v3.1 → v3.2 到底改了什么（都是「看起来假」的根因）</h3>
+ * <table border="1">
+ *   <tr><th></th><th>v3.1（我自己写的）</th><th>v3.2（照 Backdrop 移植）</th></tr>
+ *   <tr><td>剖面曲线</td><td>{@code k = t²} 二次曲线</td>
+ *       <td>{@code circleMap(x) = 1 - sqrt(1 - x²)} <b>四分之一圆</b></td></tr>
+ *   <tr><td>法线</td><td>用面板自身圆角算</td>
+ *       <td>用 {@code radius × 1.5} 的<b>放大圆角</b>算（转角处法线更平滑，不出折线）</td></tr>
+ *   <tr><td>深度感</td><td>无</td><td>{@code depthEffect}：法线叠加<b>指向圆心的径向分量</b></td></tr>
+ *   <tr><td>参数</td><td>band 14dp / 偏移 9dp</td><td>高度 16dp / 偏移 <b>32dp</b>（参考实现是高度的 1.5~2 倍）</td></tr>
+ * </table>
+ *
+ * <p>★ 二次曲线 vs 四分之一圆：二次曲线在边缘处斜率有限，看起来像「渐变的模糊」；
+ * 四分之一圆在边缘处斜率趋于无穷 —— 这正是真实玻璃倒角的样子，边缘会有一道
+ * **锐利的光学压缩带**，这是「像玻璃」和「像贴纸」的分界线。
+ *
+ * <h3>★ 与参考实现的一处刻意不同</h3>
+ * 参考实现在面板内部返回 {@code content.eval(coord)}（即未折射的背景本身，
+ * 因为它的 content 就是画在下面的背景层，所以视觉上等于透明）。
+ * 本实现直接 {@code return half4(0.0)} —— 用户明确要求「只要一层畸变圈」，
+ * 面板内部必须透出**真实背景**而不是再采样一份副本：
  * <ul>
- *   <li>看到的永远是**真实背景**，不是副本 ⇒ 滚动时不会「粘在板块上」；</li>
- *   <li>没有模糊、没有白边、没有投影 ⇒ 就是用户要的「一层畸变圈」；</li>
- *   <li>填充率降到只剩边缘一圈 ⇒ 比 3.0 快一个数量级。</li>
+ *   <li>省掉内部区域的采样（填充率只花在边缘一圈）；</li>
+ *   <li>彻底杜绝「图片像粘在板块上滑动」—— 采样副本一旦跟随面板坐标就会粘。</li>
  * </ul>
  *
- * <h3>⚠️ 关于「不模糊」的代价</h3>
- * 不做模糊意味着玻璃后面是清晰的原图，严格说这不是「毛玻璃」而是「透镜」。
- * 这是**用户明确要求**的（原话：「其他的不要，比如背景模糊之类的」），
- * 所以不再保留模糊路径。
+ * <h3>★ 未移植的部分</h3>
+ * 参考实现还有一个带 RGB 色散的版本（{@code RoundedRectRefractionWithDispersionShaderString}），
+ * 每像素采样 <b>7 次</b>。用户明确说「不要边边的白色」且抱怨过性能，
+ * 色散在深色背景上会呈现彩色描边，正是他不想要的那种「花边」⇒ 不移植。
  *
  * <h3>AGSL 要点</h3>
  * <ul>
- *   <li>原点在**左上角、y 轴向下**，与 GLSL 相反，所以**不要翻转 y**。</li>
- *   <li>{@code fragCoord} 是画布局部坐标，与 {@code drawRect} 同一套。</li>
- *   <li>循环必须能编译期展开 —— 这里没有循环。</li>
+ *   <li>原点在**左上角、y 轴向下**，与 GLSL 相反，**不要翻转 y**。</li>
+ *   <li>{@code fragCoord} 是画布局部坐标，必须先把 canvas translate 到面板原点再画，
+ *       否则 SDF 的圆心对不上（v3.1 踩过：控件有 padding 时圈会整体画歪）。</li>
+ *   <li>没有循环（AGSL 要求循环可编译期展开）。</li>
  * </ul>
  */
 public final class GlassShader {
@@ -77,8 +95,8 @@ public final class GlassShader {
             // ★ 真的设一次 uniform 才算数 —— 部分设备类在、驱动却编译不过
             sh.setFloatUniform("uRadius", 12f);
             sUsable = true;
-            sPath = "AGSL 边缘畸变（纯折射，无模糊/无白边）";
-            Log.i(TAG, "玻璃着色器可用（v3.1 边缘畸变）");
+            sPath = "AGSL 边缘折射（四分之一圆剖面 + 深度感）";
+            Log.i(TAG, "玻璃着色器可用（v3.2 边缘折射）");
         } catch (Throwable t) {
             sUsable = false;
             sPath = "透镜近似（AGSL 编译失败：" + t.getClass().getSimpleName() + "）";
@@ -132,68 +150,96 @@ public final class GlassShader {
     }
 
     /**
-     * 面板着色器源码（AGSL）。
+     * 边缘折射着色器源码（AGSL，像素空间）。
      *
      * <h3>结构</h3>
      * <pre>
-     *   SDF 求到边缘的距离 d
-     *     ├ d &gt;= 0（面板外）      → 全透明，什么都不画
-     *     ├ d &lt; -uBand（内部）    → 全透明，让真实背景透出来   ★ 这就是「不要副本」
-     *     └ 边缘带内               → 沿法线偏移采样，越靠边偏得越多
+     *   SDF 求到圆角矩形边缘的有符号距离 sd（内部为负）
+     *     ├ sd &gt;= 0                → 面板外，全透明
+     *     ├ -sd &gt;= 折射高度        → 面板内部，全透明（露出真实背景）  ★ 用户要求
+     *     └ 边缘带内                → 沿法线偏移采样，四分之一圆剖面
      * </pre>
      *
-     * <p>★ 偏移量用 {@code k = t²} 而非线性：平方让畸变集中在最外缘，
+     * <p>★ 偏移量：{@code d = circleMap(1 - (-sd)/h) * amount}。
+     * 令 {@code u = -sd/h}（0 在最外缘、1 在带宽内边界）：
+     * {@code u=0 → circleMap(1)=1} 偏移最大；{@code u=1 → circleMap(0)=0} 偏移归零。
      * 内侧平滑收敛到 0，不会出现「带子边界处突然错位」的硬缝。
+     *
+     * <p>★ {@code amount} 由 Java 侧传**负值**（与参考实现一致）：
+     * 法线朝外，负偏移 = 向内采样 = 放大镜观感。
      */
     static final String SRC = ""
-            // ---- 输入（只有 8 个 uniform，3.0 是 20 个）----
+            // ---- 输入（9 个 uniform）----
             + "uniform shader uBg;\n"
-            + "uniform vec2  uBgSize;\n"       // 背景纹理尺寸（像素）
-            + "uniform vec2  uPanelSize;\n"    // 面板尺寸（像素）
-            + "uniform vec2  uPanelOrigin;\n"  // 面板在屏幕上的左上角
-            + "uniform vec2  uScreenSize;\n"
-            + "uniform float uRadius;\n"       // 圆角（像素）
-            + "uniform float uBand;\n"         // 畸变带宽度（像素）
-            + "uniform float uStrength;\n"     // 最大偏移（像素）
+            + "uniform vec2  uBgSize;\n"          // 背景位图尺寸（像素）
+            + "uniform vec2  uPanelSize;\n"       // 面板尺寸（像素）
+            + "uniform vec2  uPanelOrigin;\n"     // 面板在屏幕上的左上角（含 bounds 偏移）
+            + "uniform vec2  uScreenSize;\n"      // 屏幕尺寸（像素）
+            + "uniform float uRadius;\n"          // 圆角（像素）
+            + "uniform float uRefractionHeight;\n"// 折射带宽度（像素）
+            + "uniform float uRefractionAmount;\n"// 最大偏移（像素，传负值）
+            + "uniform float uDepthEffect;\n"     // 0 = 无深度感，1 = 叠加径向分量
             + "\n"
-            // 圆角矩形 SDF，返回 (距离, 法线xy)，距离 < 0 在内部
-            + "vec3 sdgBox(vec2 p, vec2 b, float r) {\n"
-            + "    vec2 w = abs(p) - (b - r);\n"
-            + "    vec2 s = vec2(p.x < 0.0 ? -1.0 : 1.0, p.y < 0.0 ? -1.0 : 1.0);\n"
-            + "    float g = max(w.x, w.y);\n"
-            + "    vec2 q = max(w, vec2(0.0));\n"
-            + "    float l = length(q);\n"
-            + "    float dist = (g > 0.0) ? l - r : g - r;\n"
-            + "    vec2 n = (g > 0.0) ? (q / max(l, 1e-6))\n"
-            + "                       : ((w.x > w.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0));\n"
-            + "    return vec3(dist, s * n);\n"
+            // ── 圆角矩形 SDF（照 Backdrop 的 RoundedRectSDF）──
+            + "float sdRoundedRect(float2 coord, float2 halfSize, float radius) {\n"
+            + "    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));\n"
+            + "    float outside = length(max(cornerCoord, 0.0)) - radius;\n"
+            + "    float inside = min(max(cornerCoord.x, cornerCoord.y), 0.0);\n"
+            + "    return outside + inside;\n"
+            + "}\n"
+            + "\n"
+            + "float2 gradSdRoundedRect(float2 coord, float2 halfSize, float radius) {\n"
+            + "    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));\n"
+            + "    if (cornerCoord.x >= 0.0 || cornerCoord.y >= 0.0) {\n"
+            + "        float2 q = max(cornerCoord, 0.0);\n"
+            + "        float ql = length(q);\n"
+            + "        // ★ 防 NaN：正好落在直边上时 q 可能是 0，normalize(0) 是 NaN，\n"
+            + "        //   NaN 会顺着 grad 传染成整块面板全黑（在 v3.1 上踩过一次类似问题）。\n"
+            + "        float2 n = (ql > 1e-5) ? (q / ql) : float2(0.0, 1.0);\n"
+            + "        return sign(coord) * n;\n"
+            + "    } else {\n"
+            + "        float gradX = step(cornerCoord.y, cornerCoord.x);\n"
+            + "        return sign(coord) * float2(gradX, 1.0 - gradX);\n"
+            + "    }\n"
+            + "}\n"
+            + "\n"
+            // 四分之一圆剖面：x=0 → 0，x=1 → 1，边缘处斜率无穷
+            + "float circleMap(float x) {\n"
+            + "    return 1.0 - sqrt(max(0.0, 1.0 - x * x));\n"
             + "}\n"
             + "\n"
             + "half4 main(float2 fragCoord) {\n"
-            + "    vec2 H = max(uScreenSize, vec2(1.0));\n"
-            + "    vec2 p = (fragCoord - 0.5 * uPanelSize) / H.y;\n"
-            + "    vec2 b = 0.5 * uPanelSize / H.y;\n"
-            + "    float r = min(uRadius / H.y, min(b.x, b.y));\n"
+            + "    float2 halfSize = uPanelSize * 0.5;\n"
+            + "    float2 centeredCoord = fragCoord - halfSize;\n"
+            + "    float radius = min(uRadius, min(halfSize.x, halfSize.y));\n"
             + "\n"
-            + "    vec3 g = sdgBox(p, b, r);\n"
-            + "    float dPx = g.x * H.y;\n"
+            + "    float sd = sdRoundedRect(centeredCoord, halfSize, radius);\n"
             + "\n"
             + "    // ---- 面板外：不画 ----\n"
-            + "    if (dPx >= 0.0) { return half4(0.0); }\n"
+            + "    if (sd >= 0.0) { return half4(0.0); }\n"
             + "\n"
             + "    // ---- ★★★ 内部：一律透明，让真实背景原样透出 ----\n"
             + "    //   这是「图片不再粘在板块上」和「性能」两件事的共同解。\n"
-            + "    float depth = -dPx;\n"
-            + "    if (depth > uBand) { return half4(0.0); }\n"
+            + "    float height = max(uRefractionHeight, 1e-3);\n"
+            + "    float depth = -sd;\n"
+            + "    if (depth >= height) { return half4(0.0); }\n"
             + "\n"
             + "    // ---- 边缘带：折射位移采样 ----\n"
-            + "    float nlen = length(g.yz);\n"
-            + "    vec2 n = (nlen > 1e-6) ? (g.yz / nlen) : vec2(0.0);\n"
-            + "    float t = 1.0 - depth / max(uBand, 1e-4);\n"
-            + "    float k = t * t;\n"
-            + "    vec2 off = n * (k * uStrength) / H.y;\n"
+            + "    float d = circleMap(1.0 - depth / height) * uRefractionAmount;\n"
+            + "    // ★ 用放大的圆角算梯度：直接用面板圆角时，转角处法线会突变，\n"
+            + "    //   表现为四角出现一道折线。参考实现取 radius * 1.5。\n"
+            + "    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));\n"
+            + "    float2 grad = gradSdRoundedRect(centeredCoord, halfSize, gradRadius);\n"
+            + "    if (uDepthEffect > 0.5) {\n"
+            + "        float cl = length(centeredCoord);\n"
+            + "        if (cl > 1e-5) { grad += centeredCoord / cl; }\n"
+            + "    }\n"
+            + "    float gl = length(grad);\n"
+            + "    if (gl > 1e-5) { grad = grad / gl; }\n"
             + "\n"
-            + "    vec2 uv = clamp((uPanelOrigin + fragCoord) / H + off, vec2(0.0), vec2(1.0));\n"
+            + "    float2 refracted = fragCoord + d * grad;\n"
+            + "    vec2 uv = clamp((uPanelOrigin + refracted) / max(uScreenSize, vec2(1.0)),\n"
+            + "                    vec2(0.0), vec2(1.0));\n"
             + "    vec3 c = uBg.eval(uv * uBgSize).rgb;\n"
             + "    return half4(half3(c), 1.0);\n"
             + "}\n";

@@ -63,10 +63,22 @@ public final class GlassApplier {
     /** 记录控件原本的背景 —— 关掉玻璃时**原样还原**。 */
     private static final int TAG_ORIGINAL_BG = 0x7C1A5502;
 
-    /** 畸变带宽度（dp）。14dp ≈ 一圈 40px 的扭曲，够看出「玻璃边」又不糊住内容。 */
-    private static final float BAND_DP = 14f;
-    /** 最大偏移（dp）。 */
-    private static final float STRENGTH_DP = 9f;
+    /**
+     * 折射带宽度（dp）。v3.2 起 16dp。
+     *
+     * <p>★ 数值来自参考实现（kyant0 的 Backdrop 库）：它在按钮上用 12dp、
+     * 在底部导航和对话框上用 16~24dp。本项目面板尺寸跨度大（62dp 的导航条到整屏对话框），
+     * 取 16dp 是折中 —— 再宽会把小面板的整个宽度都吃掉（只剩畸变没有内容）。
+     */
+    private static final float BAND_DP = 16f;
+    /**
+     * 最大偏移（dp）。v3.2 起 32dp。
+     *
+     * <p>★★★ 这个值必须**明显大于带宽**（参考实现是 1.5~2 倍）。
+     * v3.1 用的是 9dp（比带宽还小），结果是「边缘只是有点模糊」，完全不像玻璃 ——
+     * 因为折射的本质就是「把远处的东西搬到边缘来」，搬得不够远就等于没搬。
+     */
+    private static final float STRENGTH_DP = 32f;
     /** 统一圆角（dp）—— Drawable 不暴露 corner，只能统一给。 */
     private static final float RADIUS_DP = 14f;
 
@@ -344,7 +356,8 @@ public final class GlassApplier {
         GlassDrawable glass = new GlassDrawable(v)
                 .radiusDp(RADIUS_DP)
                 .band(BAND_DP)
-                .strength(STRENGTH_DP);
+                .strength(STRENGTH_DP)
+                .depthEffect(true);
 
         // ★★★ 必须先存原背景再替换 —— 关掉开关时才能原样还原。
         //   不存的话，关掉后只能把背景设成 null，原本的白色圆角卡片会变成全透明，

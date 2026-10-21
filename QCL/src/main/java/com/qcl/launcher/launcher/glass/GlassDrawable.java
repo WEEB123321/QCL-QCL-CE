@@ -16,18 +16,23 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 /**
- * ★★★ 液态玻璃 · **纯边缘畸变**面板背景（v3.1）。
+ * ★★★ 液态玻璃 · **边缘折射**面板背景（v3.2）。
  *
  * <p>把它设成任意 View 的背景，那个 View 的**边缘一圈**就会折射背后的背景；
  * 面板内部完全透明，露出真实背景。
  *
+ * <h3>★ v3.2 的折射数学移植自 kyant0 的 Backdrop 库（Apache-2.0）</h3>
+ * 参考工程：{@code D:\A\AndroidLiquidGlass-2.0.1\AndroidLiquidGlass-2.0.1}。
+ * 那个库是 Compose Multiplatform 的，不能直接依赖（QCL 没有 Compose）；
+ * 只移植 AGSL 数学，详见 {@link GlassShader} 的类注释。
+ *
  * <h3>★ 与 3.0 的差别（用户看过真机后的要求）</h3>
  * <table border="1">
- *   <tr><th></th><th>3.0</th><th>v3.1 本版</th></tr>
+ *   <tr><th></th><th>3.0</th><th>v3.2 本版</th></tr>
  *   <tr><td>面板内部</td><td>画一份背景副本（模糊 + 色调）</td><td><b>完全透明</b>，露出真实背景</td></tr>
- *   <tr><td>边缘</td><td>菲涅尔白边 + 高光 + 投影</td><td><b>只有折射畸变</b>，无白边</td></tr>
+ *   <tr><td>边缘</td><td>菲涅尔白边 + 高光 + 投影</td><td><b>只有折射</b>，无白边</td></tr>
  *   <tr><td>模糊</td><td>背景预模糊</td><td><b>不模糊</b></td></tr>
- *   <tr><td>每像素采样</td><td>3 次（RGB 色散）</td><td><b>1 次</b>（单次采样）</td></tr>
+ *   <tr><td>每像素采样</td><td>3 次（RGB 色散）</td><td><b>1 次</b></td></tr>
  *   <tr><td>输出像素</td><td>整块面板</td><td><b>只有边缘一圈</b></td></tr>
  * </table>
  *
@@ -37,12 +42,12 @@ import android.view.View;
  *
  * <h3>★★ 两层降级（任何一层失效都不会崩，也不会画出假效果）</h3>
  * <pre>
- *   ① AGSL 边缘畸变      —— RuntimeShader 可用时（API 33+ 且驱动能编译）
- *   ② 环状放大透镜        —— 着色器不可用：只画边缘一圈，把背景放大 1.12x 填进去
+ *   ① AGSL 边缘折射      —— RuntimeShader 可用时（API 33+ 且驱动能编译）
+ *   ② 环状放大透镜        —— 着色器不可用：只画边缘一圈，把背景放大 1.25x 填进去
  *   ③ 什么都不画          —— 连背景位图都没有：完全透明，等于没开效果
  * </pre>
  * ★ ② 是**真实的光学放大**（位图矩阵缩放 + 环形裁剪），不是画的假光斑；
- *   它没有边缘畸变的渐变，观感弱一档，但**不会**出现白色描边或色块。
+ *   它没有剖面曲线和深度感，观感弱一档，但**不会**出现白色描边或色块。
  * ★ ③ 明确选择「什么都不画」而不是「涂个半透明色」—— 涂色会盖住背景，
  *   与「面板内部要透出真实背景」的整个设计相矛盾。
  */
@@ -83,10 +88,12 @@ public final class GlassDrawable extends Drawable {
 
     /** 圆角（像素）。 */
     private float radius = -1f;
-    /** 畸变带宽度（dp）。用户要「一圈」，默认 14dp。 */
-    private float bandDp = 14f;
-    /** 最大偏移（dp）。 */
-    private float strengthDp = 9f;
+    /** 折射带宽度（dp）。v3.2 起 16dp（参考实现同量级）。 */
+    private float bandDp = 16f;
+    /** 最大偏移（dp）。v3.2 起 32dp —— 参考实现是带宽的 1.5~2 倍，太弱就看不出折射。 */
+    private float strengthDp = 32f;
+    /** 是否叠加「指向圆心的径向分量」—— 这一项是「玻璃有厚度」的观感来源。 */
+    private boolean depthEffect = true;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fallbackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -95,10 +102,11 @@ public final class GlassDrawable extends Drawable {
     private RuntimeShader shader;
 
     // ★★ uniform 缓存：位置每帧都变，但尺寸/圆角/带宽不变。
-    //    滚动时几百块面板 × 8 个 uniform = 几千次 JNI 调用，缓存能砍掉 5/8。
+    //    滚动时几百块面板 × 9 个 uniform = 几千次 JNI 调用，缓存能砍掉大部分。
     private float lastBand = Float.NaN;
     private float lastStrength = Float.NaN;
     private float lastRadius = Float.NaN;
+    private float lastDepth = Float.NaN;
     private int lastW = -1, lastH = -1;
     private long lastBgVersion = -1;
 
@@ -127,15 +135,21 @@ public final class GlassDrawable extends Drawable {
         return this;
     }
 
-    /** 畸变带宽度（dp）。越大，被扭曲的边越宽。 */
+    /** 折射带宽度（dp）。越大，被扭曲的边越宽。 */
     public GlassDrawable band(float dp) {
         this.bandDp = dp;
         return this;
     }
 
-    /** 最大偏移（dp）。越大，边缘扭曲越明显。 */
+    /** 最大偏移（dp）。越大，边缘折射越明显。 */
     public GlassDrawable strength(float dp) {
         this.strengthDp = dp;
+        return this;
+    }
+
+    /** 深度感：法线叠加指向圆心的径向分量，让玻璃看起来有厚度。 */
+    public GlassDrawable depthEffect(boolean on) {
+        this.depthEffect = on;
         return this;
     }
 
@@ -203,7 +217,9 @@ public final class GlassDrawable extends Drawable {
         float dh = owner != null ? owner.getResources().getDisplayMetrics().heightPixels : 2340f;
         float r = radius >= 0 ? radius : 14f * d;
         float band = bandDp * d;
-        float strength = strengthDp * d;
+        // ★ v3.2：传负值（与参考实现一致）。法线朝外，负偏移 = 向内采样 = 放大镜观感。
+        float strength = -strengthDp * d;
+        float depth = depthEffect ? 1f : 0f;
 
         // ★ 只设变化的那几个 —— 见字段注释
         long bgVer = GlassBackdrop.version();
@@ -223,12 +239,16 @@ public final class GlassDrawable extends Drawable {
             lastRadius = r;
         }
         if (lastBand != band) {
-            shader.setFloatUniform("uBand", band);
+            shader.setFloatUniform("uRefractionHeight", band);
             lastBand = band;
         }
         if (lastStrength != strength) {
-            shader.setFloatUniform("uStrength", strength);
+            shader.setFloatUniform("uRefractionAmount", strength);
             lastStrength = strength;
+        }
+        if (lastDepth != depth) {
+            shader.setFloatUniform("uDepthEffect", depth);
+            lastDepth = depth;
         }
         // 位置每帧都可能变（滚动 / 动画），必须无条件更新
         shader.setFloatUniform("uPanelOrigin", ox, oy);
@@ -316,8 +336,14 @@ public final class GlassDrawable extends Drawable {
         sH = Math.max(1, h);
     }
 
-    /** 降级环的放大倍率。 */
-    private static final float RING_MAGNIFY = 1.12f;
+    /**
+     * 降级环的放大倍率。
+     *
+     * <p>★ v3.2 从 1.12 提到 1.25：折射带宽从 14dp 提到 16dp、最大偏移从 9dp 提到 32dp，
+     * 真·着色器路径的观感强了很多，降级路径若还停在 1.12 就会明显「不是一个东西」。
+     * 降级路径没有剖面曲线和深度感，观感仍弱一档，但至少量级对得上。
+     */
+    private static final float RING_MAGNIFY = 1.25f;
 
     /** 归还着色器实例（由 GlassApplier 在 View 分离时调）。 */
     void release() {
