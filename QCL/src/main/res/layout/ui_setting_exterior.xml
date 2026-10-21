@@ -458,6 +458,73 @@
 
                     </LinearLayout>
 
+                    <!-- ★★★ v3.4：覆盖范围（轻量 / 标准）。
+                         轻量 = 只给长边 ≥ 200dp 的大面板（导航栏 / 返回栏 / 大卡片）；
+                         标准 = 长边 ≥ 110dp 的中等面板也套。
+                         ★ 这是「观感」和「性能」之间的那根秤 —— 面板越多越好看也越费。
+                         默认轻量，与 v3.1~v3.3 的行为完全一致（老用户升级后不变）。 -->
+                    <LinearLayout
+                        android:id="@+id/liquid_glass_scope_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:paddingBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/exterior_setting_liquid_glass_scope"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_small"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="6dp">
+
+                            <TextView
+                                android:id="@+id/liquid_glass_scope_light"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/exterior_setting_liquid_glass_scope_light"
+                                android:textColor="@color/colorPureBlack"
+                                android:textSize="@dimen/text_size_small"/>
+
+                            <TextView
+                                android:id="@+id/liquid_glass_scope_full"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
+                                android:gravity="center"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:text="@string/exterior_setting_liquid_glass_scope_full"
+                                android:textColor="@color/colorPureBlack"
+                                android:textSize="@dimen/text_size_small"/>
+
+                        </LinearLayout>
+
+                        <!-- ★ 把代价明说：这是唯一一个「开了会明显变费」的开关，
+                             不写清楚的话，用户切到标准后掉帧只会以为「玻璃做得差」。 -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/exterior_setting_liquid_glass_scope_hint"
+                            android:textColor="@color/colorGray"
+                            android:textSize="@dimen/text_size_small"/>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <!-- ★★★ v3.1：排版风格（FCL / HMCL 电脑端 / ZL2）。

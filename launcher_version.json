@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20201,
-    "versionName": "2.2.1",
+    "versionCode": 20202,
+    "versionName": "2.2.2",
     "date": "2026-10-21",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.1/QCL-CE-v2.2.1-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.2/QCL-CE-v2.2.2-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.2.1</b><br/>· <b>修：老版本进游戏后按什么都没反应</b>——要不要 LWJGL2 兼容层，改成按 Minecraft 版本判断（低于 1.13 就需要），不再看版本 json 里写的 lwjgl 库版本。从 FCL 导入的实例、精简过的 json 现在也能正确挂上 lwjgl-lwjglx.jar<br/>· <b>液态玻璃提速</b>：只绘制边缘四条带，不再整块面板跑着色器，全屏面板的片元调用少 86%<br/>· 液态玻璃外缘加 1px 抗锯齿，圆角不再有锯齿毛边<br/>· 新增「折射强度」滑块（0~100，默认 50）：设置 → 外观 → 液态玻璃<br/>· 小面板的折射带自动收窄，不再被边带吃光<br/>· <b>修：从其它启动器导入账户</b>——补上 FCL 的 serverBaseURL（外置登录不再丢服务器地址）、角色名优先取 displayName（不再显示成邮箱）、微软账户不再被误判成离线<br/>· 版本号 2.2.0 → 2.2.1"
+    "updateLog": "<b>QCL-CE 2.2.2</b><br/>· <b>液态玻璃新增「覆盖范围」</b>：轻量（只给导航栏、返回栏、大卡片）/ 标准（中等面板也参与折射）。设置 → 外观 → 液态玻璃<br/>· 覆盖范围与开关分开保存，关掉再打开不会退回轻量<br/>· 切换范围立刻生效，不用重启<br/>· 版本号 2.2.1 → 2.2.2"
   },
   "latestPrerelease": null
 }

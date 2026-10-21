@@ -108,6 +108,10 @@ android.widget.SeekBar.OnSeekBarChangeListener {
     private LinearLayout liquidGlassStrengthRow;
     private android.widget.SeekBar liquidGlassStrengthSeek;
     private TextView liquidGlassStrengthValue;
+    /** ★ v3.4：覆盖范围（轻量 / 标准）—— 决定「套多少面板」，与开关是两件事。 */
+    private LinearLayout liquidGlassScopeRow;
+    private TextView liquidGlassScopeLight;
+    private TextView liquidGlassScopeFull;
     private LinearLayout fullscreenSetting;
     private RadioButton defaultRadio;
     private RadioButton classicRadio;
@@ -168,6 +172,15 @@ android.widget.SeekBar.OnSeekBarChangeListener {
         this.liquidGlassStrengthValue = (TextView)this.activity.findViewById(R.id.liquid_glass_strength_value);
         if (this.liquidGlassStrengthSeek != null) {
             this.liquidGlassStrengthSeek.setOnSeekBarChangeListener((android.widget.SeekBar.OnSeekBarChangeListener)this);
+        }
+        // ★ v3.4：覆盖范围（轻量 / 标准）
+        this.liquidGlassScopeRow = (LinearLayout)this.activity.findViewById(R.id.liquid_glass_scope_row);
+        this.liquidGlassScopeLight = (TextView)this.activity.findViewById(R.id.liquid_glass_scope_light);
+        this.liquidGlassScopeFull = (TextView)this.activity.findViewById(R.id.liquid_glass_scope_full);
+        for (TextView tv : new TextView[]{this.liquidGlassScopeLight, this.liquidGlassScopeFull}) {
+            if (tv != null) {
+                tv.setOnClickListener((View.OnClickListener)this);
+            }
         }
         this.fullscreenSetting = (LinearLayout)this.activity.findViewById(R.id.fullscreen_layout);
         this.defaultRadio = (RadioButton)this.activity.findViewById(R.id.select_bg_default);
@@ -334,6 +347,8 @@ android.widget.SeekBar.OnSeekBarChangeListener {
         }
         // ★ v3.3：强度滑块的初始值 + 可见性（关着玻璃时整行隐藏，避免「拖了没用」的困惑）
         refreshLiquidGlassStrength();
+        // ★ v3.4：覆盖范围的选中态 + 可见性（同上）
+        refreshLiquidGlassScope();
         this.refreshColorEditable();
         this.refreshLayoutStyleSelection();
         if (Build.VERSION.SDK_INT < 28) {
@@ -407,6 +422,44 @@ android.widget.SeekBar.OnSeekBarChangeListener {
             GsonUtils.saveLauncherSetting(this.activity.launcherSetting,
                     AppManifest.SETTING_DIR + "/launcher_setting.json");
             this.activity.setLiquidGlassStrength(pct);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ v3.4：刷新「覆盖范围」的显示（可见性 + 选中态）。
+     *
+     * <p>★ 选中态用「白底蓝字 / 灰底黑字」两个既有 drawable 区分 ——
+     * 与「排版风格」「主题方案」那几组按钮同一套做法，不新增 drawable。
+     *
+     * <p>★ 0 在这里当**轻量**（不是「未设置」）：轻量本来就是默认档，
+     * 不需要哨兵值。老配置没有这个字段，Gson 落到 0 ⇒ 正好就是轻量。
+     */
+    private void refreshLiquidGlassScope() {
+        try {
+            boolean on = this.activity.launcherSetting != null
+                    && this.activity.launcherSetting.liquidGlassMode != 0;
+            if (this.liquidGlassScopeRow != null) {
+                this.liquidGlassScopeRow.setVisibility(on ? View.VISIBLE : View.GONE);
+            }
+            int cur = this.activity.launcherSetting == null
+                    ? 0 : this.activity.launcherSetting.liquidGlassScope;
+            TextView[] all = {this.liquidGlassScopeLight, this.liquidGlassScopeFull};
+            int[] values = {
+                    com.qcl.launcher.launcher.glass.GlassApplier.MODE_LIGHT,
+                    com.qcl.launcher.launcher.glass.GlassApplier.MODE_FULL};
+            for (int i = 0; i < all.length; i++) {
+                if (all[i] == null) {
+                    continue;
+                }
+                boolean sel = values[i] == cur;
+                all[i].setBackgroundResource(sel
+                        ? R.drawable.launcher_button_white_blue
+                        : R.drawable.launcher_button_gray);
+                all[i].setTextColor(sel
+                        ? this.context.getColor(R.color.colorAccent)
+                        : this.context.getColor(R.color.colorPureBlack));
+            }
         } catch (Throwable ignored) {
         }
     }
@@ -923,6 +976,17 @@ android.widget.SeekBar.OnSeekBarChangeListener {
     }
 
     public void onClick(View v) {
+        // ★ v3.4：液态玻璃覆盖范围（轻量 / 标准）
+        if (v == this.liquidGlassScopeLight || v == this.liquidGlassScopeFull) {
+            int scope = v == this.liquidGlassScopeFull
+                    ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_FULL
+                    : com.qcl.launcher.launcher.glass.GlassApplier.MODE_LIGHT;
+            this.activity.launcherSetting.liquidGlassScope = scope;
+            GsonUtils.saveLauncherSetting(this.activity.launcherSetting, AppManifest.SETTING_DIR + "/launcher_setting.json");
+            this.activity.setLiquidGlassScope(scope);
+            refreshLiquidGlassScope();
+            return;
+        }
         // ★ v3.1：排版风格（经典 / FCL / HMCL 电脑端 / ZL2）
         if (v == this.layoutStyleQcl || v == this.layoutStyleFcl
                 || v == this.layoutStyleHmcl || v == this.layoutStyleZl2) {
@@ -1092,6 +1156,8 @@ android.widget.SeekBar.OnSeekBarChangeListener {
             this.activity.setLiquidGlassMode(mode);
             // ★ v3.3：开关一动，强度那一行的可见性跟着变
             refreshLiquidGlassStrength();
+            // ★ v3.4：覆盖范围那一行同理
+            refreshLiquidGlassScope();
         }
         if (buttonView == this.defaultRadio && isChecked) {
             this.classicRadio.setChecked(false);

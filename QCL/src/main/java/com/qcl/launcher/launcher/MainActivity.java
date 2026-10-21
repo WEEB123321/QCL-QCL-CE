@@ -511,9 +511,7 @@ implements View.OnClickListener {
      */
     public void applyLiquidGlass() {
         try {
-            int mode = this.launcherSetting == null
-                    ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF
-                    : this.launcherSetting.liquidGlassMode;
+            int mode = effectiveGlassMode();
             com.qcl.launcher.launcher.glass.GlassApplier.setMode(mode);
             // ★ v3.3：把「折射强度」也交给挂载器。0 = 未设置 → 用 50（标准），
             //   与 v3.2 的定值等价，老用户升级后观感不变。
@@ -535,19 +533,75 @@ implements View.OnClickListener {
     }
 
     /**
+     * ★★★ v3.4：把「开关」与「覆盖范围」两个设置合成**实际生效的模式**。
+     *
+     * <p>为什么要有这个合成步骤：{@code liquidGlassMode} 只回答「开不开」，
+     * {@code liquidGlassScope} 只回答「套多少面板」。而 {@code GlassApplier} 只认一个
+     * {@code MODE_*} 值 —— 合成放在这里，别让两处各判一次。
+     *
+     * <p>★ 兼容旧配置：v3.4 之前 {@code liquidGlassMode} 可能是 2（标准），
+     * 那批配置里 {@code liquidGlassScope} 会是 0 —— 这里把 2 也算成「标准」，
+     * 免得升级后悄悄退化成轻量。
+     */
+    private int effectiveGlassMode() {
+        if (this.launcherSetting == null) {
+            return com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF;
+        }
+        int on = this.launcherSetting.liquidGlassMode;
+        if (on == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+            return com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF;
+        }
+        int scope = this.launcherSetting.liquidGlassScope;
+        if (scope == com.qcl.launcher.launcher.glass.GlassApplier.MODE_FULL
+                || on == com.qcl.launcher.launcher.glass.GlassApplier.MODE_FULL) {
+            return com.qcl.launcher.launcher.glass.GlassApplier.MODE_FULL;
+        }
+        return com.qcl.launcher.launcher.glass.GlassApplier.MODE_LIGHT;
+    }
+
+    /**
      * ★★★ v3.1：设置里拨动开关时调这个 —— 立刻生效，不用重启。
      *
      * <p>★ 关闭时必须 {@code detachAll}：只「不再套新的」的话，已经套上的面板会留在界面上，
      * 用户看到的就是「关了还在」。
+     *
+     * <p>★ v3.4：调用方已经把 {@code liquidGlassMode} 写进 setting 了，
+     * 这里一律用 {@link #effectiveGlassMode()} 重新合成 —— 打开时要恢复用户上次选的
+     * 覆盖范围，不能写死成轻量。
      */
     public void setLiquidGlassMode(int mode) {
         try {
-            com.qcl.launcher.launcher.glass.GlassApplier.setMode(mode);
-            if (mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+            int eff = mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF
+                    ? com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF
+                    : effectiveGlassMode();
+            com.qcl.launcher.launcher.glass.GlassApplier.setMode(eff);
+            if (eff == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
                 return;
             }
             com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+            rescanLiquidGlass();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ v3.4：设置里切「覆盖范围」（轻量 / 标准）时调这个。
+     *
+     * <p>★ 和 {@link #setLiquidGlassStrength(int)} 同一个道理：范围决定的是
+     * 「哪些 View 该套」，而判断发生在 {@code maybeApply()} 里、并且套过的 View
+     * 都打了 {@code TAG_APPLIED}。不先 detachAll 再重扫，从轻量切到标准时
+     * 新该套上的中等面板会被 tag 挡住 —— 表现就是「切了没变化」。
+     */
+    public void setLiquidGlassScope(int scope) {
+        try {
+            com.qcl.launcher.launcher.glass.GlassApplier.setMode(effectiveGlassMode());
+            if (com.qcl.launcher.launcher.glass.GlassApplier.getMode()
+                    == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                return; // 没开玻璃，只记住数值即可
+            }
+            com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
             com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
             rescanLiquidGlass();
         } catch (Throwable ignored) {

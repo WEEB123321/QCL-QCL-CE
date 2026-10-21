@@ -1222,6 +1222,10 @@
     <string name="exterior_setting_liquid_glass">液态玻璃</string>
     <string name="exterior_setting_liquid_glass_hint">打开后，面板边缘会折射背后的背景；默认关闭</string>
     <string name="exterior_setting_liquid_glass_strength">折射强度</string>
+    <string name="exterior_setting_liquid_glass_scope">覆盖范围</string>
+    <string name="exterior_setting_liquid_glass_scope_light">轻量</string>
+    <string name="exterior_setting_liquid_glass_scope_full">标准</string>
+    <string name="exterior_setting_liquid_glass_scope_hint">轻量只给导航栏、返回栏和大卡片；标准会让中等面板也参与折射，观感更完整，低端机可能掉帧。</string>
     <string name="exterior_layout_style_title">排版风格</string>
     <string name="exterior_layout_style_qcl">经典</string>
     <string name="exterior_layout_style_fcl">FCL</string>
