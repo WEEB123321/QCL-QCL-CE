@@ -992,4 +992,19 @@
     <string name="splash_runtime_arch_unsupported">目前裝置架構（%1$s）沒有打包可用的 Java 執行環境檔案，請改用全架構版本的 QCL。</string>
     <string name="update_checking">正在檢查更新…</string>
     <string name="update_not_exist">目前已是最新版本</string>
+    <string name="account_import_card_title">從其它啟動器匯入</string>
+    <string name="account_import_card_hint">FCL / ZL2 / HMCL-PE 的帳戶</string>
+    <string name="account_import_title">匯入帳戶</string>
+    <string name="account_import_hint">讀取 FCL / ZL2 / HMCL-PE 留下的 accounts.json。全程唯讀，不會改動你原本的啟動器。</string>
+    <string name="account_import_cancel">取消</string>
+    <string name="account_import_pick_file">選擇檔案</string>
+    <string name="account_import_do">匯入選取</string>
+    <string name="account_import_scan_none">沒掃到 accounts.json。Android 11 以上讀不到其他應用的 Android/data 目錄，請點「選擇檔案」手動指定。</string>
+    <string name="account_import_scan_found">找到 %1$d 個檔案，點一下解析。</string>
+    <string name="account_import_parse_fail">檔案路徑無效。</string>
+    <string name="account_import_parse_empty">這個檔案裡沒有識別到帳戶。</string>
+    <string name="account_import_all_exist">這些帳戶都已經在清單裡了。</string>
+    <string name="account_import_parsed">解析到 %1$d 個帳戶，勾選後點「匯入選取」。</string>
+    <string name="account_import_pick_fail">打不開檔案選擇器。</string>
+    <string name="account_import_done">已匯入 %1$d 個帳戶。</string>
 </resources>

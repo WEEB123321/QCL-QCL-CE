@@ -119,6 +119,53 @@
 
         </LinearLayout>
 
+        <!-- ★★★ 社区版新增：从其它启动器导入账户（FCL / ZL2 / HMCL-PE 及其分支）。
+             为什么放在这里：它属于「加账户」这一类，必须和离线/微软/外置排在一起，
+             否则用户永远找不到（这个项目已经因为「功能有但入口不可发现」被抱怨过多次）。
+             放在微软之后、服务器列表之前 —— 服务器列表有 weight=1，让它先让位。 -->
+        <LinearLayout
+            android:padding="10dp"
+            android:background="@drawable/launcher_button_parent"
+            android:focusable="true"
+            android:clickable="true"
+            android:id="@+id/import_other_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/ic_baseline_person_black"/>
+
+            <LinearLayout
+                android:layout_marginStart="12dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:singleLine="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_import_card_title"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"/>
+
+                <TextView
+                    android:singleLine="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_import_card_hint"
+                    android:textSize="@dimen/text_size_small"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="0dp"

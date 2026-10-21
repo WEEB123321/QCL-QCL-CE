@@ -29,6 +29,8 @@ import com.qcl.launcher.R;
 /* loaded from: classes2.dex */
 public class AccountUI extends BaseUI implements View.OnClickListener {
     public static final int SELECT_SKIN_REQUEST = 6900;
+    /** ★ 社区版新增：从其它启动器导入账户时选 accounts.json 的请求码。 */
+    public static final int SELECT_ACCOUNT_FILE_REQUEST = 6901;
     private ListView accountList;
     public AccountListAdapter accountListAdapter;
     public LinearLayout accountUI;
@@ -38,6 +40,9 @@ public class AccountUI extends BaseUI implements View.OnClickListener {
     private AddMicrosoftAccountDialog addMicrosoftAccountDialog;
     private LinearLayout addMojangAccount;
     private LinearLayout addOfflineAccount;
+    /** ★ 社区版新增：从其它启动器（FCL / ZL2 / HMCL-PE）导入账户。 */
+    private LinearLayout importOtherAccount;
+    private com.qcl.launcher.launcher.dialogs.account.ImportOtherLauncherAccountDialog importDialog;
     private ListView externalServerList;
     public ArrayList<AuthlibInjectorServer> serverList;
     public AuthlibInjectorServerListAdapter serverListAdapter;
@@ -64,10 +69,14 @@ public class AccountUI extends BaseUI implements View.OnClickListener {
         this.addMojangAccount = (LinearLayout) this.activity.findViewById(R.id.add_mojang_account);
         this.addMicrosoftAccount = (LinearLayout) this.activity.findViewById(R.id.add_microsoft_account);
         this.addLoginServer = (LinearLayout) this.activity.findViewById(R.id.add_login_server);
+        this.importOtherAccount = (LinearLayout) this.activity.findViewById(R.id.import_other_account);
         this.addOfflineAccount.setOnClickListener(this);
         this.addMojangAccount.setOnClickListener(this);
         this.addMicrosoftAccount.setOnClickListener(this);
         this.addLoginServer.setOnClickListener(this);
+        if (this.importOtherAccount != null) {
+            this.importOtherAccount.setOnClickListener(this);
+        }
         this.externalServerList = (ListView) this.activity.findViewById(R.id.external_server_list);
         this.accountList = (ListView) this.activity.findViewById(R.id.account_list);
         this.addMojangAccount.setVisibility(8);
@@ -107,6 +116,16 @@ public class AccountUI extends BaseUI implements View.OnClickListener {
                 return;
             }
             accountListAdapter.uploadSkin(realPathFromUri_AboveApi19);
+        }
+        // ★ 社区版新增：导入其它启动器账户时选完 accounts.json 回来了
+        if (i == SELECT_ACCOUNT_FILE_REQUEST && i2 == -1 && intent != null) {
+            try {
+                String path = UriUtils.getRealPathFromUri_AboveApi19(this.context, intent.getData());
+                if (this.importDialog != null && this.importDialog.isShowing()) {
+                    this.importDialog.onFilePicked(path);
+                }
+            } catch (Throwable ignored) {
+            }
         }
     }
 
@@ -156,6 +175,18 @@ public class AccountUI extends BaseUI implements View.OnClickListener {
                     AccountUI.this.m474lambda$onClick$3$comqcllauncherlauncheruisaccountAccountUI(authlibInjectorServer);
                 }
             }).show();
+        }
+        // ★ 社区版新增：从其它启动器导入账户
+        if (view == this.importOtherAccount) {
+            try {
+                this.importDialog = new com.qcl.launcher.launcher.dialogs.account.ImportOtherLauncherAccountDialog(
+                        this.context, this.activity, this.accounts);
+                this.importDialog.show();
+            } catch (Throwable t) {
+                android.widget.Toast.makeText(this.context,
+                        "导入功能启动失败：" + t.getClass().getSimpleName(),
+                        android.widget.Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

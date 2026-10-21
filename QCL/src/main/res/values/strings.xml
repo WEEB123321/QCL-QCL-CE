@@ -1194,4 +1194,19 @@ Multiplayer is powered by Terracotta (by BurningTNT). The multiplayer feature is
     <string name="backup_rollback_failed">Roll back failed: %1$s</string>
     <string name="backup_delete_confirm">Delete this backup? %1$s</string>
     <string name="backup_restore_safety">safety copy</string>
+    <string name="account_import_card_title">Import from other launchers</string>
+    <string name="account_import_card_hint">FCL / ZL2 / HMCL-PE accounts</string>
+    <string name="account_import_title">Import accounts</string>
+    <string name="account_import_hint">Reads accounts.json left by FCL / ZL2 / HMCL-PE. Read-only: your original launcher is untouched.</string>
+    <string name="account_import_cancel">Cancel</string>
+    <string name="account_import_pick_file">Pick file</string>
+    <string name="account_import_do">Import selected</string>
+    <string name="account_import_scan_none">No accounts.json found. On Android 11+ other app Android/data folders are not readable — use "Pick file".</string>
+    <string name="account_import_scan_found">Found %1$d file(s). Tap one to parse.</string>
+    <string name="account_import_parse_fail">Invalid file path.</string>
+    <string name="account_import_parse_empty">No account recognized in this file.</string>
+    <string name="account_import_all_exist">All of these accounts are already in the list.</string>
+    <string name="account_import_parsed">Parsed %1$d account(s). Tick and tap "Import selected".</string>
+    <string name="account_import_pick_fail">Could not open the file picker.</string>
+    <string name="account_import_done">Imported %1$d account(s).</string>
 </resources>

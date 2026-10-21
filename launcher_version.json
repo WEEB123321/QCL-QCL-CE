@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20109,
-    "versionName": "2.1.9",
+    "versionCode": 20200,
+    "versionName": "2.2.0",
     "date": "2026-10-21",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.1.9/QCL-CE-v2.1.9-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.0/QCL-CE-v2.2.0-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.1.9</b><br/>· <b>液态玻璃折射数学重写</b>：改用四分之一圆剖面 + 径向深度感，边缘出现真实的「光学压缩带」，不再是模糊边<br/>· 折射强度按参考实现调到「带宽 16dp / 偏移 32dp」（原来 14dp / 9dp 太弱，看起来只是发虚）<br/>· 面板内部依然完全透明，只保留边缘一圈<br/>· 无背景模糊、无白边、无投影（按你的要求）<br/>· <b>液态玻璃仍默认关闭</b>，在「设置 → 外观」手动打开<br/>· 修掉畸变圈位置偏移（控件有内边距时会画歪）<br/>· 修掉切排版后导航条逐次上飘<br/>· 修掉列表刷新时反复遍历界面<br/>· 版本号 2.1.8 → 2.1.9"
+    "updateLog": "<b>QCL-CE 2.2.0</b><br/>· <b>新增：从其它启动器导入账户</b>——可读取 FCL / ZL2 / HMCL-PE 留下的 accounts.json，微软正版、外置登录、离线账户都能搬过来，<b>头像（皮肤）一起带过来</b><br/>· 导入全程只读，不会改动你原来的启动器<br/>· 入口：账号页 →「从其它启动器导入」（自动扫常见目录，扫不到可手动选文件）<br/>· 液态玻璃折射数学重写：四分之一圆剖面 + 径向深度感，边缘出现真实的「光学压缩带」<br/>· 折射强度调到「带宽 16dp / 偏移 32dp」，不再是发虚的模糊边<br/>· 面板内部依然完全透明，只保留边缘一圈；无模糊、无白边、无投影<br/>· <b>液态玻璃默认关闭</b>，在「设置 → 外观」手动打开<br/>· 修掉切排版后导航条逐次上飘、列表刷新时反复遍历界面<br/>· 版本号 2.1.9 → 2.2.0"
   },
   "latestPrerelease": null
 }

@@ -1272,4 +1272,19 @@
     <string name="backup_rollback_failed">回滚失败：%1$s</string>
     <string name="backup_delete_confirm">删除这份备份？%1$s</string>
     <string name="backup_restore_safety">安全副本</string>
+    <string name="account_import_card_title">从其它启动器导入</string>
+    <string name="account_import_card_hint">FCL / ZL2 / HMCL-PE 的账户</string>
+    <string name="account_import_title">导入账户</string>
+    <string name="account_import_hint">读取 FCL / ZL2 / HMCL-PE 留下的 accounts.json。全程只读，不会改动你原来的启动器。</string>
+    <string name="account_import_cancel">取消</string>
+    <string name="account_import_pick_file">选择文件</string>
+    <string name="account_import_do">导入选中</string>
+    <string name="account_import_scan_none">没扫到 accounts.json。Android 11 以上读不到别的应用的 Android/data 目录，请点「选择文件」手动指定。</string>
+    <string name="account_import_scan_found">找到 %1$d 个文件，点一下解析。</string>
+    <string name="account_import_parse_fail">文件路径无效。</string>
+    <string name="account_import_parse_empty">这个文件里没有识别到账户。</string>
+    <string name="account_import_all_exist">这些账户都已经在列表里了。</string>
+    <string name="account_import_parsed">解析到 %1$d 个账户，勾选后点「导入选中」。</string>
+    <string name="account_import_pick_fail">打不开文件选择器。</string>
+    <string name="account_import_done">已导入 %1$d 个账户。</string>
 </resources>
