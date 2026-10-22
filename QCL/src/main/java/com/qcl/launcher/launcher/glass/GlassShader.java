@@ -76,11 +76,41 @@ public final class GlassShader {
     private static Boolean sUsable = null;
     private static String sPath = "未检测";
 
+    /**
+     * ★★★ 绘制阶段是否已经失败过。
+     *
+     * <p>为什么要单独记：{@link #usable()} 只证明「能构造出 RuntimeShader」，
+     * 不证明「每次 draw 都不抛」。绘制阶段失败时 {@code GlassDrawable} 会降级到环状放大，
+     * 但如果那里写 {@code catch (Throwable ignored)}，后果是：
+     * <ul>
+     *   <li>界面上没有玻璃，日志里也没有任何线索 —— 又回到「只能猜」；</li>
+     *   <li>每帧都重新试一次、每帧都抛一次异常，白烧 CPU。</li>
+     * </ul>
+     * 所以这里记一个一次性标志：记一条日志、停止重试、并让诊断行如实显示。
+     */
+    private static volatile boolean sDrawFailed = false;
+
     private GlassShader() {
+    }
+
+    static void markDrawFailed(Throwable t) {
+        if (sDrawFailed) {
+            return;
+        }
+        sDrawFailed = true;
+        Log.w(TAG, "玻璃着色器绘制失败，本次运行改用环状放大（不再重试）", t);
+    }
+
+    static boolean drawFailed() {
+        return sDrawFailed;
     }
 
     public static String pathDescription() {
         ensureProbed();
+        // ★ 诊断行必须如实反映**最终**结果：能构造不代表能画。
+        if (sDrawFailed) {
+            return sPath + "（绘制阶段失败，已降级到环状放大）";
+        }
         return sPath;
     }
 
@@ -269,7 +299,9 @@ public final class GlassShader {
             //   ★ 为什么不用「只在带内 drawRect」那套老办法：ReGlass 的玻璃内部
             //     是**模糊背景**，不是透明，必须整块画（见类注释 V5）。
             + "    float3 raw = uBg.eval(uvC * uBgSize).rgb;\n"
-            + "    float3 col;\n"
+            // ★ 显式初始化：SkSL 允许未初始化局部变量，但一旦某条分支漏赋值
+            //   就会拿到未定义值（表现为随机色块），显式给 0 更安全。
+            + "    float3 col = float3(0.0);\n"
             + "    if (depth >= thick) {\n"
             + "        col = raw;\n"
             + "    } else {\n"

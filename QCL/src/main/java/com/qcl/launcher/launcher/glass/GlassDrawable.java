@@ -364,10 +364,14 @@ public final class GlassDrawable extends Drawable {
         //   （用户两次报「白灰色」的根因之一，另一次是壁纸被放大 4.9 倍）。
         //   ★ 只有着色器不可用时才画回原背景，否则「玻璃失效 + 面板消失」会同时发生。
         boolean drawn = false;
-        if (GlassShader.usable() && GlassShader.sharedBackdropShader() != null) {
+        // ★★★ 绘制失败过就不再重试：否则每帧构造一次异常、每帧降级一次，
+        //   既烧 CPU 又把线索埋掉（详见 GlassShader#markDrawFailed 的注释）。
+        if (!GlassShader.drawFailed()
+                && GlassShader.usable() && GlassShader.sharedBackdropShader() != null) {
             try {
                 drawn = drawShader(canvas, w, h, bg);
-            } catch (Throwable ignored) {
+            } catch (Throwable t) {
+                GlassShader.markDrawFailed(t);
             }
         }
         if (!drawn) {
