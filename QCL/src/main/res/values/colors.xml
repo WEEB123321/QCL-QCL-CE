@@ -56,6 +56,9 @@
          60% 黑），保证浅色模式下**一个像素都不变**；夜间由 values-night 覆盖成
          60% 的近白色。原来那 17 处直接写死 #99000000，深色底上等于没字。 -->
     <color name="qcl_s_text_hint">#99000000</color>
+    <!-- ★ 错误 / 异常提示。日间值 = 原来写死在 ui_diagnostic 里的 #FFB3261E，
+         浅色模式下外观不变；夜间调亮，否则深锈红压在 #1B1A18 上对比度只有约 2.4:1。 -->
+    <color name="qcl_s_error">#FFB3261E</color>
     <color name="qcl_s_accent">#A8452F</color>      <!-- 强调（铁锈红） -->
     <!-- 深色文字（上游大量使用 #FF1B1B1B，日间值保持完全一致，夜间变亮） -->
     <color name="qcl_s_ink">#FF1B1B1B</color>
