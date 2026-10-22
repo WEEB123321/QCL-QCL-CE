@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -42,6 +43,17 @@ public final class RegionGate {
 
     /** 用户明确要求的解锁次数。 */
     private static final int TAPS_TO_UNLOCK = 5;
+
+    /**
+     * ★★★ 2.2.6：解锁进度存在**静态字段**里，不放在每次 bind 新建的数组里。
+     *
+     * <p>为什么必须这样：{@code bindOverlay} 每次进下载页都会重新 bind，而 2.2.5 的进度
+     * 是 {@code new int[]{0}} —— bind 一旦发生在两次点击之间，进度就归零。
+     * 表现和「按钮根本点不动」几乎无法区分：点 3 次和第 1 次看到的一模一样。
+     *
+     * <p>取值语义：已经点中几次（0 ~ {@link #TAPS_TO_UNLOCK}）。换地区、成功落地都会清零。
+     */
+    private static int sTaps = 0;
 
     /**
      * ★★★ 为什么单独一个 SharedPreferences 文件：
@@ -239,7 +251,12 @@ public final class RegionGate {
 
         // 每次绑定都从干净的初始态开始（对话框复用同一份布局，不能带着上次的选择）
         final String[] picked = new String[]{getRegion(activity)};
-        final int[] taps = new int[]{0};
+        // ★★★ 2.2.6：进度**跨 bind 保留**。
+        //   2.2.5 是 `new int[]{0}` —— 而 bindOverlay 每次进下载页都会重新 bind。
+        //   只要 bind 在点击之间发生一次（切页回来、LayoutEditor 重排后重新挂），
+        //   进度就归零，用户点第 3 次和第 1 次看到的效果一模一样 ⇒ 又是「按多少次都一样」。
+        //   存在静态字段里，重新 bind 接着上一次的进度走。
+        final int[] taps = new int[]{Math.max(0, Math.min(sTaps, TAPS_TO_UNLOCK - 1))};
 
         View.OnClickListener pick = new View.OnClickListener() {
             @Override
@@ -249,7 +266,8 @@ public final class RegionGate {
                 showWarnIfCn(root, REGION_CN.equals(picked[0]));
                 // 换选之后解锁进度作废 —— 不能「在中国大陆上戳 4 次、切到其它地区再补 1 次」
                 taps[0] = 0;
-                refreshConfirm(confirm, 0);
+                sTaps = 0;
+                refreshConfirm(root, confirm, 0);
             }
         };
         cn.setOnClickListener(pick);
@@ -259,39 +277,98 @@ public final class RegionGate {
         if (picked[0] != null) {
             markSelected(root, cn, other, REGION_CN.equals(picked[0]));
             showWarnIfCn(root, REGION_CN.equals(picked[0]));
-            refreshConfirm(confirm, 0);
         }
+        // ★ 2.2.6：不论有没有预选都要刷 —— 没预选时按钮本来就点不动（点了只弹提示），
+        //   压到 0.55 正好把「还没选地区」这件事表达出来；同时也让「还差几次」这一行
+        //   从第一眼就在，用户不必点一下才知道有这行字。
+        refreshConfirm(root, confirm, taps[0]);
 
+        final Runnable tapAction = new Runnable() {
+            @Override
+            public void run() {
+                advance(activity, root, confirm, picked, taps, onCommitted);
+            }
+        };
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (picked[0] == null) {
-                    // 没选地区就点确定：不推进、不跑位，只是提示一下
-                    android.widget.Toast.makeText(activity, R.string.region_gate_title,
-                            android.widget.Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                taps[0]++;
-                if (taps[0] >= TAPS_TO_UNLOCK) {
-                    // ★ 第 5 次：落地。先写盘再回调 —— 回调里可能立刻去读地区做限制判断
-                    setRegion(activity, picked[0]);
-                    refreshConfirm(confirm, TAPS_TO_UNLOCK);
-                    onCommitted.run();
-                    return;
-                }
-                // ★★★ 还没够 5 次：按钮跑掉，但**计数必须保留**。
-                //   ⚠️ 这里原来写的是 `taps[0] = 0;`（「跑位就清零」）—— 结果是
-                //     `taps` 永远只可能是 1，**5 次永远达不到**，按钮永远点不落地。
-                //   与下面 refreshConfirm 的 setEnabled(false) 叠加，就成了用户报的
-                //   「按多少次都是一样」：点击根本不进这个方法，进来也永远凑不满。
-                hop(confirm);
-                refreshConfirm(confirm, taps[0]);
-                android.widget.Toast.makeText(activity,
-                        activity.getString(R.string.region_gate_confirm_hint,
-                                TAPS_TO_UNLOCK - taps[0]),
-                        android.widget.Toast.LENGTH_SHORT).show();
+                tapAction.run();
             }
         });
+
+        // ★★★ 2.2.6：根节点兜底。
+        //   动机：用户报「2.2.5 也是一样」，而 2.2.5 的 dex 里 refreshConfirm 已经是
+        //   setEnabled(true)（已反汇编核对）。说明还有**别的**东西在吞掉按钮的点击 ——
+        //   可能是外层加了透明覆盖层、可能是按钮被重新挂到别处。
+        //   这里在**根节点**再接一道：根是 clickable 的，子 View 不消费触摸时事件会落到
+        //   根上，我们按坐标判断「这次落点在确定按钮范围内」就当成一次确定。
+        //   ★ 不会重复计数：子 View 一旦消费（正常情况），根节点的 OnTouchListener
+        //     根本收不到这次事件。
+        //   ★ 返回 false：不消费，其它正常点击（选项、滚动）完全不受影响。
+        root.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                if (e.getActionMasked() == MotionEvent.ACTION_UP
+                        && hitConfirm(confirm, e.getRawX(), e.getRawY())) {
+                    tapAction.run();
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * 推进一次「确定」。
+     *
+     * <p>★ 抽成一个方法是因为它有**两个入口**（按钮自己的点击 + 根节点兜底），
+     * 两处逻辑必须完全一致，否则会出现「点按钮算 1 次、点边缘算 2 次」这种更怪的行为。
+     */
+    private static void advance(final Activity activity, final View root, final TextView confirm,
+                                final String[] picked, final int[] taps,
+                                final Runnable onCommitted) {
+        if (picked[0] == null) {
+            // 没选地区就点确定：不推进、不跑位，只是提示一下
+            android.widget.Toast.makeText(activity, R.string.region_gate_title,
+                    android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        taps[0]++;
+        sTaps = taps[0];
+        if (taps[0] >= TAPS_TO_UNLOCK) {
+            // ★ 第 5 次：落地。先写盘再回调 —— 回调里可能立刻去读地区做限制判断
+            setRegion(activity, picked[0]);
+            sTaps = 0;
+            refreshConfirm(root, confirm, TAPS_TO_UNLOCK);
+            onCommitted.run();
+            return;
+        }
+        // ★★★ 还没够 5 次：按钮跑掉，但**计数必须保留**。
+        //   ⚠️ 这里原来写的是 `taps[0] = 0;`（「跑位就清零」）—— 结果是
+        //     `taps` 永远只可能是 1，**5 次永远达不到**，按钮永远点不落地。
+        //     与 refreshConfirm 的 setEnabled(false) 叠加，就成了用户报的
+        //     「按多少次都是一样」：点击根本不进这个方法，进来也永远凑不满。
+        hop(confirm);
+        refreshConfirm(root, confirm, taps[0]);
+        android.widget.Toast.makeText(activity,
+                activity.getString(R.string.region_gate_confirm_hint,
+                        TAPS_TO_UNLOCK - taps[0]),
+                android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    /** 这次触摸的落点是否在「确定」按钮范围内（含 8dp 宽容，手指不是针尖）。 */
+    private static boolean hitConfirm(View confirm, float rawX, float rawY) {
+        if (confirm == null || confirm.getWidth() <= 0 || confirm.getHeight() <= 0) {
+            return false;
+        }
+        try {
+            int[] loc = new int[2];
+            confirm.getLocationOnScreen(loc);
+            float pad = 8f * confirm.getResources().getDisplayMetrics().density;
+            return rawX >= loc[0] - pad && rawX <= loc[0] + confirm.getWidth() + pad
+                    && rawY >= loc[1] - pad && rawY <= loc[1] + confirm.getHeight() + pad;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /**
@@ -355,7 +432,7 @@ public final class RegionGate {
      * 不再只传 0 / 5 两个哨兵值 —— 这样按钮的视觉能随进度连续变化，
      * 用户看得出「确实在推进」，而不是「点了没反应」。
      */
-    private static void refreshConfirm(TextView confirm, int taps) {
+    private static void refreshConfirm(View root, TextView confirm, int taps) {
         if (confirm == null) {
             return;
         }
@@ -372,6 +449,23 @@ public final class RegionGate {
             float t = Math.max(0, Math.min(taps, TAPS_TO_UNLOCK - 1))
                     / (float) (TAPS_TO_UNLOCK - 1);
             confirm.setAlpha(0.55f + 0.36f * t);
+        }
+        // ★★★ 2.2.6：常驻「还差几次」。
+        //   之前只有 Toast —— 用户点完两轮都报「按多少次都一样」，因为 Toast 一闪就没，
+        //   事后完全看不出「到底有没有生效」。常驻数字顺带成了「这版有没有装上」的证据：
+        //   旧版没有这一行。
+        if (root != null) {
+            TextView hint = (TextView) root.findViewById(R.id.region_gate_confirm_hint);
+            if (hint != null) {
+                if (unlocked) {
+                    hint.setText("");
+                    hint.setVisibility(View.GONE);
+                } else {
+                    hint.setVisibility(View.VISIBLE);
+                    hint.setText(root.getResources().getString(
+                            R.string.region_gate_confirm_hint, TAPS_TO_UNLOCK - taps));
+                }
+            }
         }
     }
 

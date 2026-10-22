@@ -177,6 +177,23 @@
 
             </FrameLayout>
 
+            <!-- ── 还差几次：常驻小字，不是 Toast ──────────────────────────
+                 ★★★ 为什么必须有一行常驻文字（2.2.6）：
+                   之前只弹 Toast。用户点了两轮都报「按多少次都一样」—— 因为
+                   Toast 一闪就没，事后完全没有痕迹，用户无从判断「到底有没有生效」。
+                   常驻数字还有个副作用是好事：它同时是**这版有没有装上的证据**
+                   （旧版没有这一行）。
+                 ★ 字号 13sp + 60% 透明度：是提示，不是警告（警告是上面 20sp 那条）。 -->
+            <TextView
+                android:id="@+id/region_gate_confirm_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:alpha="0.6"
+                android:gravity="center"
+                android:textColor="@color/colorPureBlack"
+                android:textSize="@dimen/text_size_middle" />
+
         </LinearLayout>
     </ScrollView>
 
