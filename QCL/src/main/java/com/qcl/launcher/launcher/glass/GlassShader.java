@@ -253,14 +253,27 @@ public final class GlassShader {
             + "\n"
             + "    float2 uv0 = (uPanelOrigin + fragCoord) / max(uScreenSize, float2(1.0));\n"
             + "    float2 uvC = clamp(uv0, float2(0.0), float2(1.0));\n"
+            // ★★★ 内部快速路径（性能）：折射只在 depth < thick 的那一圈里存在，
+            //   厚度之外 off 恒为 0 ⇒ 三个通道的采样点是同一个点，色散没有任何作用。
+            //   但着色器仍然会老老实实采三次 —— 面板内部占面积 90% 以上，
+            //   等于每个像素白花 2 次纹理读取（加上眩光那次一共 4 次）。
+            //   这里先采一次未位移的 raw，内部直接用它，边缘带才走三通道分支。
+            //   ★ 为什么不用「只在带内 drawRect」那套老办法：ReGlass 的玻璃内部
+            //     是**模糊背景**，不是透明，必须整块画（见类注释 V5）。
+            + "    float3 raw = uBg.eval(uvC * uBgSize).rgb;\n"
+            + "    float3 col;\n"
+            + "    if (depth >= thick) {\n"
+            + "        col = raw;\n"
+            + "    } else {\n"
             // ── 色散：R / G / B 用略微不同的位移量 ──
             //   ReGlass 的 NR=0.985 / NG=1.0 / NB=1.015，再乘色散强度
-            + "    float kR = 1.0 + 0.015 * uRefDisp;\n"
-            + "    float kB = 1.0 - 0.015 * uRefDisp;\n"
-            + "    float3 col = float3(0.0);\n"
-            + "    col.r = uBg.eval(clamp(uv0 + off * kR, float2(0.0), float2(1.0)) * uBgSize).r;\n"
-            + "    col.g = uBg.eval(clamp(uv0 + off, float2(0.0), float2(1.0)) * uBgSize).g;\n"
-            + "    col.b = uBg.eval(clamp(uv0 + off * kB, float2(0.0), float2(1.0)) * uBgSize).b;\n"
+            + "        float kR = 1.0 + 0.015 * uRefDisp;\n"
+            + "        float kB = 1.0 - 0.015 * uRefDisp;\n"
+            + "        col = float3(0.0);\n"
+            + "        col.r = uBg.eval(clamp(uv0 + off * kR, float2(0.0), float2(1.0)) * uBgSize).r;\n"
+            + "        col.g = uBg.eval(clamp(uv0 + off, float2(0.0), float2(1.0)) * uBgSize).g;\n"
+            + "        col.b = uBg.eval(clamp(uv0 + off * kB, float2(0.0), float2(1.0)) * uBgSize).b;\n"
+            + "    }\n"
             + "\n"
             + "    col = mix(col, uTint, uTintA * 0.8);\n"
             + "\n"
@@ -279,7 +292,7 @@ public final class GlassShader {
             + "    col = mix(col, mix(float3(1.0), uTint, uTintA * 0.5), fres * uFresFac * 0.7);\n"
             + "\n"
             // ── 眩光：朝光的那半边再多一层"雾面反光" ──
-            + "    float3 raw = uBg.eval(uvC * uBgSize).rgb;\n"
+            //   ★ 复用上面已经采过的那次 raw，不再重复采样
             + "    float glBase = clamp(1.0 - depth / 1500.0"
             + "            * pow(500.0 / max(uGlareRange, 1e-6), 2.0) + uGlareHard, 0.0, 1.0);\n"
             + "    float gl = pow(glBase, 5.0);\n"
