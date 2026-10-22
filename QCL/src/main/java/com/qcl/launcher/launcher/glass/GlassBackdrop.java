@@ -114,14 +114,32 @@ public final class GlassBackdrop {
 
     // ───────────────── 模糊 ─────────────────
 
-    /** 模糊图的长边目标（像素）。再大没意义 —— 玻璃只采样低频，双线性放大足够。 */
-    private static final int BLUR_MAX_DIM = 420;
+    /**
+     * 模糊图的长边目标（像素）。
+     *
+     * <p>★★★ 900 这个值是**用预览图对比出来的**，不是拍的：
+     * 用一张 40px 网格的高频测试图跑 `preview_glass.py`，对比了
+     * 420/4/3、720/2/2、900/2/2、960/2/1 四档 ——
+     * <ul>
+     *   <li>420/4/3（初版）：内部糊成一片，边缘的压缩带**完全看不出来**，
+     *       观感就是「高斯模糊」；</li>
+     *   <li>960/2/1：压缩带很抢眼，但内部几乎没糊，读起来像放大镜而不是磨砂玻璃；</li>
+     *   <li><b>900/2/2</b>：内部仍是磨砂、边缘的网格能被明显压弯 —— 这才是玻璃。</li>
+     * </ul>
+     * <p>★ 关键约束：压缩带能不能被看见，取决于「模糊后的背景在带宽尺度上还有没有结构」。
+     * 糊得太狠 ⇒ 位移搬过来的还是同一团颜色 ⇒ 折射等于没做。
+     * 带宽 48px，所以模糊的等效半径必须明显小于 48px。
+     */
+    private static final int BLUR_MAX_DIM = 900;
 
-    /** 盒式模糊半径（在缩小后的图上）。3 次盒式 ≈ 一次高斯。 */
-    private static final int BLUR_RADIUS = 4;
+    /** 盒式模糊半径（在缩小后的图上）。2 次盒式 ≈ 一次轻高斯。 */
+    private static final int BLUR_RADIUS = 2;
+
+    /** 盒式模糊次数。 */
+    private static final int BLUR_PASSES = 2;
 
     /**
-     * 生成模糊背景：先缩小到长边 {@link #BLUR_MAX_DIM}，再做 3 次盒式模糊。
+     * 生成模糊背景：先缩小到长边 {@link #BLUR_MAX_DIM}，再做 {@link #BLUR_PASSES} 次盒式模糊。
      *
      * <p>★ 为什么先缩小：盒式模糊的复杂度是 O(w·h)，在 1080×2340 上做 3 次要几十毫秒；
      * 缩到 420 长边之后是 1~2ms，而视觉上**完全等价**（模糊本身就是丢掉高频）。
@@ -149,7 +167,7 @@ public final class GlassBackdrop {
             int[] px = new int[w * h];
             work.getPixels(px, 0, w, 0, 0, w, h);
             int[] tmp = new int[px.length];
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < BLUR_PASSES; i++) {
                 boxBlurH(px, tmp, w, h, BLUR_RADIUS);
                 boxBlurV(tmp, px, w, h, BLUR_RADIUS);
             }
