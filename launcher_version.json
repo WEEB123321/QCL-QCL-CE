@@ -1,13 +1,13 @@
 {
   "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
   "latestRelease": {
-    "versionCode": 20203,
-    "versionName": "2.2.3",
-    "date": "2026-10-21",
+    "versionCode": 20205,
+    "versionName": "2.2.5",
+    "date": "2026-10-22",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.3/QCL-CE-v2.2.3-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v2.2.5/QCL-CE-v2.2.5-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 2.2.3</b><br/>· <b>玻璃圆角跟随面板真实圆角</b>——以前一律按 14dp 画，而面板实际有 3/5/12/14/16dp 好几种，导致小圆角面板的角看起来被切掉、大圆角面板边缘错位<br/>· <b>玻璃面板恢复按压反馈</b>——按住时边缘折射略微加强（光学响应，不涂色、不加白边），不再点下去毫无反应<br/>· 版本号 2.2.2 → 2.2.3"
+    "updateLog": "<b>QCL-CE 2.2.5</b><br/>· <b>三套排版照源码重做</b>——之前只是把导航栏换个位置，结构上就不对。这次去 GitHub 读了三个仓库的布局文件：<br/>&nbsp;&nbsp;· <b>FCL</b>：左侧窄图标栏（#40F4F4F4 + 8dp 圆角）+ 右侧 25% 宽满高操作面板（只圆左上/左下 8dp，内含头像 / 版本 / 启动）<br/>&nbsp;&nbsp;· <b>HMCL 电脑端</b>：顶部棕色彩条（图标 + 白色粗体标题）+ 左侧 200dp 菜单（图标 + 文字横排）<br/>&nbsp;&nbsp;· <b>ZL2</b>：整条导航栏隐藏，右侧 30% 宽浮动卡片（28dp 四角、离屏 12dp）<br/>· <b>侧栏可直接操作</b>——点账号行换账号、点版本行换实例、点启动直接开游戏，全部复用原有路由<br/>· <b>侧栏新增「全部功能」入口</b>——ZL2 隐藏导航栏后，下载 / 大厅 / 实验室 / 多人联机 / 设置 仍能到达<br/>· <b>返回栏按风格自动移位</b>——有右侧面板的风格把它挪到左边，HMCL 下移到彩条之下，避免被挡<br/>· 版本号 2.2.4 → 2.2.5"
   },
   "latestPrerelease": null
 }

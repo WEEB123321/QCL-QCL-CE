@@ -88,6 +88,15 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
     private LinearLayout noVersionAlert;
     private TextView currentVersionText;
 
+    // ★★★ v3.7：FCL / ZL2 的右侧操作面板（照两家真实源码做的，见 view_side_panel.xml 注释）。
+    //   只有这两种风格会显示；HMCL 风格没有侧栏，QCL 风格也不用。
+    //   ★ 面板里没有任何数据源：头像 / 账号名 / 版本名全部由本类在刷新时同步过来，
+    //     避免出现「主页显示 A、侧栏显示 B」。
+    private View sidePanel;
+    private ImageView sidePanelAvatar;
+    private TextView sidePanelAccountName;
+    private TextView sidePanelVersionName;
+
     private VersionSpinnerAdapter versionSpinnerAdapter;
 
     private ImageView versionListIcon;
@@ -176,6 +185,44 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
         versionIcon = activity.findViewById(R.id.current_version_icon);
         noVersionAlert = activity.findViewById(R.id.no_version_alert_text);
         currentVersionText = activity.findViewById(R.id.current_version_name_text);
+
+        // ★★★ v3.7：右侧操作面板（FCL / ZL2 风格才显示）。
+        //   ★ 为什么走 performClick() 而不是自己写路由：
+        //     上面那 8 个入口 View 只是被 setVisibility(GONE) 了，View 本身和
+        //     OnClickListener 都还在 ⇒ performClick() 完全复用原有逻辑。
+        //     自己写一份路由 = 两套代码，改一处忘一处 ✗
+        try {
+            sidePanel = activity.findViewById(R.id.qcl_side_panel);
+            sidePanelAvatar = activity.findViewById(R.id.side_panel_avatar);
+            sidePanelAccountName = activity.findViewById(R.id.side_panel_account_name);
+            sidePanelVersionName = activity.findViewById(R.id.side_panel_version_name);
+
+            View sideAccountRow = activity.findViewById(R.id.side_panel_account_row);
+            if (sideAccountRow != null && startAccountUI != null) {
+                sideAccountRow.setOnClickListener(v -> startAccountUI.performClick());
+            }
+            View sideVersionRow = activity.findViewById(R.id.side_panel_version_row);
+            if (sideVersionRow != null && startVersionListUI != null) {
+                sideVersionRow.setOnClickListener(v -> startVersionListUI.performClick());
+            }
+            View sideLaunch = activity.findViewById(R.id.side_panel_launch);
+            if (sideLaunch != null && startGame != null) {
+                sideLaunch.setOnClickListener(v -> startGame.performClick());
+            }
+            // ★★★ v3.7：「全部功能」入口。
+            //   ZL2 风格下整条导航栏是隐藏的，而「≡ 菜单」按钮是加在导航栏里的
+            //   ⇒ 导航一藏，下载 / 大厅 / 实验室 / 多人联机 / 设置 就都到不了了。
+            //   这里复用同一个 MainMenuDialog，路由和导航栏那个按钮完全一致。
+            View sideMenu = activity.findViewById(R.id.side_panel_menu);
+            if (sideMenu != null) {
+                sideMenu.setOnClickListener(v -> MainMenuDialog.show(activity, new View[]{
+                        startAccountUI, startGameManagerUI, startVersionListUI,
+                        startDownloadUI, startLobbyUI, startLabUI,
+                        startMultiPlayerUI, startSettingUI}));
+            }
+        } catch (Throwable ignored) {
+            // 侧栏是增强项，接不上不能影响主页。
+        }
 
         //icon
         versionListIcon = activity.findViewById(R.id.version_list_icon);
@@ -628,6 +675,10 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                     currentVersionText.setVisibility(View.VISIBLE);
                     currentVersionText.setText(currentVersion.name);
                     launchVersionText.setText(currentVersion.name);
+                    // ★ v3.7：右侧操作面板的版本名跟着一起走。
+                    if (sidePanelVersionName != null) {
+                        sidePanelVersionName.setText(currentVersion.name);
+                    }
                     if (!currentVersion.iconPath.equals("") && new File(currentVersion.iconPath).exists()) {
                         versionIcon.setBackground(DrawableUtils.getDrawableFromFile(currentVersion.iconPath));
                     }
@@ -683,7 +734,32 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                 accountSkinHat.setImageBitmap(null);
                 break;
         }
+        // ★ v3.7：账号信息同步到右侧操作面板（放在各分支之后，一次覆盖五种账号类型）。
+        syncSidePanelAccount();
         refreshAccountModel();
+    }
+
+    /**
+     * ★★★ v3.7：把主页当前显示的账号信息同步到右侧操作面板。
+     *
+     * <p>为什么是「复制主页」而不是「自己再读一遍账号」：
+     * 主页的 {@link #refreshAccount()} 已经按 loginType 1~5 分好支、设好了文字和头像，
+     * 侧栏再写一遍同样五支 = 两套逻辑，改一处忘一处 ✗
+     * 侧栏只要把主页**当前显示的内容**搬过去，两边就永远一致 ✓
+     */
+    private void syncSidePanelAccount() {
+        if (sidePanel == null) {
+            return;
+        }
+        try {
+            if (sidePanelAccountName != null && accountName != null) {
+                sidePanelAccountName.setText(accountName.getText());
+            }
+            if (sidePanelAvatar != null && accountSkinFace != null) {
+                sidePanelAvatar.setImageDrawable(accountSkinFace.getDrawable());
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     /**

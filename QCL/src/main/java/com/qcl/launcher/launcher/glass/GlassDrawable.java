@@ -106,6 +106,46 @@ public final class GlassDrawable extends Drawable {
     private boolean depthEffect = true;
 
     /**
+     * ★★★ v3.6：面板**原来的背景**。玻璃只画边缘那一圈，里面要把原背景画回去。
+     *
+     * <h3>为什么必须画回去（这是「液态玻璃没有」的根因）</h3>
+     * {@link GlassApplier} 把面板原背景换成了这个 Drawable，而本类的内部区域是
+     * <b>完全透明</b>的（用户要求「只要一层畸变圈」）。于是：
+     * <ul>
+     *   <li>{@code launcher_button_parent} 本来是 {@code #24FFFFFF} 的磨砂白底 ——
+     *       一换就变成<b>彻底透明</b>，设置页每一行、每一张卡片的底色全部消失；</li>
+     *   <li>{@code qcl_button_gray} / {@code qcl_gray_translucent_bar} 同理。</li>
+     * </ul>
+     * 用户看到的就是「开了玻璃，界面上的板块全没了」⇒ 报上来写成「液态玻璃没有」。
+     *
+     * <h3>★ 为什么这不违反「不要背景副本」</h3>
+     * 3.0 被否掉的做法是在面板里画**壁纸的副本** —— 面板一滚动副本跟着走，
+     * 就是用户说的「图片粘在板块上滑动」。这里画的是面板**自己的** drawable
+     * （一片纯色 / 渐变 / 磨砂），它不随滚动变化，也不含壁纸内容，
+     * 所以不会重现那个问题，同时把面板的可见性保住了。
+     *
+     * <p>★ 附带收益：原背景多是带 {@code state_pressed} 的 selector / ripple，
+     * 状态转发（见 {@link #onStateChange}）之后，**按压反馈也一起回来了**。
+     */
+    private Drawable originalBackground;
+
+    /**
+     * ★★★ v3.7：原背景画回来时的**不透明度**（0~1）。
+     *
+     * <h3>为什么从「原样画回」改成「按比例画回」</h3>
+     * v3.6 是 1:1 画回，解决了「板块凭空消失」，但把面板原本的**磨砂白底**
+     * （{@code qcl_bottom_nav} 是 {@code #D9FFFFFF} 即 85% 白）整块搬了回来 ⇒
+     * 用户看到的是一块**白灰色卡片**，加上边缘采样的是被放大 4.9 倍的软壁纸，
+     * 合起来就是「液态玻璃变成了高斯模糊还是白灰色的」。
+     *
+     * <p>真正的液态玻璃：**内部几乎透明**（壁纸清晰透出），面板的「存在感」
+     * 由边缘那一圈折射 + 倒角明暗提供，而不是靠一层不透明底色。
+     * 所以这里取 0.16 —— 原背景 85% 白 ⇒ 实际约 14% 白，是一层极淡的玻璃色调；
+     * 原背景 14% 白 ⇒ 约 2%，几乎完全透明，正是一块玻璃该有的样子。
+     */
+    private float originalAlpha = 0.16f;
+
+    /**
      * ★★★ v3.5：当前是否被按住。
      *
      * <p><b>为什么必须自己做这件事</b>：{@link GlassApplier} 把面板原来的背景
@@ -127,6 +167,37 @@ public final class GlassDrawable extends Drawable {
      */
     private static final float PRESS_GAIN = 1.4f;
 
+    /**
+     * ★★★ v3.7：按住程度的**平滑值**（0 松开 → 1 按到底），驱动 {@code uPressT}。
+     *
+     * <p>为什么不用布尔量直接切：折射偏移瞬间放大 45% 是「跳变」，
+     * 看起来像面板抖了一下。用 120ms 缓动走过去，才是「玻璃被手指压下去」的观感。
+     */
+    private float pressT = 0f;
+
+    /** 按住 / 松开的过渡时长（ms）。按下要快（跟手），回弹要慢一点（有阻尼感）。 */
+    private static final int PRESS_IN_MS = 110;
+    private static final int PRESS_OUT_MS = 240;
+
+    /** 正在跑的按压动画（同一时刻只会有一个）。 */
+    private android.animation.ValueAnimator pressAnim;
+
+    /**
+     * ★★★ v3.7：入场淡入的起点时刻。
+     *
+     * <p>为什么用时间戳而不是 ValueAnimator：一次页面切换可能有十几块面板同时挂上玻璃，
+     * 十几个 Animator 各自 invalidate，不如「各自读一次时钟、自己算进度」便宜。
+     * 每块面板只需要在 220ms 窗口内 {@code invalidateSelf()}。
+     */
+    private long createdAt = 0L;
+    private static final int APPEAR_MS = 220;
+
+    /** 入场是否已经走完（走完就不再 invalidate，避免无谓重绘）。 */
+    private boolean appearDone = false;
+
+    /** 入场进度 0~1（驱动 {@code uAppear}）。 */
+    private float appearT = 1f;
+
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fallbackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] locBuf = new int[2];
@@ -141,6 +212,9 @@ public final class GlassDrawable extends Drawable {
     private float lastDepth = Float.NaN;
     private int lastW = -1, lastH = -1;
     private long lastBgVersion = -1;
+    /** v3.7：两个动画量的缓存，避免每帧都走 JNI。 */
+    private float lastPressT = Float.NaN;
+    private float lastAppear = Float.NaN;
 
     // 降级②的缓存
     private BitmapShader magShader;
@@ -185,6 +259,51 @@ public final class GlassDrawable extends Drawable {
         return this;
     }
 
+    /**
+     * ★★★ v3.7：设置面板原背景，并按 {@code alpha} 压成半透明画回来。
+     *
+     * <p>★ 为什么用 {@code mutate().setAlpha()} 而不是每帧 {@code saveLayerAlpha}：
+     * {@code saveLayerAlpha} 每次绘制都要分配一块离屏缓冲，全屏面板就是一次
+     * 1080×2340 的纹理分配 —— 几百块面板滚动时会直接把显存打爆。
+     * 而 {@code setAlpha} 只是改 Drawable 的一个字段，零成本。
+     *
+     * <p>⚠️ 副作用：原 Drawable 的 alpha 被**改掉**了。关掉玻璃时必须复原
+     * （见 {@link #restoreOriginal()}），否则面板会永久停在半透明。
+     */
+    public GlassDrawable originalBackground(Drawable d, float alpha) {
+        this.originalAlpha = Math.max(0f, Math.min(1f, alpha));
+        if (d != null) {
+            try {
+                d = d.mutate();
+                d.setAlpha(Math.round(255f * this.originalAlpha));
+            } catch (Throwable ignored) {
+                // mutate / setAlpha 不支持就退回「不压透明度」，至少不会崩
+            }
+        }
+        this.originalBackground = d;
+        return this;
+    }
+
+    /** 兼容旧签名：按默认 16% 画回。 */
+    public GlassDrawable originalBackground(Drawable d) {
+        return originalBackground(d, 0.16f);
+    }
+
+    /**
+     * ★ 归还前把原背景的透明度复原。
+     *
+     * <p>被 {@link GlassApplier#detachTree} 调用 —— 关掉玻璃时面板要回到
+     * 「原来的样子」，包括原来的不透明度。
+     */
+    void restoreOriginal() {
+        if (originalBackground != null) {
+            try {
+                originalBackground.setAlpha(255);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
     // ───────────────── 绘制 ─────────────────
 
     @Override
@@ -199,6 +318,34 @@ public final class GlassDrawable extends Drawable {
         if (bg == null || bg.isRecycled()) {
             // ③ 没有背景 → 什么都不画（不要涂色块，那会盖住背景）
             return;
+        }
+        // ★★★ v3.7：入场淡入进度。
+        //   第一次 draw 才算「挂上」，之后 220ms 内线性从 0 走到 1。
+        //   没走完就自己再 invalidate 一次 —— 不依赖任何外部定时器。
+        if (createdAt == 0L) {
+            createdAt = android.os.SystemClock.uptimeMillis();
+        }
+        if (!appearDone) {
+            long dt = android.os.SystemClock.uptimeMillis() - createdAt;
+            appearT = Math.min(1f, dt / (float) APPEAR_MS);
+            if (appearT >= 1f) {
+                appearDone = true;
+            } else {
+                invalidateSelf();
+            }
+        }
+        // ★★★ v3.6/v3.7：先把面板**自己的**底色按比例画回来。
+        //   玻璃只负责边缘那一圈折射 + 倒角，面板内部必须是它原本的样子 ——
+        //   否则磨砂白底被「内部全透明」吃掉，板块整块消失（用户报「液态玻璃没有」）。
+        //   ★ 但**不能 1:1 画回**：那样就是一块白灰卡片（用户报「白灰色的」）。
+        //   0.16 的压暗让壁纸清晰透出，面板的可见性交给边缘那圈光。
+        if (originalBackground != null) {
+            try {
+                // ★ 直接复用方法开头那个 bnd —— 同一个作用域里不能重复声明同名局部变量。
+                originalBackground.setBounds(bnd.left, bnd.top, bnd.right, bnd.bottom);
+                originalBackground.draw(canvas);
+            } catch (Throwable ignored) {
+            }
         }
         try {
             if (!drawShader(canvas, w, h, bg)) {
@@ -253,8 +400,9 @@ public final class GlassDrawable extends Drawable {
         //   视觉上仍然连续，不会出现带子宽过半、内外边界打架的怪相。
         float band = Math.min(bandDp * d, Math.min(w, h) * 0.5f);
         // ★ v3.2：传负值（与参考实现一致）。法线朝外，负偏移 = 向内采样 = 放大镜观感。
-        // ★ v3.5：按住时把偏移放大 —— 这就是「按压反馈」，见 pressed 字段注释。
-        float strength = -(pressed ? strengthDp * PRESS_GAIN : strengthDp) * d;
+        // ★ v3.5/v3.7：按住时把偏移放大 —— 但用**平滑的 pressT**而不是布尔量，
+        //   否则偏移会瞬间跳 40%，看起来像面板抖了一下。
+        float strength = -(strengthDp * (1f + (PRESS_GAIN - 1f) * pressT)) * d;
         float depth = depthEffect ? 1f : 0f;
 
         // ★ 只设变化的那几个 —— 见字段注释
@@ -288,6 +436,15 @@ public final class GlassDrawable extends Drawable {
         }
         // 位置每帧都可能变（滚动 / 动画），必须无条件更新
         shader.setFloatUniform("uPanelOrigin", ox, oy);
+        // ★ v3.7：两个动画量 —— 值没变就不传（滚动时每帧都会走这里，省 JNI）
+        if (lastPressT != pressT) {
+            shader.setFloatUniform("uPressT", pressT);
+            lastPressT = pressT;
+        }
+        if (lastAppear != appearT) {
+            shader.setFloatUniform("uAppear", appearT);
+            lastAppear = appearT;
+        }
 
         paint.setShader(shader);
         // ★★ 必须先 translate 到 bounds 左上角：着色器里的 fragCoord 是画布局部坐标，
@@ -427,12 +584,62 @@ public final class GlassDrawable extends Drawable {
                 }
             }
         }
+        // ★ v3.6：状态也转发给原背景 —— 它多半是带 state_pressed 的 selector / ripple，
+        //   转发了按压反馈才是真的回来（而不只是折射偏移变大）。
+        if (originalBackground != null && originalBackground.isStateful()) {
+            try {
+                originalBackground.setState(stateSet);
+            } catch (Throwable ignored) {
+            }
+        }
         if (p != pressed) {
             pressed = p;
-            invalidateSelf();
+            animatePress(p ? 1f : 0f);
             return true;
         }
         return false;
+    }
+
+    /**
+     * ★★★ v3.7：把 {@code pressT} 平滑推到目标值。
+     *
+     * <p>按下 110ms、松开 240ms —— 按下要跟手，松开要有阻尼。
+     * 每帧 {@code invalidateSelf()} 让面板重绘边缘那一圈（只有一圈，成本可控）。
+     *
+     * <p>★ 用 {@code ValueAnimator} 而不是 {@code View.animate()}：后者作用在 View 的
+     * 属性上，而这里要动的是 Drawable 内部的着色器 uniform，跟 View 的变换无关。
+     */
+    private void animatePress(final float target) {
+        try {
+            if (pressAnim != null) {
+                pressAnim.cancel();
+            }
+            final float from = pressT;
+            if (Math.abs(target - from) < 0.001f) {
+                return;
+            }
+            android.animation.ValueAnimator a =
+                    android.animation.ValueAnimator.ofFloat(from, target);
+            a.setDuration(target > from ? PRESS_IN_MS : PRESS_OUT_MS);
+            // 按下用 decelerate（快速跟上）、松开用 accelerate-decelerate（有回弹感）
+            a.setInterpolator(target > from
+                    ? new android.view.animation.DecelerateInterpolator(1.8f)
+                    : new android.view.animation.AccelerateDecelerateInterpolator());
+            a.addUpdateListener(new android.animation.ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(android.animation.ValueAnimator anim) {
+                    Object v = anim.getAnimatedValue();
+                    pressT = v instanceof Float ? (Float) v : target;
+                    invalidateSelf();
+                }
+            });
+            pressAnim = a;
+            a.start();
+        } catch (Throwable t) {
+            // 动画起不来也不能影响按压本身
+            pressT = target;
+            invalidateSelf();
+        }
     }
 
     @Override

@@ -169,7 +169,7 @@ public final class GlassShader {
      * 法线朝外，负偏移 = 向内采样 = 放大镜观感。
      */
     static final String SRC = ""
-            // ---- 输入（9 个 uniform）----
+            // ---- 输入（11 个 uniform）----
             + "uniform shader uBg;\n"
             + "uniform vec2  uBgSize;\n"          // 背景位图尺寸（像素）
             + "uniform vec2  uPanelSize;\n"       // 面板尺寸（像素）
@@ -179,6 +179,9 @@ public final class GlassShader {
             + "uniform float uRefractionHeight;\n"// 折射带宽度（像素）
             + "uniform float uRefractionAmount;\n"// 最大偏移（像素，传负值）
             + "uniform float uDepthEffect;\n"     // 0 = 无深度感，1 = 叠加径向分量
+            // ★★★ v3.7 新增两个动画量（都由 Java 侧按时间驱动，0..1）
+            + "uniform float uPressT;\n"          // 按住程度：0 松开、1 按到底
+            + "uniform float uAppear;\n"          // 入场程度：0 刚挂上、1 完全显现
             + "\n"
             // ── 圆角矩形 SDF（照 Backdrop 的 RoundedRectSDF）──
             + "float sdRoundedRect(float2 coord, float2 halfSize, float radius) {\n"
@@ -220,12 +223,19 @@ public final class GlassShader {
             + "\n"
             + "    // ---- ★★★ 内部：一律透明，让真实背景原样透出 ----\n"
             + "    //   这是「图片不再粘在板块上」和「性能」两件事的共同解。\n"
-            + "    float height = max(uRefractionHeight, 1e-3);\n"
+            + "    //   ★ v3.7：入场时折射带从 55% 宽度「长」到 100% ——\n"
+            + "    //     读作「玻璃正在贴合这块面板」，比单纯淡入更有材质感。\n"
+            + "    //     u 是按 height 归一化的，所以缩放 height 不会让带子内边界错位。\n"
+            + "    float height = max(uRefractionHeight, 1e-3) * (0.55 + 0.45 * clamp(uAppear, 0.0, 1.0));\n"
             + "    float depth = -sd;\n"
             + "    if (depth >= height) { return half4(0.0); }\n"
             + "\n"
             + "    // ---- 边缘带：折射位移采样 ----\n"
-            + "    float d = circleMap(1.0 - depth / height) * uRefractionAmount;\n"
+            + "    //   u = 0 在最外缘、1 在带宽内边界。\n"
+            + "    float u = clamp(depth / height, 0.0, 1.0);\n"
+            + "    // ★ v3.7：按住时偏移再放大 45% —— 手指压上去玻璃被「挤」得更狠，\n"
+            + "    //   这是最接近真实材质的一种触感反馈（不改变带宽，所以尺寸不跳）。\n"
+            + "    float d = circleMap(1.0 - u) * uRefractionAmount * (1.0 + 0.45 * uPressT);\n"
             + "    // ★ 用放大的圆角算梯度：直接用面板圆角时，转角处法线会突变，\n"
             + "    //   表现为四角出现一道折线。参考实现取 radius * 1.5。\n"
             + "    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));\n"
@@ -241,11 +251,33 @@ public final class GlassShader {
             + "    vec2 uv = clamp((uPanelOrigin + refracted) / max(uScreenSize, vec2(1.0)),\n"
             + "                    vec2(0.0), vec2(1.0));\n"
             + "    vec3 c = uBg.eval(uv * uBgSize).rgb;\n"
+            // ★★★ v3.7：倒角明暗（全部**乘性**，绝不加白）
+            //
+            //   为什么要这一项：只做位移时，效果强不强完全取决于壁纸有没有细节。
+            //   本项目的默认壁纸 ic_background_classic.jpg 只有 800x480 且被拉伸到竖屏，
+            //   本身就很软 ⇒ 位移采样出来的东西没有对比度 ⇒ 用户看到的只有「一团模糊」。
+            //   倒角明暗是**与背景无关**的玻璃特征：真实玻璃的斜面会把光压暗、把中部提亮，
+            //   再加一条随光照方向变化的高光带。加上它之后，无论壁纸多软，
+            //   边缘都能读成「一块有厚度的玻璃」。
+            //
+            //   ★ 全部用乘法：暗的地方只会更暗、亮的地方只会更亮，
+            //     不会凭空出现一条白线 —— 用户明确要求「不要边边的白色」。
+            + "    float bevel = 1.0;\n"
+            //   ① 最外缘压暗（玻璃厚度造成的暗边），0.18 在软背景上也看得见
+            + "    bevel -= 0.18 * (1.0 - smoothstep(0.0, 0.28, u));\n"
+            //   ② 中段提亮（光从玻璃侧面透进来的亮带），与①形成「亮暗亮」的剖面
+            + "    bevel += 0.10 * smoothstep(0.16, 0.50, u) * (1.0 - smoothstep(0.50, 0.92, u));\n"
+            //   ③ 方向性高光：光从左上来 ⇒ 左/上边缘亮、右/下边缘暗。
+            //      grad 是朝外的法线，点乘固定光向量 (-0.707,-0.707) 即得。
+            + "    float spec = max(0.0, -0.7071 * (grad.x + grad.y));\n"
+            + "    bevel += 0.16 * spec * (1.0 - smoothstep(0.0, 0.90, u));\n"
+            //   ④ 按压时整圈再亮一点（配合位移放大，读作「被压亮」）
+            + "    bevel += 0.10 * uPressT * (1.0 - smoothstep(0.0, 0.80, u));\n"
+            + "    c *= clamp(bevel, 0.55, 1.40);\n"
+            //
             // ★ v3.3 抗锯齿：外缘 sd 在 (-1,0) 这一像素里把 alpha 从 0 渐变到 1。
-            //   之前是硬切（sd >= 0 直接丢弃），在圆角上会看到明显锯齿 ——
-            //   因为面板原来的背景已被玻璃替换，这一圈就是面板**可见的边**，
-            //   硬切的锯齿直接暴露成「毛边」。
             + "    float aa = clamp(-sd, 0.0, 1.0);\n"
-            + "    return half4(half3(c), half(aa));\n"
+            // ★ v3.7：入场淡入 —— uAppear 从 0 走到 1，边圈「聚」出来，而不是硬闪一下。
+            + "    return half4(half3(c), half(aa) * half(clamp(uAppear, 0.0, 1.0)));\n"
             + "}\n";
 }

@@ -120,6 +120,28 @@ public class BottomNavHelper implements View.OnClickListener {
     }
 
     public void show(int tab) {
+        // ★★★ v3.7：ZL2 排版**没有导航栏**（照 ZalithLauncher2 的真实结构）。
+        //   这里原来无条件 setVisibility(VISIBLE)，每次页面切换都会把
+        //   LauncherLayoutStyle 藏起来的导航栏又拉回来 ⇒ 切到 ZL2 后
+        //   一进二级页导航就"复活"，排版就废了。
+        //   ⇒ 由排版层说了算：它要求隐藏，这里就不显示（搜索球也一起藏，
+        //     因为 ZL2 的搜索球同样不在设计里）。
+        if (com.qcl.launcher.launcher.ui.LauncherLayoutStyle.navHiddenByStyle()) {
+            if (navBar != null) {
+                navBar.setVisibility(View.GONE);
+            }
+            if (searchFab != null) {
+                searchFab.setVisibility(View.GONE);
+            }
+            selectedTab = tab;
+            for (int i = 0; i < tabs.length; i++) {
+                if (tabs[i] != null) {
+                    tabs[i].setSelected(i == tab);
+                }
+            }
+            visible = true;
+            return;
+        }
         if (navBar != null) {
             navBar.setVisibility(View.VISIBLE);
             navBar.bringToFront();

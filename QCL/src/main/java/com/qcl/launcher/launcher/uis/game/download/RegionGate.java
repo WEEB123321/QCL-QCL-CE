@@ -279,56 +279,99 @@ public final class RegionGate {
                     onCommitted.run();
                     return;
                 }
-                // ★★★ 还没够 5 次：按钮跑掉 + 清零计数
-                //   清零的理由见类注释 ② —— 不点中就不算数，乱戳空气凑不够
-                taps[0] = 0;
+                // ★★★ 还没够 5 次：按钮跑掉，但**计数必须保留**。
+                //   ⚠️ 这里原来写的是 `taps[0] = 0;`（「跑位就清零」）—— 结果是
+                //     `taps` 永远只可能是 1，**5 次永远达不到**，按钮永远点不落地。
+                //   与下面 refreshConfirm 的 setEnabled(false) 叠加，就成了用户报的
+                //   「按多少次都是一样」：点击根本不进这个方法，进来也永远凑不满。
                 hop(confirm);
-                refreshConfirm(confirm, 0);
+                refreshConfirm(confirm, taps[0]);
                 android.widget.Toast.makeText(activity,
-                        activity.getString(R.string.region_gate_confirm_hint, TAPS_TO_UNLOCK),
+                        activity.getString(R.string.region_gate_confirm_hint,
+                                TAPS_TO_UNLOCK - taps[0]),
                         android.widget.Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    /** 让按钮「跑」一下：随机左右上下位移 + 缩放回弹。 */
+    /**
+     * 让按钮「跑」一下。
+     *
+     * <p>★ v3.7 加了两个细节：**轻微旋转** + **回弹过冲**。
+     * 纯位移的按钮看起来像被人拖着走；带一点旋转和过冲之后，
+     * 读起来是「按钮自己弹开了」—— 这才是用户说的「乱跑」的手感。
+     */
     private static void hop(View v) {
         if (v == null) {
             return;
         }
         int w = v.getWidth() > 0 ? v.getWidth() : 600;
-        float dx = (float) ((Math.random() - 0.5) * w * 0.55);
-        float dy = (float) ((Math.random() - 0.5) * v.getHeight() * 1.6);
+        int h = v.getHeight() > 0 ? v.getHeight() : 140;
+        // ★ 位移幅度收窄到 50% / 1.4 倍：v3.6 的 55% / 1.6 倍在窄屏上会把按钮
+        //   甩到屏幕外，用户点不到就只能一直等它回来。
+        float dx = (float) ((Math.random() - 0.5) * w * 0.50);
+        float dy = (float) ((Math.random() - 0.5) * h * 1.40);
+        float rot = (float) ((Math.random() - 0.5) * 7.0);
         v.animate()
                 .translationX(dx)
                 .translationY(dy)
-                .scaleX(0.94f)
-                .scaleY(0.94f)
-                .setDuration(90)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .rotation(rot)
+                .scaleX(0.93f)
+                .scaleY(0.93f)
+                .setDuration(120)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator(1.7f))
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
-                        v.animate().scaleX(1f).scaleY(1f).setDuration(110).start();
+                        // 回弹：缩放和旋转用 Overshoot 过冲一点点，像弹簧归位
+                        v.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .rotation(0f)
+                                .setDuration(190)
+                                .setInterpolator(
+                                        new android.view.animation.OvershootInterpolator(1.2f))
+                                .start();
                     }
                 })
                 .start();
     }
 
-    /** 刷新确定按钮的文字与状态（未解锁半透明，第 5 次后变实心）。 */
+    /**
+     * 刷新确定按钮的文字与状态。
+     *
+     * <p>★★★ 2.2.4：**绝不能 {@code setEnabled(false)}**。
+     *
+     * <p>用户报「这个界面安不了确定，按多少次都是一样」—— 根因就是这里原来写着
+     * {@code confirm.setEnabled(unlocked)}。Android 里被禁用的 View **不接收任何点击**，
+     * {@code OnClickListener} 根本不会触发 ⇒ 而 {@code taps} 只能在点击里累加
+     * ⇒ 计数永远停在 0 ⇒ 永远解锁不了。**这是一个自锁**：解锁条件反过来把唯一能推进
+     * 解锁的动作关掉了。
+     *
+     * <p>正确做法：按钮**始终可点**，只用透明度表达「还差几次」。
+     * 透明度是视觉提示，不影响触摸；这样点击 → 计数 +1 → 透明度变实 → 第 5 次落地。
+     *
+     * <p>★ 参数 {@code taps} 现在是**已点次数**（0 ~ {@link #TAPS_TO_UNLOCK}），
+     * 不再只传 0 / 5 两个哨兵值 —— 这样按钮的视觉能随进度连续变化，
+     * 用户看得出「确实在推进」，而不是「点了没反应」。
+     */
     private static void refreshConfirm(TextView confirm, int taps) {
         if (confirm == null) {
             return;
         }
         boolean unlocked = taps >= TAPS_TO_UNLOCK;
-        confirm.setEnabled(unlocked);
+        // ★ 始终可点。这一行是修 bug 的核心，不要改成 setEnabled(unlocked)。
+        confirm.setEnabled(true);
+        confirm.setClickable(true);
         if (unlocked) {
             confirm.setText(R.string.region_gate_confirm_ready);
             confirm.setAlpha(1f);
         } else {
             confirm.setText(R.string.region_gate_confirm);
-            // 没选地区时更淡一点；选了就是「差几次」的半透明
-            confirm.setAlpha(1f);
+            // 0 次 → 0.55，4 次 → 0.91：每点一次都明显更实一点
+            float t = Math.max(0, Math.min(taps, TAPS_TO_UNLOCK - 1))
+                    / (float) (TAPS_TO_UNLOCK - 1);
+            confirm.setAlpha(0.55f + 0.36f * t);
         }
     }
 

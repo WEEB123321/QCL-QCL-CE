@@ -64,6 +64,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <!-- FCL / HMCL 风格的图标（默认隐藏；QCL 原版只用罗马数字 + 中文） -->
+        <ImageView
+            android:id="@+id/nav_icon_home"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/ic_baseline_home_dark"/>
 
         <TextView
             android:singleLine="true"
@@ -98,6 +106,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <!-- FCL / HMCL 风格的图标（默认隐藏；QCL 原版只用罗马数字 + 中文） -->
+        <ImageView
+            android:id="@+id/nav_icon_instance"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/ic_qcl_version_list_dark"/>
 
         <TextView
             android:singleLine="true"
@@ -132,6 +148,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <!-- FCL / HMCL 风格的图标（默认隐藏；QCL 原版只用罗马数字 + 中文） -->
+        <ImageView
+            android:id="@+id/nav_icon_download"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/ic_qcl_download_dark"/>
 
         <TextView
             android:singleLine="true"
@@ -166,6 +190,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <!-- FCL / HMCL 风格的图标（默认隐藏；QCL 原版只用罗马数字 + 中文） -->
+        <ImageView
+            android:id="@+id/nav_icon_plugin"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/ic_outline_extension_black"/>
 
         <TextView
             android:singleLine="true"
@@ -200,6 +232,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <!-- FCL / HMCL 风格的图标（默认隐藏；QCL 原版只用罗马数字 + 中文） -->
+        <ImageView
+            android:id="@+id/nav_icon_mine"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/ic_qcl_setting_dark"/>
 
         <TextView
             android:singleLine="true"

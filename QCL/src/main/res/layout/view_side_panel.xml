@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ★★★ v3.7：FCL / ZL2 的「右侧操作面板」。
+
+  为什么要有这个面板（这是三种排版风格里最容易被认出来的一条）：
+  去读了三个启动器的真实源码，它们的首页都不是「底部一条导航」——
+    · FoldCraftLauncher（FCL-Team/FoldCraftLauncher）：
+      activity_main.xml 里 right_menu 是 ConstraintLayout，
+      app:layout_constraintWidth_percent="0.25"（**屏幕宽的 25%**），满高，
+      背景 bg_right_menu 只圆**左上 / 左下** 8dp（右缘贴屏幕边），
+      里面从上到下是 52dp 头像 + 账号名 + 版本卡片（30dp 图标）+ 启动按钮。
+    · ZalithLauncher2（ZalithLauncher/ZalithLauncher2，Compose）：
+      LauncherScreen.kt 里 ActionMenu 卡片宽 = maxWidth * 3/(7+3) - 12dp（**30%**），
+      高 = maxHeight - 24dp，shape = MaterialTheme.shapes.extraLarge（**四角 28dp**），
+      停靠左或右、离屏 12dp；内容 = 账号 + 版本 + 启动按钮。
+    · HMCL-PE（HMCL-dev/HMCL-PE）：没有这种侧栏，它是「顶部 Toolbar + 左侧 200dp 菜单」，
+      所以这个面板在 HMCL 风格下不用。
+
+  ★ 面板里的按钮全部走 performClick() 复用 MainUI 里原有的路由
+    （那 8 个入口 View 已被 MainUI 收进「菜单」对话框，但 View 和监听都还在）——
+    不新增任何路由代码，也不会和原有逻辑分成两套。
+
+  ★ 头像 / 账号名 / 版本名由 MainUI 在刷新时同步填进来（side_panel_* 三个字段），
+    不自己做数据源，避免出现「主页显示 A、侧栏显示 B」。
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/qcl_side_panel"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <!-- ── 账号 ── -->
+    <LinearLayout
+        android:id="@+id/side_panel_account_row"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/launcher_button_parent"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/side_panel_avatar"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_steve"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/side_panel_account_name"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="@dimen/text_size_middle"
+                android:textStyle="bold"
+                android:textColor="@color/colorPureBlack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorGray"
+                android:text="@string/side_panel_account_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ── 当前版本 ── -->
+    <LinearLayout
+        android:id="@+id/side_panel_version_row"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/launcher_button_parent"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/side_panel_version_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_entry_version"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/side_panel_version_name"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="@dimen/text_size_middle"
+                android:textStyle="bold"
+                android:textColor="@color/colorPureBlack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_small"
+                android:textColor="@color/colorGray"
+                android:text="@string/side_panel_version_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ★★★ v3.7：「全部功能」入口。
+         为什么必须有：ZL2 风格下整条导航栏是隐藏的（ZL2 本来就没有导航栏），
+         而「≡ 菜单」按钮是 MainUI 动态加进导航栏的 —— 导航一藏，
+         下载 / 大厅 / 实验室 / 多人联机 / 设置 就全都到不了了。
+         这里给侧栏补一个入口，点击走 MainMenuDialog，和导航栏那个按钮完全同一套路由。
+         ★ 放在版本行下面、弹性空间上面：视觉上属于「信息区」，
+           不和底部的启动按钮抢位置。 -->
+    <LinearLayout
+        android:id="@+id/side_panel_menu"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:singleLine="true"
+            android:text="≡"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:singleLine="true"
+            android:text="@string/side_panel_menu"
+            android:textSize="@dimen/text_size_middle"
+            android:textColor="@color/colorGray"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <!-- 弹性空间：把启动按钮压到面板底部（FCL / ZL2 的启动按钮都在最下面） -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- ── 启动 ── -->
+    <LinearLayout
+        android:id="@+id/side_panel_launch"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/launcher_button_blue"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:singleLine="true"
+            android:text="@string/side_panel_launch"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPureWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</LinearLayout>

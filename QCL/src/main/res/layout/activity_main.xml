@@ -315,6 +315,21 @@
         android:layout_height="match_parent"
         android:background="#73252525"/>
 
+    <!-- ★★★ v3.7：FCL / ZL2 的「右侧操作面板」。
+         为什么加它：去读了三个启动器的真实源码，
+         FCL 的 right_menu 占屏幕宽 25%（只圆左上/左下 8dp，右缘贴屏幕边），
+         ZL2 的 ActionMenu 是 30% 宽、四角 28dp、离屏 12dp 的浮动卡片
+         —— 两者都是「账号 + 版本 + 启动」集中在右侧。
+         之前按「底部横栏」做，结构上就完全不是一回事。
+         ★ 宽高与圆角由 LauncherLayoutStyle 按风格运行时设置（三套风格三个数），
+           所以这里只给 wrap_content，默认 GONE —— 只有 FCL / ZL2 会显示它。
+         ★ 放在 launcher_root 下、launcher_layout 之外：和底部导航、返回栅同样的
+           「悬浮」做法，不占任何现有页面的布局空间，也不需要改那 28 个 include。 -->
+    <include
+        layout="@layout/view_side_panel"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
     <include
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"

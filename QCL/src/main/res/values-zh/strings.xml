@@ -1225,6 +1225,10 @@
     <string name="exterior_setting_liquid_glass_scope">覆盖范围</string>
     <string name="exterior_setting_liquid_glass_scope_light">轻量</string>
     <string name="exterior_setting_liquid_glass_scope_full">标准</string>
+    <string name="side_panel_launch">启 动</string>
+    <string name="side_panel_menu">全部功能</string>
+    <string name="side_panel_account_hint">点击管理账号</string>
+    <string name="side_panel_version_hint">点击切换实例</string>
     <string name="exterior_setting_liquid_glass_scope_hint">轻量只给导航栏、返回栏和大卡片；标准会让中等面板也参与折射，观感更完整，低端机可能掉帧。</string>
     <string name="exterior_layout_style_title">排版风格</string>
     <string name="exterior_layout_style_qcl">经典</string>

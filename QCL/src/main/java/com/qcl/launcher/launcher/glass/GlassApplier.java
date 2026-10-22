@@ -340,6 +340,15 @@ public final class GlassApplier {
     }
 
     private static void maybeApply(View v) {
+        // ⓪ ★★★ v3.6：没有背景位图就**什么都别套**。
+        //   为什么放在最前面：{@link GlassDrawable#draw} 拿不到位图时是「什么都不画」，
+        //   而面板原来的背景已经被换掉了 —— 结果就是**整块面板凭空消失**，
+        //   界面上只剩浮在壁纸上的文字。这个失败模式很吓人，而且完全没有报错。
+        //   ★ 只「不套新的」、不 detachAll：位图一旦设置过就不会再变 null
+        //   （GlassBackdrop.clear() 没有任何调用点），所以不会把已套的面板卡成透明。
+        if (GlassBackdrop.backdrop() == null) {
+            return;
+        }
         // ① 不该套的类型
         if (v instanceof ImageView) {
             return; // 图标/头像，玻璃会盖住图形
@@ -384,7 +393,12 @@ public final class GlassApplier {
                 .radiusPx(radiusOfBackground(bg, RADIUS_DP * d))
                 .band(bandDp())
                 .strength(strengthDp())
-                .depthEffect(true);
+                .depthEffect(true)
+                // ★★★ v3.6/v3.7：把面板原来的背景交给它，**按 16% 压成半透明**画回来。
+                //   1:1 画回 ⇒ 一块白灰卡片（用户报「白灰色的」）；
+                //   完全不画 ⇒ 板块凭空消失（用户报「液态玻璃没有」）。
+                //   16% 是这两者之间：壁纸清晰透出，面板靠边缘那圈折射 + 倒角明暗立住。
+                .originalBackground(bg, 0.16f);
 
         // ★★★ 必须先存原背景再替换 —— 关掉开关时才能原样还原。
         //   不存的话，关掉后只能把背景设成 null，原本的白色圆角卡片会变成全透明，
@@ -596,10 +610,20 @@ public final class GlassApplier {
             if (v.getBackground() instanceof GlassDrawable) {
                 GlassDrawable g = (GlassDrawable) v.getBackground();
                 g.release();
+                // ★★★ v3.7：先把原背景的透明度复原 ——
+                //   v3.7 起玻璃会把原背景压到 16% 再画回来（见 GlassDrawable#originalAlpha），
+                //   不还原的话，关掉玻璃后面板会**永久停在半透明**，看起来像界面坏了。
+                g.restoreOriginal();
                 // ★★★ 还原成**原来那个背景**（不是 null）——
                 //   原背景在 maybeApply 里存进 TAG_ORIGINAL_BG 了。
                 //   还原成 null 会让原本的白色圆角卡片变成全透明，界面像坏掉一样。
                 Object orig = v.getTag(TAG_ORIGINAL_BG);
+                if (orig instanceof Drawable) {
+                    try {
+                        ((Drawable) orig).setAlpha(255);
+                    } catch (Throwable ignored) {
+                    }
+                }
                 v.setBackground(orig instanceof Drawable ? (Drawable) orig : null);
                 v.setTag(TAG_ORIGINAL_BG, null);
                 v.setTag(TAG_APPLIED, null);

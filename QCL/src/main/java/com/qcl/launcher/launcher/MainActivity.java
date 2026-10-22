@@ -660,7 +660,21 @@ implements View.OnClickListener {
     }
 
 
-    private void pushBackdropFromCurrentBackground() {
+    /**
+     * ★★★ v3.6：**换壁纸之后**必须调这个 —— 把当前背景位图重新喂给玻璃。
+     *
+     * <p><b>为什么这是个真 bug 而不是洁癖</b>：{@code GlassBackdrop} 里存的是一张位图引用，
+     * 外观设置里换背景走的是 {@code launcherLayout.setBackground(...)}，
+     * 这条路径**不经过** {@code applyLiquidGlass()}，于是玻璃一直拿旧位图采样 ——
+     * 表现就是「壁纸换了，玻璃边那圈还是上一张图的图案」。
+     *
+     * <p>★ 光 {@code GlassBackdrop.set()} 不够：它只换了静态引用，**没有任何人让已套玻璃的
+     * View 重绘**，那些面板会一直显示旧折射，直到别的原因触发重绘。
+     * 所以这里还要 {@code invalidateApplied()}。
+     *
+     * <p>★ 这个方法以前是 private 且**没有任何调用点**（死代码），v3.6 接到换背景的六处。
+     */
+    public void pushBackdropFromCurrentBackground() {
         try {
             if (this.launcherLayout == null) {
                 return;
