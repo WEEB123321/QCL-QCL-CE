@@ -91,6 +91,45 @@ public final class GlassApplier {
         return sStrengthPercent;
     }
 
+    /**
+     * ★★★ 诊断用的一行摘要（给「我的 → 启动诊断」用）。
+     *
+     * <p><b>为什么必须暴露这一行</b>：玻璃「看起来没效果」有三种**完全不同**的原因 ——
+     * <ol>
+     *   <li>开关没开（用户以为开了，其实设置项在另一个页面）；</li>
+     *   <li>这台机器的驱动编译不过 AGSL（{@code RuntimeShader} 类在，但编译抛异常）；</li>
+     *   <li>编译过了，但没挂到任何控件上（覆盖范围门槛把它全筛掉了）。</li>
+     * </ol>
+     * 这三者在屏幕上长得一模一样。没有这行字，排查就只能靠猜 ——
+     * 而「猜 → 改 → 用户说还是没有」这个循环在这个项目里已经绕了十几轮。
+     * 把判断依据直接摆到用户眼前，一轮就能定位。
+     */
+    public static String debugLine() {
+        int n = 0;
+        try {
+            n = sApplied.size();
+        } catch (Throwable ignored) {
+        }
+        String mode;
+        try {
+            mode = !isEnabled() ? "关闭"
+                    : (getMode() == MODE_FULL ? "标准" : "轻量");
+        } catch (Throwable t) {
+            mode = "未知";
+        }
+        String blur;
+        try {
+            Bitmap b = GlassBackdrop.blurred();
+            blur = (b != null && b != GlassBackdrop.backdrop()) ? "就绪" : "缺失（退回原图）";
+        } catch (Throwable t) {
+            blur = "未知";
+        }
+        return "模式=" + mode + " 强度=" + sStrengthPercent
+                + " 已挂载=" + n + " 个控件"
+                + " 背景版本=" + GlassBackdrop.version()
+                + " 模糊图=" + blur;
+    }
+
     /** 百分比 → 带宽 dp。p=0 → 10dp，p=50 → 16dp（v3.2 的定值），p=100 → 22dp。 */
     private static float bandDp() {
         return BAND_DP_MIN + (BAND_DP_MAX - BAND_DP_MIN) * (sStrengthPercent / 100f);

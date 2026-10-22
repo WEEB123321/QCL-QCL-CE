@@ -354,8 +354,31 @@ public class DiagnosticUI extends BaseUI implements View.OnClickListener {
         sb.append("机型：").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
         sb.append("ABI：").append(join(Build.SUPPORTED_ABIS)).append('\n');
         sb.append("内存：").append(memoryLine()).append('\n');
+        // ★★★ 玻璃走的是哪条渲染路径 —— 这一行是为了「一次定位」而不是「再来一轮」。
+        //   pathDescription() 内部会**真的编译一次**着色器（不是只看类在不在），
+        //   编译失败会把异常类型写在这里，所以这行字能直接区分
+        //   「驱动不支持」和「代码写错了」。
+        sb.append("玻璃：").append(glassPath()).append('\n');
+        sb.append("玻璃状态：").append(glassState()).append('\n');
         sb.append("上次退出：").append(lastExitShort()).append('\n');
         return sb.toString();
+    }
+
+    /** 玻璃的渲染路径。★ 单独 try/catch：诊断页本身绝不能因为装饰性功能崩掉。 */
+    private String glassPath() {
+        try {
+            return com.qcl.launcher.launcher.glass.GlassShader.pathDescription();
+        } catch (Throwable t) {
+            return "读取失败：" + t.getClass().getSimpleName();
+        }
+    }
+
+    private String glassState() {
+        try {
+            return com.qcl.launcher.launcher.glass.GlassApplier.debugLine();
+        } catch (Throwable t) {
+            return "读取失败：" + t.getClass().getSimpleName();
+        }
     }
 
     /** 上次进程退出原因的一行摘要（详情见 buildReport 里的完整段落） */

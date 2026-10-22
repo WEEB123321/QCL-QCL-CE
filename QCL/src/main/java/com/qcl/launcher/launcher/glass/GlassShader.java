@@ -10,55 +10,63 @@ import android.util.Log;
 import java.lang.ref.WeakReference;
 
 /**
- * ★★★ 液态玻璃 · **边缘折射**着色器（v3.2）。
+ * ★★★ 液态玻璃 · 折射着色器（v4.0，照 ReGlass 模组移植）。
  *
- * <h3>v3.2 的折射数学来自 kyant0 的 Backdrop 库（Apache-2.0）</h3>
- * 参考实现：{@code D:\A\AndroidLiquidGlass-2.0.1\AndroidLiquidGlass-2.0.1}
- * （{@code backdrop/src/commonMain/.../internal/Shaders.kt} 的
- * {@code RoundedRectRefractionShaderString}）。
+ * <h3>参考实现</h3>
+ * {@code D:\QCL-CE资源包\reglass-26.3-2.1.1.jar} 里的
+ * {@code assets/reglass/shaders/program/liquid_glass_gui.fsh}。
+ * Java 侧默认参数见同包的 {@code ReGlassConfig} / {@code WidgetStyle}。
  *
- * <p><b>为什么不能直接依赖那个库</b>：它是 Compose Multiplatform 工程
- * （{@code io.github.kyant0:backdrop}），依赖 Compose Runtime / Skiko；
+ * <p><b>为什么不能直接依赖别人的库</b>：ReGlass 是 Minecraft 模组（GLSL，跑在桌面 GPU 上），
+ * kyant0 的 Backdrop 是 Compose Multiplatform 工程（依赖 Compose Runtime / Skiko）。
  * QCL 是传统 View 体系，没有任何 Compose。引入 Compose 只为一个背景效果，
  * 会让包体、启动时间和构建复杂度都上一个台阶，收益不成比例。
  * ⇒ 只移植**着色器数学**（纯 AGSL 字符串，无依赖），适配成 View 背景 Drawable 能用的形式。
  *
- * <h3>v3.1 → v3.2 到底改了什么（都是「看起来假」的根因）</h3>
+ * <h3>v3.x → v4.0 到底改了什么</h3>
  * <table border="1">
- *   <tr><th></th><th>v3.1（我自己写的）</th><th>v3.2（照 Backdrop 移植）</th></tr>
- *   <tr><td>剖面曲线</td><td>{@code k = t²} 二次曲线</td>
- *       <td>{@code circleMap(x) = 1 - sqrt(1 - x²)} <b>四分之一圆</b></td></tr>
- *   <tr><td>法线</td><td>用面板自身圆角算</td>
- *       <td>用 {@code radius × 1.5} 的<b>放大圆角</b>算（转角处法线更平滑，不出折线）</td></tr>
- *   <tr><td>深度感</td><td>无</td><td>{@code depthEffect}：法线叠加<b>指向圆心的径向分量</b></td></tr>
- *   <tr><td>参数</td><td>band 14dp / 偏移 9dp</td><td>高度 16dp / 偏移 <b>32dp</b>（参考实现是高度的 1.5~2 倍）</td></tr>
+ *   <tr><th></th><th>v3.x</th><th>v4.0（照 ReGlass 移植）</th></tr>
+ *   <tr><td>剖面曲线</td><td>{@code circleMap(x) = 1 - sqrt(1 - x²)} 四分之一圆</td>
+ *       <td>{@code asin(xR²)} → 斯涅尔 → {@code -tan(thT-thI)}</td></tr>
+ *   <tr><td>色散</td><td>无</td><td>RGB 三通道不同位移（0.985 / 1.0 / 1.015 × 强度）</td></tr>
+ *   <tr><td>菲涅尔 / 眩光</td><td>无</td><td>同一条 5 次方多项式（range 30 / hardness 0.2）</td></tr>
+ *   <tr><td>采样对象</td><td>原图</td><td><b>模糊图</b>（ReGlass 的 Sampler1..5）</td></tr>
+ *   <tr><td>面板内部</td><td>全透明（只画边带）</td><td><b>模糊背景 + 透镜边缘</b>（整块画）</td></tr>
  * </table>
  *
- * <p>★ 二次曲线 vs 四分之一圆：二次曲线在边缘处斜率有限，看起来像「渐变的模糊」；
- * 四分之一圆在边缘处斜率趋于无穷 —— 这正是真实玻璃倒角的样子，边缘会有一道
- * **锐利的光学压缩带**，这是「像玻璃」和「像贴纸」的分界线。
+ * <p>★ 四分之一圆在边缘处斜率也趋于无穷，但它的位移摊满整条带宽 ⇒ 观感是「边缘发虚」；
+ * ReGlass 的剖面把位移压在最外缘 20% ⇒ 是一道**锐利的压缩带**。这是「像玻璃」和「像贴纸」的分界。
  *
- * <h3>★ 与参考实现的一处刻意不同</h3>
- * 参考实现在面板内部返回 {@code content.eval(coord)}（即未折射的背景本身，
- * 因为它的 content 就是画在下面的背景层，所以视觉上等于透明）。
- * 本实现直接 {@code return half4(0.0)} —— 用户明确要求「只要一层畸变圈」，
- * 面板内部必须透出**真实背景**而不是再采样一份副本：
+ * <h3>★★★ 两条最容易搬错的地方（都踩过，且都编译能过）</h3>
+ * <ol>
+ *   <li><b>位移量是归一化 UV，不是像素</b>。ReGlass 的原式是
+ *       {@code -normal * edgeFactor * 0.08 * vec2(inSize.y/inSize.x, 1.0)}，
+ *       0.08 是「屏幕高度的比例」。第一版把像素偏移直接加到 0~1 的 uv 上，
+ *       96px 被当成 96 个屏幕宽度 ⇒ clamp 到边界 ⇒ 整条边带采样同一个角落像素。</li>
+ *   <li><b>菲涅尔的深度项是「减」不是「加」</b>。ReGlass 写的是 {@code merged * inSize.y}，
+ *       而 {@code merged} 是**负的**有符号距离 ⇒ 等价于 {@code -depth}。
+ *       写成 {@code +depth} 时，外缘 {@code (1+0.2)^5} 已经 >1 被 clamp 成 1.0
+ *       ⇒ 整块面板恒定叠一层 14% 白，正是用户反复抱怨的「白灰」。</li>
+ * </ol>
+ *
+ * <h3>★ 与参考实现的三处刻意不同</h3>
  * <ul>
- *   <li>省掉内部区域的采样（填充率只花在边缘一圈）；</li>
- *   <li>彻底杜绝「图片像粘在板块上滑动」—— 采样副本一旦跟随面板坐标就会粘。</li>
+ *   <li><b>内部快速路径</b>：折射只在 {@code depth < 厚度} 那圈存在，之外三通道采的是同一点
+ *       ⇒ 内部只采一次，省 75% 纹理读取（面板内部占面积 90%+）。</li>
+ *   <li><b>去掉 hover / focus 分支</b>：那是桌面端鼠标悬停和键盘焦点用的，手机没有。</li>
+ *   <li><b>参数从 uniform 来</b>，不是从纹理图集读：我们没有 {@code Optics0} 那种批量面板。</li>
  * </ul>
- *
- * <h3>★ 未移植的部分</h3>
- * 参考实现还有一个带 RGB 色散的版本（{@code RoundedRectRefractionWithDispersionShaderString}），
- * 每像素采样 <b>7 次</b>。用户明确说「不要边边的白色」且抱怨过性能，
- * 色散在深色背景上会呈现彩色描边，正是他不想要的那种「花边」⇒ 不移植。
  *
  * <h3>AGSL 要点</h3>
  * <ul>
+ *   <li>类型是 {@code float2 / float3 / half4}，不是 GLSL 的 {@code vec2 / vec3}。</li>
+ *   <li>{@code uniform shader uBg} 用 {@code uBg.eval(pixelCoord)} 采样，**不是归一化 uv**
+ *       —— 所以传的是 {@code uv * uBgSize}。</li>
  *   <li>原点在**左上角、y 轴向下**，与 GLSL 相反，**不要翻转 y**。</li>
  *   <li>{@code fragCoord} 是画布局部坐标，必须先把 canvas translate 到面板原点再画，
  *       否则 SDF 的圆心对不上（v3.1 踩过：控件有 padding 时圈会整体画歪）。</li>
  *   <li>没有循环（AGSL 要求循环可编译期展开）。</li>
+ *   <li>{@code pow} 的底数必须先 clamp 再取幂：底数会变负，{@code pow(负, 5)} 在 SkSL 里是 NaN。</li>
  * </ul>
  */
 public final class GlassShader {
@@ -96,7 +104,7 @@ public final class GlassShader {
             sh.setFloatUniform("uRadius", 12f);
             sUsable = true;
             sPath = "AGSL 折射（ReGlass 光学模型：IOR 1.4 + 色散 + 菲涅尔）";
-            Log.i(TAG, "玻璃着色器可用（v3.2 边缘折射）");
+            Log.i(TAG, "玻璃着色器可用：" + sPath);
         } catch (Throwable t) {
             sUsable = false;
             sPath = "透镜近似（AGSL 编译失败：" + t.getClass().getSimpleName() + "）";
