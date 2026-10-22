@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ 夜间版的导航栏背景（2.2.7）。
+
+     为什么必须有这个文件（用户报「左侧 UI 文字颜色有些问题」的根因）：
+       values-night 里 colorPureBlack = #FFEDE7DE（近白），所以夜间所有正文变成浅色。
+       但导航栏背景原来是**写死的** #D9FFFFFF（85% 白）—— 浅色字落在浅色板上，
+       对比度接近 1:1，看起来就是「字没了」。
+     修法：背景也跟着主题走。日间保持白色磨砂，夜间换成同明度的深色玻璃。
+
+     ★ 数值取 #D91A1A1A 而不是纯黑：85% 的黑在深色壁纸上仍然能读出「一块板」，
+       纯黑会变成一块没有层次的洞。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#D91A1A1A" />
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp" />
+</shape>

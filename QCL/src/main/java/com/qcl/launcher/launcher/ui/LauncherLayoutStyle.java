@@ -209,9 +209,17 @@ public final class LauncherLayoutStyle {
         navLayout(nav, dp(a, 76), ViewGroup.LayoutParams.MATCH_PARENT);
         navOrientation(nav, true, dp(a, 6), dp(a, 14));
         navBackground(nav, new int[]{dp(a, 18), dp(a, 18), dp(a, 18), dp(a, 18), 0, 0, 0, 0},
-                0xD9FFFFFF);
+                navPanelColor(a));
         tabs(nav, TABS_TEXT);
-        setBrandVisible(nav, true);
+        // ★★★ 2.2.7：**矮屏（横屏）下必须让出高度**。
+        //   竖栏里是「品牌 + 5 个等分 Tab + 分隔线 + 版本号 + 菜单」，
+        //   固定部分在横屏（可用高度常常只有 160dp 左右）会把高度吃光，
+        //   5 个 weight=1 的 Tab 各自分到 0 高 ⇒ 五条文字**叠在同一处**，
+        //   看起来像一堆乱码（用户截图里那块模糊的中文就是这个）。
+        //   矮屏时先砍品牌和页脚，把高度全让给 Tab。
+        boolean compact = screenH(a) < dp(a, 420);
+        setBrandVisible(nav, !compact);
+        setNavFooterVisible(nav, !compact);
         hideHmclBar(content);
 
         // ★ 写绝对值（top / right / bottom 全归零）——
@@ -502,9 +510,47 @@ public final class LauncherLayoutStyle {
         return null;
     }
 
-    /** 品牌区（方框 + 字母 + 小字）只在 QCL 原版的侧栏里放得下。 */
-    private static void setBrandVisible(View nav, boolean visible) {
+    /**
+     * ★★★ 2.2.7：导航栏底色**必须跟着深浅色走**。
+     *
+     * <p>用户报「左侧 UI 文字颜色有些问题」：夜间模式里 {@code colorPureBlack} 被
+     * {@code values-night} 换成 {@code #FFEDE7DE}（近白），所有正文变浅色；
+     * 而导航栏底色是写死的 85% 白 ⇒ 浅色字落在浅色板上，等于看不见。
+     *
+     * <p>同一个问题在 XML 那边也用 {@code drawable-night/qcl_bottom_nav_bg.xml} 修了一份 ——
+     * 两条路都要对：玻璃关掉时走 XML，玻璃开着时这里会把背景整个换掉。
+     */
+    private static int navPanelColor(Activity a) {
+        return isNight(a) ? 0xD91A1A1A : 0xD9FFFFFF;
+    }
+
+    private static boolean isNight(Activity a) {
         try {
+            int mode = a.getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+            return mode == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 侧栏底部（分隔线 + 版本号）。矮屏时整组藏掉，把高度让给 Tab。 */
+    private static void setNavFooterVisible(View nav, boolean visible) {
+        try {
+            View divider = nav.findViewById(R.id.nav_divider);
+            if (divider != null) {
+                divider.setVisibility(visible ? View.VISIBLE : View.GONE);
+            }
+            View version = nav.findViewById(R.id.nav_app_version);
+            if (version != null) {
+                version.setVisibility(visible ? View.VISIBLE : View.GONE);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** 品牌区（方框 + 字母 + 小字）只在 QCL 原版的侧栏里放得下。 */
+    private static void setBrandVisible(View nav, boolean visible) {        try {
             View brand = nav.findViewById(R.id.nav_brand);
             if (brand != null) {
                 brand.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -758,5 +804,10 @@ public final class LauncherLayoutStyle {
 
     private static int screenW(Context c) {
         return c.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /** 屏幕高度（像素）。横屏时这里会明显小于宽度 —— 侧栏要不要精简就看它。 */
+    private static int screenH(Context c) {
+        return c.getResources().getDisplayMetrics().heightPixels;
     }
 }

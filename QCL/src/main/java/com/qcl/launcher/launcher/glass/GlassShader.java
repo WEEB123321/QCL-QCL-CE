@@ -95,7 +95,7 @@ public final class GlassShader {
             // ★ 真的设一次 uniform 才算数 —— 部分设备类在、驱动却编译不过
             sh.setFloatUniform("uRadius", 12f);
             sUsable = true;
-            sPath = "AGSL 边缘折射（四分之一圆剖面 + 深度感）";
+            sPath = "AGSL 折射（ReGlass 光学模型：IOR 1.4 + 色散 + 菲涅尔）";
             Log.i(TAG, "玻璃着色器可用（v3.2 边缘折射）");
         } catch (Throwable t) {
             sUsable = false;
@@ -128,7 +128,10 @@ public final class GlassShader {
     private static BitmapShader sBgShader;
 
     public static BitmapShader sharedBackdropShader() {
-        Bitmap b = GlassBackdrop.backdrop();
+        // ★★★ v4.0：绑的是**模糊版**。ReGlass 的玻璃采样的是模糊后的背景
+        //   （它的 Sampler1..5 就是多级模糊），折射偏移作用在模糊图上才像玻璃；
+        //   拿原图做位移只会得到「画面错位」。
+        Bitmap b = GlassBackdrop.blurred();
         if (b == null || b.isRecycled()) {
             return null;
         }
@@ -169,115 +172,121 @@ public final class GlassShader {
      * 法线朝外，负偏移 = 向内采样 = 放大镜观感。
      */
     static final String SRC = ""
-            // ---- 输入（11 个 uniform）----
-            + "uniform shader uBg;\n"
-            + "uniform vec2  uBgSize;\n"          // 背景位图尺寸（像素）
-            + "uniform vec2  uPanelSize;\n"       // 面板尺寸（像素）
-            + "uniform vec2  uPanelOrigin;\n"     // 面板在屏幕上的左上角（含 bounds 偏移）
-            + "uniform vec2  uScreenSize;\n"      // 屏幕尺寸（像素）
-            + "uniform float uRadius;\n"          // 圆角（像素）
-            + "uniform float uRefractionHeight;\n"// 折射带宽度（像素）
-            + "uniform float uRefractionAmount;\n"// 最大偏移（像素，传负值）
-            + "uniform float uDepthEffect;\n"     // 0 = 无深度感，1 = 叠加径向分量
-            // ★★★ v3.7 新增两个动画量（都由 Java 侧按时间驱动，0..1）
-            + "uniform float uPressT;\n"          // 按住程度：0 松开、1 按到底
-            + "uniform float uAppear;\n"          // 入场程度：0 刚挂上、1 完全显现
+            // ── 输入 ──
+            + "uniform shader uBg;\n"              // 模糊后的背景
+            + "uniform float2 uBgSize;\n"
+            + "uniform float2 uPanelSize;\n"
+            + "uniform float2 uPanelOrigin;\n"
+            + "uniform float2 uScreenSize;\n"
+            + "uniform float uRadius;\n"
+            // ── 光学参数（默认值全部照 ReGlassConfig，见 GlassOptics）──
+            + "uniform float uRefThickness;\n"     // 玻璃厚度（像素）
+            + "uniform float uRefFactor;\n"        // 折射率 IOR
+            + "uniform float uRefDisp;\n"          // 色散强度
+            + "uniform float uRefrAmount;\n"       // 边缘最大位移（像素）
+            + "uniform float uFresRange;\n"
+            + "uniform float uFresHard;\n"
+            + "uniform float uFresFac;\n"
+            + "uniform float uGlareRange;\n"
+            + "uniform float uGlareHard;\n"
+            + "uniform float3 uTint;\n"
+            + "uniform float uTintA;\n"
+            + "uniform float uPressT;\n"
+            + "uniform float uAppear;\n"
             + "\n"
-            // ── 圆角矩形 SDF（照 Backdrop 的 RoundedRectSDF）──
             + "float sdRoundedRect(float2 coord, float2 halfSize, float radius) {\n"
-            + "    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));\n"
-            + "    float outside = length(max(cornerCoord, 0.0)) - radius;\n"
-            + "    float inside = min(max(cornerCoord.x, cornerCoord.y), 0.0);\n"
+            + "    float2 q = abs(coord) - (halfSize - float2(radius));\n"
+            + "    float outside = length(max(q, 0.0)) - radius;\n"
+            + "    float inside = min(max(q.x, q.y), 0.0);\n"
             + "    return outside + inside;\n"
             + "}\n"
             + "\n"
             + "float2 gradSdRoundedRect(float2 coord, float2 halfSize, float radius) {\n"
-            + "    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));\n"
-            + "    if (cornerCoord.x >= 0.0 || cornerCoord.y >= 0.0) {\n"
-            + "        float2 q = max(cornerCoord, 0.0);\n"
-            + "        float ql = length(q);\n"
-            + "        // ★ 防 NaN：正好落在直边上时 q 可能是 0，normalize(0) 是 NaN，\n"
-            + "        //   NaN 会顺着 grad 传染成整块面板全黑（在 v3.1 上踩过一次类似问题）。\n"
-            + "        float2 n = (ql > 1e-5) ? (q / ql) : float2(0.0, 1.0);\n"
+            + "    float2 q = abs(coord) - (halfSize - float2(radius));\n"
+            + "    if (q.x >= 0.0 || q.y >= 0.0) {\n"
+            + "        float2 v = max(q, 0.0);\n"
+            + "        float l = length(v);\n"
+            + "        float2 n = (l > 1e-5) ? (v / l) : float2(0.0, 1.0);\n"
             + "        return sign(coord) * n;\n"
-            + "    } else {\n"
-            + "        float gradX = step(cornerCoord.y, cornerCoord.x);\n"
-            + "        return sign(coord) * float2(gradX, 1.0 - gradX);\n"
             + "    }\n"
-            + "}\n"
-            + "\n"
-            // 四分之一圆剖面：x=0 → 0，x=1 → 1，边缘处斜率无穷
-            + "float circleMap(float x) {\n"
-            + "    return 1.0 - sqrt(max(0.0, 1.0 - x * x));\n"
+            + "    float gx = step(q.y, q.x);\n"
+            + "    return sign(coord) * float2(gx, 1.0 - gx);\n"
             + "}\n"
             + "\n"
             + "half4 main(float2 fragCoord) {\n"
             + "    float2 halfSize = uPanelSize * 0.5;\n"
-            + "    float2 centeredCoord = fragCoord - halfSize;\n"
+            + "    float2 c = fragCoord - halfSize;\n"
             + "    float radius = min(uRadius, min(halfSize.x, halfSize.y));\n"
+            + "    float sd = sdRoundedRect(c, halfSize, radius);\n"
+            + "    if (sd >= 1.0) { return half4(0.0); }\n"
             + "\n"
-            + "    float sd = sdRoundedRect(centeredCoord, halfSize, radius);\n"
-            + "\n"
-            + "    // ---- 面板外：不画 ----\n"
-            + "    if (sd >= 0.0) { return half4(0.0); }\n"
-            + "\n"
-            + "    // ---- ★★★ 内部：一律透明，让真实背景原样透出 ----\n"
-            + "    //   这是「图片不再粘在板块上」和「性能」两件事的共同解。\n"
-            + "    //   ★ v3.7：入场时折射带从 55% 宽度「长」到 100% ——\n"
-            + "    //     读作「玻璃正在贴合这块面板」，比单纯淡入更有材质感。\n"
-            + "    //     u 是按 height 归一化的，所以缩放 height 不会让带子内边界错位。\n"
-            + "    float height = max(uRefractionHeight, 1e-3) * (0.55 + 0.45 * clamp(uAppear, 0.0, 1.0));\n"
-            + "    float depth = -sd;\n"
-            + "    if (depth >= height) { return half4(0.0); }\n"
-            + "\n"
-            + "    // ---- 边缘带：折射位移采样 ----\n"
-            + "    //   u = 0 在最外缘、1 在带宽内边界。\n"
-            + "    float u = clamp(depth / height, 0.0, 1.0);\n"
-            + "    // ★ v3.7：按住时偏移再放大 45% —— 手指压上去玻璃被「挤」得更狠，\n"
-            + "    //   这是最接近真实材质的一种触感反馈（不改变带宽，所以尺寸不跳）。\n"
-            + "    float d = circleMap(1.0 - u) * uRefractionAmount * (1.0 + 0.45 * uPressT);\n"
-            + "    // ★ 用放大的圆角算梯度：直接用面板圆角时，转角处法线会突变，\n"
-            + "    //   表现为四角出现一道折线。参考实现取 radius * 1.5。\n"
+            + "    float depth = max(-sd, 0.0);\n"
+            // ★★★ 法线用**放大 1.5 倍的圆角**算（照 ReGlass / Backdrop）。
+            //   直接用面板圆角时，直边与圆角的交界处法线会突变，四角出现一道折线。
             + "    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));\n"
-            + "    float2 grad = gradSdRoundedRect(centeredCoord, halfSize, gradRadius);\n"
-            + "    if (uDepthEffect > 0.5) {\n"
-            + "        float cl = length(centeredCoord);\n"
-            + "        if (cl > 1e-5) { grad += centeredCoord / cl; }\n"
-            + "    }\n"
-            + "    float gl = length(grad);\n"
-            + "    if (gl > 1e-5) { grad = grad / gl; }\n"
+            + "    float2 nrm = gradSdRoundedRect(c, halfSize, max(gradRadius, 1e-3));\n"
+            + "    float nlen = length(nrm);\n"
+            + "    nrm = (nlen > 1e-6) ? (nrm / nlen) : float2(0.0, 1.0);\n"
             + "\n"
-            + "    float2 refracted = fragCoord + d * grad;\n"
-            + "    vec2 uv = clamp((uPanelOrigin + refracted) / max(uScreenSize, vec2(1.0)),\n"
-            + "                    vec2(0.0), vec2(1.0));\n"
-            + "    vec3 c = uBg.eval(uv * uBgSize).rgb;\n"
-            // ★★★ v3.7：倒角明暗（全部**乘性**，绝不加白）
-            //
-            //   为什么要这一项：只做位移时，效果强不强完全取决于壁纸有没有细节。
-            //   本项目的默认壁纸 ic_background_classic.jpg 只有 800x480 且被拉伸到竖屏，
-            //   本身就很软 ⇒ 位移采样出来的东西没有对比度 ⇒ 用户看到的只有「一团模糊」。
-            //   倒角明暗是**与背景无关**的玻璃特征：真实玻璃的斜面会把光压暗、把中部提亮，
-            //   再加一条随光照方向变化的高光带。加上它之后，无论壁纸多软，
-            //   边缘都能读成「一块有厚度的玻璃」。
-            //
-            //   ★ 全部用乘法：暗的地方只会更暗、亮的地方只会更亮，
-            //     不会凭空出现一条白线 —— 用户明确要求「不要边边的白色」。
-            + "    float bevel = 1.0;\n"
-            //   ① 最外缘压暗（玻璃厚度造成的暗边），0.18 在软背景上也看得见
-            + "    bevel -= 0.18 * (1.0 - smoothstep(0.0, 0.28, u));\n"
-            //   ② 中段提亮（光从玻璃侧面透进来的亮带），与①形成「亮暗亮」的剖面
-            + "    bevel += 0.10 * smoothstep(0.16, 0.50, u) * (1.0 - smoothstep(0.50, 0.92, u));\n"
-            //   ③ 方向性高光：光从左上来 ⇒ 左/上边缘亮、右/下边缘暗。
-            //      grad 是朝外的法线，点乘固定光向量 (-0.707,-0.707) 即得。
-            + "    float spec = max(0.0, -0.7071 * (grad.x + grad.y));\n"
-            + "    bevel += 0.16 * spec * (1.0 - smoothstep(0.0, 0.90, u));\n"
-            //   ④ 按压时整圈再亮一点（配合位移放大，读作「被压亮」）
-            + "    bevel += 0.10 * uPressT * (1.0 - smoothstep(0.0, 0.80, u));\n"
-            + "    c *= clamp(bevel, 0.55, 1.40);\n"
-            //
-            // ★ v3.3 抗锯齿：外缘 sd 在 (-1,0) 这一像素里把 alpha 从 0 渐变到 1。
+            // ── ReGlass 的透镜剖面（liquid_glass_gui.fsh 第 283~291 行）──
+            //   xR   = 1 - 距边缘的深度 / 玻璃厚度  （外缘 1 → 厚度处 0）
+            //   thI  = asin(xR²)        入射角：外缘 90°，到厚度处 0°
+            //   thT  = asin(sin(thI)/n) 折射角（斯涅尔定律）
+            //   edge = -tan(thT - thI)  位移量：外缘最大、厚度处归零
+            //   ★ 这个剖面在**外缘处斜率最大**，所以边缘会有一道被"压缩"的锐利带，
+            //     这是玻璃和贴纸的分界线（v3.x 用的四分之一圆没这个效果）。
+            + "    float thick = max(uRefThickness, 1e-3);\n"
+            + "    float xR = 1.0 - depth / thick;\n"
+            + "    float thI = asin(pow(clamp(xR, 0.0, 1.0), 2.0));\n"
+            + "    float thT = asin(clamp((1.0 / max(uRefFactor, 1e-6)) * sin(thI), -1.0, 1.0));\n"
+            + "    float edgeF = -tan(thT - thI);\n"
+            + "    if (depth >= thick) { edgeF = 0.0; }\n"
+            // ★★★ 位移量是**归一化 UV**，不是像素。ReGlass 的原式：
+            //   refrOffset = -normal * edgeFactor * 0.08 * vec2(inSize.y/inSize.x, 1.0)
+            //   我第一版把它当成像素直接加到 uv0 上（uv0 是 0~1 的归一化值），
+            //   于是偏移量 96 被当成「96 个屏幕宽度」⇒ clamp 到边界 ⇒
+            //   整个边缘带采样同一个角落像素，看起来像一块纯色涂抹。
+            //   x 分量乘宽高比：让横向和纵向的**视觉**位移量一致。
+            + "    float2 off = -nrm * edgeF * uRefrAmount\n"
+            + "            * float2(uScreenSize.y / max(uScreenSize.x, 1.0), 1.0)\n"
+            + "            * (1.0 + 0.45 * uPressT);\n"
+            + "\n"
+            + "    float2 uv0 = (uPanelOrigin + fragCoord) / max(uScreenSize, float2(1.0));\n"
+            + "    float2 uvC = clamp(uv0, float2(0.0), float2(1.0));\n"
+            // ── 色散：R / G / B 用略微不同的位移量 ──
+            //   ReGlass 的 NR=0.985 / NG=1.0 / NB=1.015，再乘色散强度
+            + "    float kR = 1.0 + 0.015 * uRefDisp;\n"
+            + "    float kB = 1.0 - 0.015 * uRefDisp;\n"
+            + "    float3 col = float3(0.0);\n"
+            + "    col.r = uBg.eval(clamp(uv0 + off * kR, float2(0.0), float2(1.0)) * uBgSize).r;\n"
+            + "    col.g = uBg.eval(clamp(uv0 + off, float2(0.0), float2(1.0)) * uBgSize).g;\n"
+            + "    col.b = uBg.eval(clamp(uv0 + off * kB, float2(0.0), float2(1.0)) * uBgSize).b;\n"
+            + "\n"
+            + "    col = mix(col, uTint, uTintA * 0.8);\n"
+            + "\n"
+            // ── 菲涅尔：玻璃正面反射的一层乳白 ──
+            // ★★★ 这里是**减** depth，不是加。ReGlass 用的是 merged * inSize.y，
+            //   而 merged 是**负的**有符号距离（内部为负）⇒ 等价于 -depth。
+            //   我第一版写成 +depth：外缘处 1+0.2 再取 5 次方就已经 >1 被 clamp 成 1.0，
+            //   整块面板恒定叠一层 14% 白 —— 正是用户反复抱怨的「白灰」。
+            // ★ 先 clamp **底数** 再取 5 次方，不是取完再 clamp。
+            //   底数会随 depth 变成负数（这正是「越往里越没有反光」的来源），
+            //   而 pow(负数, 5.0) 在 SkSL/GLSL 里是未定义 —— 多数驱动走
+            //   exp2(y*log2(x))，log2(负数) = NaN，NaN 会顺着 mix 传染整块面板。
+            + "    float fresBase = clamp(1.0 - depth / 1500.0"
+            + "            * pow(500.0 / max(uFresRange, 1e-6), 2.0) + uFresHard, 0.0, 1.0);\n"
+            + "    float fres = pow(fresBase, 5.0);\n"
+            + "    col = mix(col, mix(float3(1.0), uTint, uTintA * 0.5), fres * uFresFac * 0.7);\n"
+            + "\n"
+            // ── 眩光：朝光的那半边再多一层"雾面反光" ──
+            + "    float3 raw = uBg.eval(uvC * uBgSize).rgb;\n"
+            + "    float glBase = clamp(1.0 - depth / 1500.0"
+            + "            * pow(500.0 / max(uGlareRange, 1e-6), 2.0) + uGlareHard, 0.0, 1.0);\n"
+            + "    float gl = pow(glBase, 5.0);\n"
+            + "    col = mix(col, mix(raw, uTint, uTintA * 0.5), 0.25 * gl);\n"
+            + "\n"
+            // ★ 外缘 1px 抗锯齿：面板原来的底色已经不画了，这一圈就是可见的边
             + "    float aa = clamp(-sd, 0.0, 1.0);\n"
-            // ★ v3.7：入场淡入 —— uAppear 从 0 走到 1，边圈「聚」出来，而不是硬闪一下。
-            + "    return half4(half3(c), half(aa) * half(clamp(uAppear, 0.0, 1.0)));\n"
+            + "    return half4(half3(col), half(aa) * half(clamp(uAppear, 0.0, 1.0)));\n"
             + "}\n";
 }

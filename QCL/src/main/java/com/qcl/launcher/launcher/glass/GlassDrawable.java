@@ -216,6 +216,30 @@ public final class GlassDrawable extends Drawable {
     private float lastPressT = Float.NaN;
     private float lastAppear = Float.NaN;
 
+    /**
+     * v4.0：光学常量是否已经设过。
+     *
+     * <p>这些值（IOR / 色散 / 菲涅尔 / 眩光）对所有面板都一样，一个着色器实例只需要设一次。
+     * 着色器是从池子里取的，取到「别人用过的」也没关系 —— 值相同，重设无害。
+     */
+    private boolean opticsSet = false;
+
+    /** v4.0：上一次用的深浅色（-1 = 还没设过）。切主题时要重设色调。 */
+    private int lastNight = -1;
+
+    /** v4.0：当前是不是夜间模式 —— 决定玻璃色调（深色玻璃配浅色字 / 浅色玻璃配深色字）。 */
+    private boolean isNightMode() {
+        try {
+            if (owner != null) {
+                int mode = owner.getResources().getConfiguration().uiMode
+                        & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+                return mode == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
     // 降级②的缓存
     private BitmapShader magShader;
     private Bitmap magShaderBg;
@@ -334,24 +358,26 @@ public final class GlassDrawable extends Drawable {
                 invalidateSelf();
             }
         }
-        // ★★★ v3.6/v3.7：先把面板**自己的**底色按比例画回来。
-        //   玻璃只负责边缘那一圈折射 + 倒角，面板内部必须是它原本的样子 ——
-        //   否则磨砂白底被「内部全透明」吃掉，板块整块消失（用户报「液态玻璃没有」）。
-        //   ★ 但**不能 1:1 画回**：那样就是一块白灰卡片（用户报「白灰色的」）。
-        //   0.16 的压暗让壁纸清晰透出，面板的可见性交给边缘那圈光。
-        if (originalBackground != null) {
+        // ★★★ v4.0：面板底色**不再画回来了**。
+        //   ReGlass 的渲染方式是「整块面板 = 模糊后的背景 + 透镜边缘」，
+        //   面板自己是透明的 —— 原来那层 16% 白底画在下面，只会把玻璃糊成一块灰白卡片
+        //   （用户两次报「白灰色」的根因之一，另一次是壁纸被放大 4.9 倍）。
+        //   ★ 只有着色器不可用时才画回原背景，否则「玻璃失效 + 面板消失」会同时发生。
+        boolean drawn = false;
+        if (GlassShader.usable() && GlassShader.sharedBackdropShader() != null) {
             try {
-                // ★ 直接复用方法开头那个 bnd —— 同一个作用域里不能重复声明同名局部变量。
-                originalBackground.setBounds(bnd.left, bnd.top, bnd.right, bnd.bottom);
-                originalBackground.draw(canvas);
+                drawn = drawShader(canvas, w, h, bg);
             } catch (Throwable ignored) {
             }
         }
-        try {
-            if (!drawShader(canvas, w, h, bg)) {
-                drawRing(canvas, w, h, bg);
+        if (!drawn) {
+            if (originalBackground != null) {
+                try {
+                    originalBackground.setBounds(bnd.left, bnd.top, bnd.right, bnd.bottom);
+                    originalBackground.draw(canvas);
+                } catch (Throwable ignored) {
+                }
             }
-        } catch (Throwable t) {
             try {
                 drawRing(canvas, w, h, bg);
             } catch (Throwable ignored) {
@@ -395,23 +421,48 @@ public final class GlassDrawable extends Drawable {
         float dm = owner != null ? owner.getResources().getDisplayMetrics().widthPixels : 1080f;
         float dh = owner != null ? owner.getResources().getDisplayMetrics().heightPixels : 2340f;
         float r = radius >= 0 ? radius : 14f * d;
-        // ★ v3.3 带宽夹到短边的一半：小面板（如 40dp 高的列表项）上 16dp 的带子会把
-        //   整块吃光，变成「只剩畸变没有内容」。夹住之后小面板自动变成「整块折射」，
-        //   视觉上仍然连续，不会出现带子宽过半、内外边界打架的怪相。
-        float band = Math.min(bandDp * d, Math.min(w, h) * 0.5f);
-        // ★ v3.2：传负值（与参考实现一致）。法线朝外，负偏移 = 向内采样 = 放大镜观感。
-        // ★ v3.5/v3.7：按住时把偏移放大 —— 但用**平滑的 pressT**而不是布尔量，
-        //   否则偏移会瞬间跳 40%，看起来像面板抖了一下。
-        float strength = -(strengthDp * (1f + (PRESS_GAIN - 1f) * pressT)) * d;
-        float depth = depthEffect ? 1f : 0f;
+        // ★★★ v4.0：参数按 ReGlass 的语义重新映射。
+        //   · thickness = 原来的「折射带宽度」= **玻璃厚度**（像素）
+        //   · amount    = 外缘最大位移，单位是**归一化 UV**（不是像素！）
+        //   ReGlass 的剖面在 depth >= thickness 处把位移归零，所以厚度同时也是
+        //   「折射影响范围」—— 一个参数表达一件事，和它的实现一致。
+        float thickness = Math.max(bandDp * d, 1f);
+        // ★★★ 0.08 是 ReGlass 写死的系数（refrOffset = -normal * edgeFactor * 0.08 * 宽高比）。
+        //   它的强度不可调，我们的「折射强度」滑杆按 strengthDp/32dp 线性缩放 ——
+        //   默认 50%（strengthDp = 32dp）正好落在 ReGlass 的原值上，
+        //   调到 0 就是完全没有折射，调到 100 是它的 1.375 倍。
+        float amount = 0.08f * (Math.max(strengthDp, 0f) / 32f);
+        // ★ 深浅色：面板现在整块是玻璃，不再有原来的白底托着，
+        //   所以色调必须跟着主题走 —— 否则夜间模式的浅色文字会落在浅色玻璃上。
+        //   （用户报的「左侧 UI 文字颜色有问题」就是这一条：夜间 colorPureBlack 是
+        //    #FFEDE7DE，而导航栏底色还是 85% 白。）
+        boolean night = isNightMode();
+        float tintA = night ? 0.30f : 0.12f;
+        float tintC = night ? 0f : 1f;
 
         // ★ 只设变化的那几个 —— 见字段注释
         long bgVer = GlassBackdrop.version();
         if (lastBgVersion != bgVer) {
             shader.setInputShader("uBg", bgShader);
-            shader.setFloatUniform("uBgSize", bg.getWidth(), bg.getHeight());
+            // ★ v4.0：尺寸要用**模糊图**的尺寸 —— uBg.eval 的坐标空间是位图像素。
+            Bitmap blur = GlassBackdrop.blurred();
+            Bitmap forSize = (blur != null && !blur.isRecycled()) ? blur : bg;
+            shader.setFloatUniform("uBgSize", forSize.getWidth(), forSize.getHeight());
             shader.setFloatUniform("uScreenSize", dm, dh);
             lastBgVersion = bgVer;
+        }
+        // 光学常量：一个着色器实例一辈子不变，设一次就够。
+        // ★ 数值全部照 ReGlassConfig 的默认值，不要凭感觉改 ——
+        //   这组值就是用户给的那张效果图所用的值。
+        if (!opticsSet) {
+            shader.setFloatUniform("uRefFactor", 1.4f);    // IOR
+            shader.setFloatUniform("uRefDisp", 7f);        // 色散强度
+            shader.setFloatUniform("uFresRange", 30f);
+            shader.setFloatUniform("uFresHard", 0.2f);     // 20/100
+            shader.setFloatUniform("uFresFac", 0.2f);      // 20/100
+            shader.setFloatUniform("uGlareRange", 30f);
+            shader.setFloatUniform("uGlareHard", 0.2f);    // 20/100
+            opticsSet = true;
         }
         if (lastW != w || lastH != h) {
             shader.setFloatUniform("uPanelSize", w, h);
@@ -422,17 +473,18 @@ public final class GlassDrawable extends Drawable {
             shader.setFloatUniform("uRadius", r);
             lastRadius = r;
         }
-        if (lastBand != band) {
-            shader.setFloatUniform("uRefractionHeight", band);
-            lastBand = band;
+        if (lastBand != thickness) {
+            shader.setFloatUniform("uRefThickness", thickness);
+            lastBand = thickness;
         }
-        if (lastStrength != strength) {
-            shader.setFloatUniform("uRefractionAmount", strength);
-            lastStrength = strength;
+        if (lastStrength != amount) {
+            shader.setFloatUniform("uRefrAmount", amount);
+            lastStrength = amount;
         }
-        if (lastDepth != depth) {
-            shader.setFloatUniform("uDepthEffect", depth);
-            lastDepth = depth;
+        if (lastNight != (night ? 1 : 0)) {
+            shader.setFloatUniform("uTint", tintC, tintC, tintC);
+            shader.setFloatUniform("uTintA", tintA);
+            lastNight = night ? 1 : 0;
         }
         // 位置每帧都可能变（滚动 / 动画），必须无条件更新
         shader.setFloatUniform("uPanelOrigin", ox, oy);
@@ -451,20 +503,13 @@ public final class GlassDrawable extends Drawable {
         //    在 (0,0) 画才能保证 fragCoord 落在 [0,w]×[0,h]，SDF 的圆心才对得上。
         int save = canvas.save();
         canvas.translate(bnd.left, bnd.top);
-        // ★★★ v3.3 只画「四条边带」，不再整块 drawRect。
-        //   着色器内部对 depth >= band 的像素是直接 return 的，但 **return 之前那个像素
-        //   已经被光栅化、着色器已经被调用了** —— 整块面板 = 白跑一遍全屏像素。
-        //   实测一块 1080×2000 的全屏面板：整块 216 万像素，而 16dp(≈48px) 的边带只要
-        //   2×48×(1080+2000) ≈ 29.5 万像素 ⇒ **少跑 86% 的片元**。
-        //   这不是「微优化」：用户抱怨的「性能很差」主要就来自这里（面板越大越亏）。
-        //   四条带刚好覆盖 {sd > -band} 的全部区域（圆角也在上下带里），不漏不重。
-        float b = Math.min(band, Math.min(w, h) * 0.5f);
-        canvas.drawRect(0f, 0f, w, b, paint);                    // 上
-        canvas.drawRect(0f, h - b, w, h, paint);                 // 下
-        if (h > 2f * b) {
-            canvas.drawRect(0f, b, b, h - b, paint);              // 左
-            canvas.drawRect(w - b, b, w, h - b, paint);           // 右
-        }
+        // ★★★ v4.0：整块面板都要画。
+        //   v3.3~v3.7 只画四条边带，是为了省片元（当时「内部全透明」，
+        //   中间那些像素画了也是白画）。但 ReGlass 的渲染方式里**内部就是模糊背景**，
+        //   整块都是有效内容 ⇒ 不能再只画边带，否则面板中间是空的。
+        //   ★ 代价与取舍：面板越大越费。所以 GlassApplier 那边保留了「覆盖范围」
+        //     （轻量 ≥200dp / 标准 ≥110dp）—— 小控件不挂玻璃，大面板才值得。
+        canvas.drawRect(0f, 0f, w, h, paint);
         canvas.restoreToCount(save);
         paint.setShader(null);
         return true;

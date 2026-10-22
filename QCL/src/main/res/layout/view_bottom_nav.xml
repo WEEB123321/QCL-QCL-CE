@@ -267,6 +267,7 @@
     <!-- ★★★ 侧栏底部：版本号（参考图里侧栏最下方那个 V2.4）。
          上面一条细线，下面小字。由 MainUI 填入真实版本号。 -->
     <View
+        android:id="@+id/nav_divider"
         android:layout_width="26dp"
         android:layout_height="1dp"
         android:layout_marginTop="18dp"
