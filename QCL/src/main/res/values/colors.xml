@@ -52,6 +52,10 @@
     <color name="qcl_s_surface_alt">#FFFFFF</color> <!-- 更亮的卡片（弹窗内） -->
     <color name="qcl_s_text">#3A342C</color>        <!-- 正文 -->
     <color name="qcl_s_text_sub">#8A8378</color>    <!-- 次要文字 / 说明 -->
+    <!-- ★ 提示 / 最次要文字。日间值刻意写成 #99000000（= 原来散落在 layout 里的
+         60% 黑），保证浅色模式下**一个像素都不变**；夜间由 values-night 覆盖成
+         60% 的近白色。原来那 17 处直接写死 #99000000，深色底上等于没字。 -->
+    <color name="qcl_s_text_hint">#99000000</color>
     <color name="qcl_s_accent">#A8452F</color>      <!-- 强调（铁锈红） -->
     <!-- 深色文字（上游大量使用 #FF1B1B1B，日间值保持完全一致，夜间变亮） -->
     <color name="qcl_s_ink">#FF1B1B1B</color>

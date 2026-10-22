@@ -37,7 +37,7 @@
         android:layout_marginTop="2dp"
         android:singleLine="true"
         android:textSize="10sp"
-        android:textColor="#99000000" />
+        android:textColor="@color/qcl_s_text_hint" />
 
     <TextView
         android:id="@+id/widget_backups"
@@ -46,7 +46,7 @@
         android:layout_marginTop="2dp"
         android:singleLine="true"
         android:textSize="10sp"
-        android:textColor="#99000000" />
+        android:textColor="@color/qcl_s_text_hint" />
 
     <TextView
         android:id="@+id/widget_hint"

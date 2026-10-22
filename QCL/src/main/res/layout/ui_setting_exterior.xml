@@ -712,7 +712,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="11sp"
-                        android:textColor="#99000000"
+                        android:textColor="@color/qcl_s_text_hint"
                         android:text="@string/exterior_setting_ui_safe_area_hint"/>
 
                 </LinearLayout>

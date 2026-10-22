@@ -11,6 +11,9 @@
     <color name="qcl_s_surface_alt">#2E2B28</color>
     <color name="qcl_s_text">#EDE7DE</color>
     <color name="qcl_s_text_sub">#A8A196</color>
+    <!-- ★ 提示 / 最次要文字：60% 的近白色。上游把它写死成 #99000000（60% 黑），
+         深色底上完全看不见 —— 8 个页面共 17 处提示文字都受影响。 -->
+    <color name="qcl_s_text_hint">#99EDE7DE</color>
     <color name="qcl_s_accent">#D97A5E</color>
     <color name="qcl_s_ink">#EDE7DE</color>
     <color name="qcl_s_divider">#3A3733</color>

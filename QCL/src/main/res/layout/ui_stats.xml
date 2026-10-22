@@ -64,7 +64,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/text_size_small"
-                            android:textColor="#99000000"
+                            android:textColor="@color/qcl_s_text_hint"
                             android:text="@string/stats_label_time" />
                     </LinearLayout>
 
@@ -91,7 +91,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/text_size_small"
-                            android:textColor="#99000000"
+                            android:textColor="@color/qcl_s_text_hint"
                             android:text="@string/stats_label_launch" />
                     </LinearLayout>
 
@@ -118,7 +118,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/text_size_small"
-                            android:textColor="#99000000"
+                            android:textColor="@color/qcl_s_text_hint"
                             android:text="@string/stats_label_crash" />
                     </LinearLayout>
 
@@ -142,7 +142,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_size_small"
-                    android:textColor="#99000000"
+                    android:textColor="@color/qcl_s_text_hint"
                     android:text="@string/stats_empty" />
 
                 <LinearLayout
