@@ -277,8 +277,13 @@ public final class LauncherLayoutStyle {
      */
     private static void applyHmcl(Activity a, View nav, View content, View fab, View sidePanel) {
         int menuW = dp(a, HMCL_MENU_DP);
+        int barH = dp(a, HMCL_BAR_DP);
 
         navLayout(nav, menuW, ViewGroup.LayoutParams.MATCH_PARENT);
+        // ★★★ 2.2.7：左菜单必须从彩条**下面**开始。
+        //   彩条是满宽的，压在 y=0..56dp 这一条；菜单如果还从 y=0 开始，
+        //   第一个 Tab（首页）会整个藏在彩条底下 —— 点得到但看不见。
+        setTopMargin(nav, barH);
         // HMCL 的左栏是一列「条目」，横向留白靠条目自己的 padding
         navOrientation(nav, true, dp(a, 8), dp(a, 12));
         // 背景用 {@code @color/launcher_ui_background}（本项目是透明），
@@ -292,7 +297,12 @@ public final class LauncherLayoutStyle {
         if (content instanceof ViewGroup) {
             ensureHmclBar(a, (ViewGroup) content);
         }
-        content.setPadding(menuW, 0, 0, 0);
+        // ★★★ 2.2.7：上内边距让出彩条高度。
+        //   2.2.5 只写了 `setPadding(menuW, 0, 0, 0)`，而彩条是 content 的子 View ——
+        //   子 View 长在 padding 里面，于是彩条从 x=menuW 才开始、右端又短 menuW，
+        //   看起来就是「一条没铺满的棕色带子」。现在彩条挂到 launcher_root 上（见
+        //   ensureHmclBar），content 只负责让出顶部高度。
+        content.setPadding(menuW, barH, 0, 0);
 
         fabMargin(fab, dp(a, 66), dp(a, 14));
         // ★ 返回栏挪到左侧并**下移到彩条之下**，否则会压在彩条上
@@ -507,9 +517,30 @@ public final class LauncherLayoutStyle {
         }
     }
 
+    /**
+     * 给导航栏补一个**上**外边距（写绝对值）。
+     *
+     * <p>★ 为什么要单独一个方法：{@link #navLayout} 会把四条外边距全清零 ——
+     * 那是为了躲开 {@code SafeAreaHelper} 的「基准值累加」坑。HMCL 需要额外让出
+     * 顶部彩条的高度，所以只能在 {@code navLayout} **之后**再补一次。
+     */
+    private static void setTopMargin(View v, int topPx) {
+        if (v == null) {
+            return;
+        }
+        try {
+            ViewGroup.LayoutParams raw = v.getLayoutParams();
+            if (raw instanceof RelativeLayout.LayoutParams) {
+                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) raw;
+                lp.topMargin = topPx;
+                v.setLayoutParams(lp);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     /** 搜索悬浮球的底部 / 右侧外边距（写绝对值）。 */
-    private static void fabMargin(View fab, int bottomPx, int endPx) {
-        if (fab == null) {
+    private static void fabMargin(View fab, int bottomPx, int endPx) {        if (fab == null) {
             return;
         }
         try {
@@ -624,7 +655,17 @@ public final class LauncherLayoutStyle {
      * 一个只为 1/4 场景服务的东西，不该污染所有场景的布局。
      */
     private static void ensureHmclBar(Activity a, ViewGroup content) {
-        if (content.findViewWithTag(TAG_HMCL_BAR) != null) {
+        // ★★★ 2.2.7：彩条挂到 **launcher_root**（RelativeLayout）上，不再挂在 content 里。
+        //   2.2.5 挂在 content 里的后果：content 为了给 200dp 左菜单让位，设了
+        //   paddingStart=200dp —— 而子 View 是长在 padding **里面**的，于是彩条
+        //   从 x=200dp 才开始、右端又短 200dp，成了一条「没铺满的棕色带子」。
+        //   挂到根上才能满宽（HMCL 的 Toolbar 本来就是通栏的）。
+        ViewGroup host = content;
+        android.view.ViewParent p = content.getParent();
+        if (p instanceof ViewGroup) {
+            host = (ViewGroup) p;
+        }
+        if (host.findViewWithTag(TAG_HMCL_BAR) != null) {
             return;
         }
         try {
@@ -636,8 +677,16 @@ public final class LauncherLayoutStyle {
             bar.setBackgroundColor(0xFFB0552F);
             int padH = dp(a, 14);
             bar.setPadding(padH, 0, padH, 0);
-            bar.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, dp(a, HMCL_BAR_DP)));
+            if (host instanceof RelativeLayout) {
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(a, HMCL_BAR_DP));
+                lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_START);
+                bar.setLayoutParams(lp);
+            } else {
+                bar.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(a, HMCL_BAR_DP)));
+            }
 
             // 左边 18dp 的方块图标（HMCL 那里是合成台，这里用 QCL 自己的方块）
             ImageView icon = new ImageView(a);
@@ -666,8 +715,13 @@ public final class LauncherLayoutStyle {
             spacer.setLayoutParams(new LinearLayout.LayoutParams(0, 1, 1f));
             bar.addView(spacer);
 
-            content.addView(bar, 0);
-            Log.i(TAG, "HMCL 顶部彩条已挂载");
+            // ★ 插在**第 1 个**位置：第 0 个是 launcher_layout（它有不透明壁纸背景，
+            //   彩条放它后面会被整块盖住）；再往后就是返回栏 / 导航栏 / 弹窗遮罩，
+            //   彩条如果 append 到最后会盖住弹窗顶部。第 1 位正好在两者之间。
+            int index = host.getChildCount() >= 1 ? 1 : 0;
+            host.addView(bar, index, bar.getLayoutParams());
+            Log.i(TAG, "HMCL 顶部彩条已挂载（host=" + host.getClass().getSimpleName()
+                    + " index=" + index + "）");
         } catch (Throwable t) {
             Log.w(TAG, "HMCL 顶部彩条挂载失败（其余排版仍然生效）", t);
         }
@@ -675,14 +729,22 @@ public final class LauncherLayoutStyle {
 
     /** 移除 HMCL 顶部彩条（切到其它风格时）。 */
     private static void hideHmclBar(View content) {
-        if (!(content instanceof ViewGroup)) {
+        if (content == null) {
             return;
         }
         try {
-            ViewGroup g = (ViewGroup) content;
-            View bar = g.findViewWithTag(TAG_HMCL_BAR);
+            // ★ 2.2.7：彩条挂在 content 的父容器上，所以先从父容器找，找不到再退回 content。
+            ViewGroup host = content instanceof ViewGroup ? (ViewGroup) content : null;
+            android.view.ViewParent p = content.getParent();
+            if (p instanceof ViewGroup) {
+                host = (ViewGroup) p;
+            }
+            if (host == null) {
+                return;
+            }
+            View bar = host.findViewWithTag(TAG_HMCL_BAR);
             if (bar != null) {
-                g.removeView(bar);
+                host.removeView(bar);
             }
         } catch (Throwable ignored) {
         }
