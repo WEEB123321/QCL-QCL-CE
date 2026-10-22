@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 夜间版提示框底板（v3.0.0）。
+
+     为什么必须有：原版是 #FFEFC8（浅黄），而夜间正文色是 #FFEDE7DE（近白）。
+     近白的字压在浅黄上几乎读不出来 —— 和导航栏那次是同一个毛病。
+
+     ★ 夜间不用纯灰，改用**暗暖色** #FF3A3222：这个底板在语义上是「提示 / 注意」，
+       保留一点暖调才不会和普通卡片混成一片。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <corners
+        android:topLeftRadius="5.0dip"
+        android:topRightRadius="5.0dip"
+        android:bottomLeftRadius="5.0dip"
+        android:bottomRightRadius="5.0dip"/>
+
+    <solid
+        android:color="#FF3A3222" />
+
+</shape>

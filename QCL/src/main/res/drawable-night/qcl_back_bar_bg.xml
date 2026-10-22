@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 夜间版返回栏背景（v3.0.0）。
+
+     为什么必须有：values-night 把 colorPureBlack 换成 #FFEDE7DE（近白），
+     全仓 1079 处 textColor 都用它；而这里的底色原来是写死的 #D9FFFFFF。
+     浅色字落在浅色板上，对比度接近 1:1 —— 字等于消失了。
+     ⇒ 底色跟着主题走，日间保持白色磨砂，夜间换成同明度的深色玻璃。
+
+     ★ 用 #D91A1A1A 而不是纯黑：85% 的黑在深色壁纸上仍能读出「一块板」，
+       纯黑会变成一块没有层次的洞。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#D91A1A1A" />
+    <corners android:radius="18dp" />
+</shape>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 夜间版「启动检查」行底板（v3.0.0）。
+
+     日间是 50% 白（在浅色对话框上提亮一行），夜间必须反过来是 50% 黑，
+     否则近白的正文色落在这行上会糊成一片。
+     透明度沿用 0x80，保证「一行一行的条纹感」不变。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#801A1A1A" />
+</shape>

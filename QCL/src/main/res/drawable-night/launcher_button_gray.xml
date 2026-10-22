@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 夜间版灰色按钮（v3.0.0）。
+
+     为什么必须有：原版是 #ECECEC / #DADADA 两个浅灰，而夜间正文色是
+     #FFEDE7DE（近白）—— 白字压在浅灰上，按钮上的字基本看不见。
+
+     ★ 按下态保持「比常态更亮」：日间是 #ECECEC 亮于 #DADADA，
+       夜间反过来会让人以为按下去变暗了（像禁用），所以这里 #3E3E3E 亮于 #2E2E2E。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#FF3E3E3E"/>
+            <corners
+                android:topLeftRadius="5.0dip"
+                android:topRightRadius="5.0dip"
+                android:bottomLeftRadius="5.0dip"
+                android:bottomRightRadius="5.0dip"/>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#FF2E2E2E"/>
+            <corners
+                android:topLeftRadius="5.0dip"
+                android:topRightRadius="5.0dip"
+                android:bottomLeftRadius="5.0dip"
+                android:bottomRightRadius="5.0dip"/>
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动检查对话框里每一行的底板（v3.0.0）。
+
+     ★ 为什么要从 layout 里的内联色值抽成 drawable：内联的 `#80FFFFFF` 没有夜间变体，
+       而 values-night 会把正文色换成近白 #FFEDE7DE ⇒ 夜间是「白字压 50% 白底」。
+       抽成资源才能用 drawable-night 覆盖。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#80FFFFFF" />
+</shape>

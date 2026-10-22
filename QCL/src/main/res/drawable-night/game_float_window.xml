@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 夜间版游戏内悬浮窗底板（v3.0.0）。
+
+     为什么必须有：原版实心是 #CCE9E9E9（浅灰），夜间正文色是 #FFEDE7DE（近白），
+     字压在上面读不出来。
+
+     ★ 描边也要跟着翻：#33555555 是「深色描边」，在深色底板上完全看不见，
+       所以夜间换成 #33FFFFFF（同透明度的白色描边），保留那一圈「浮起来」的边。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <corners
+        android:topLeftRadius="10.0dip"
+        android:topRightRadius="10.0dip"
+        android:bottomLeftRadius="10.0dip"
+        android:bottomRightRadius="10.0dip"/>
+
+    <stroke
+        android:color="#33FFFFFF"
+        android:width="1.5dp"/>
+
+    <solid
+        android:color="#CC2A2A2A" />
+
+</shape>
