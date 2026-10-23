@@ -217,9 +217,15 @@ public final class LauncherLayoutStyle {
         //   5 个 weight=1 的 Tab 各自分到 0 高 ⇒ 五条文字**叠在同一处**，
         //   看起来像一堆乱码（用户截图里那块模糊的中文就是这个）。
         //   矮屏时先砍品牌和页脚，把高度全让给 Tab。
+        //
+        // ★★★ 3.0.1：只砍品牌还不够。横屏 499px 高时实测：
+        //   上下 padding 84px + 菜单/分隔线 ≈ 120px ⇒ 5 个 Tab 每个只剩 **19dp**，
+        //   而「11sp 中文竖排两行」需要约 30dp ⇒ 仍溢出 11dp，字照样叠。
+        //   ⇒ 矮屏时把中文**改横排**（一行，约 17dp）并收紧 padding。
         boolean compact = screenH(a) < dp(a, 420);
         setBrandVisible(nav, !compact);
         setNavFooterVisible(nav, !compact);
+        applyCompactNav(nav, compact);
         hideHmclBar(content);
 
         // ★ 写绝对值（top / right / bottom 全归零）——
@@ -535,6 +541,78 @@ public final class LauncherLayoutStyle {
     }
 
     /** 侧栏底部（分隔线 + 版本号）。矮屏时整组藏掉，把高度让给 Tab。 */
+    /** 保存导航文字原文的 tag key（竖排靠字符串里的 {@code \n}，改横排时必须能还原）。 */
+    private static final int TAG_NAV_TEXT = 0x7C1A5601;
+
+    /**
+     * ★★★ 3.0.1：矮屏（横屏）时把导航 Tab 从「罗马数字 + 中文竖排」收成「中文横排」。
+     *
+     * <h3>为什么必须收</h3>
+     * Tab 是 {@code weight=1} 均分的，横屏 499px（166dp）高时，扣掉上下 padding、
+     * 分隔线和菜单，每个 Tab 只剩约 **19dp**；而「11sp 中文两行」需要约 30dp
+     * ⇒ 超出 11dp，{@code LinearLayout} 不会压缩子 View，文字直接**溢出重叠**。
+     * 这就是用户截图里左侧那堆看不清的中文。
+     *
+     * <h3>为什么改横排而不是继续缩字号</h3>
+     * 缩到 8sp 才勉强塞进 19dp，但 8sp 的中文在手机上已经难以辨认。
+     * 改横排后一行只要约 17dp，配合收紧 padding（14dp→8dp）还能有富余，
+     * 字号保持 10sp 可读。
+     *
+     * <h3>★ 必须可逆</h3>
+     * 竖排是靠字符串里的 {@code \n} 实现的，{@code setText} 之后就没了。
+     * 所以第一次改之前把原文存进 {@link #TAG_NAV_TEXT}，恢复时读回来 ——
+     * 否则用户在「QCL / FCL / HMCL / ZL2」之间来回切一次，竖排就永久变成横排了。
+     */
+    private static void applyCompactNav(View nav, boolean compact) {
+        for (int i = 0; i < TAB_IDS.length; i++) {
+            try {
+                View tab = nav.findViewById(TAB_IDS[i]);
+                if (tab == null) {
+                    continue;
+                }
+                TextView label = nav.findViewById(TAB_TEXT_IDS[i]);
+                TextView numeral = numeralOf(tab);
+
+                if (label != null) {
+                    CharSequence orig = (CharSequence) label.getTag(TAG_NAV_TEXT);
+                    if (orig == null) {
+                        orig = label.getText();
+                        if (orig != null) {
+                            label.setTag(TAG_NAV_TEXT, orig);
+                        }
+                    }
+                    if (orig != null) {
+                        if (compact) {
+                            label.setText(orig.toString().replace("\n", ""));
+                            label.setTextSize(10f);
+                            label.setSingleLine(true);
+                        } else {
+                            label.setText(orig);
+                            label.setTextSize(11f);
+                            label.setSingleLine(false);
+                        }
+                    }
+                }
+                // 矮屏收起罗马数字：横排之后它只剩装饰作用，还占横向宽度
+                if (numeral != null) {
+                    numeral.setVisibility(compact ? View.GONE : View.VISIBLE);
+                }
+            } catch (Throwable ignored) {
+                // 单个 Tab 出问题不影响其它
+            }
+        }
+        // 上下 padding：矮屏 8dp（省 12dp 总高），正常 14dp
+        try {
+            if (nav instanceof LinearLayout) {
+                LinearLayout ll = (LinearLayout) nav;
+                int h = dp(nav.getContext(), 6f);
+                int v = dp(nav.getContext(), compact ? 8f : 14f);
+                ll.setPadding(h, v, h, v);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     private static void setNavFooterVisible(View nav, boolean visible) {
         try {
             View divider = nav.findViewById(R.id.nav_divider);
