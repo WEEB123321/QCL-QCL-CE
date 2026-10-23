@@ -286,7 +286,11 @@ public final class GlassApplier {
     /**
      * 从 Activity 的根布局里取出当前背景位图，喂给 {@link GlassBackdrop}。
      *
-     * <p>★ v3.1 起**不需要后台线程**：{@code GlassBackdrop.set()} 只存引用，零成本。
+     * <p>⚠️ 这里**会做模糊**（v4.0 起），不是零成本：{@code GlassBackdrop.set()} 内部要
+     * 缩放 + 盒式模糊一次，900 长边下几毫秒到十几毫秒，**跑在调用线程上**。
+     * 只在换背景时发生、且同一张图会被引用判等挡掉，所以可以留在主线程；
+     * 若日后出现「换背景时掉帧」，第一件事是看 {@code QCLGlass} 的耗时日志，
+     * 而不是直接改异步 —— 异步会让 View 不知道该重绘（v3.0 踩过）。
      */
     public static void refreshBackdrop(Activity activity, View backgroundHost) {
         if (activity == null || backgroundHost == null) {

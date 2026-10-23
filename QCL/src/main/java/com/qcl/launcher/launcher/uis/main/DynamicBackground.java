@@ -129,11 +129,13 @@ public class DynamicBackground {
             if (next instanceof BitmapDrawable) {
                 final Bitmap bm = ((BitmapDrawable) next).getBitmap();
                 if (bm != null && !bm.isRecycled()) {
-                    // ★★★ v3.1：**主线程直接调**，不再开线程。
-                    //   v3.0 必须开线程是因为它要做两次降采样 + 一次全尺寸放大（30~60ms）；
-                    //   v3.1 不做模糊了，set() 只存一个引用，成本接近 0。
-                    //   留着线程反而有副作用：后台线程改了 GlassBackdrop 之后，
+                    // ★★★ v4.0：**主线程直接调**，但已经**不是零成本**了 ——
+                    //   v3.1 不做模糊，set() 只存一个引用；v4.0 要生成模糊背景
+                    //   （900 长边 + 一次盒式模糊，几毫秒到十几毫秒）。
+                    //   仍然留在主线程的理由：只在换背景时发生，不是每帧；
+                    //   而开线程有副作用 —— 后台线程改了 GlassBackdrop 之后，
                     //   主线程的 View 不知道要重绘 → 玻璃边缘还显示上一张背景的折射。
+                    //   ⚠️ 真机上若「换背景掉帧」，先看 QCLGlass 的耗时日志再决定要不要改异步。
                     com.qcl.launcher.launcher.glass.GlassBackdrop.set(bm);
                     // ★ 通知所有已套玻璃的 View 重绘 —— 否则换了图，边缘折射还是旧的。
                     com.qcl.launcher.launcher.glass.GlassApplier.invalidateApplied(this.target);
