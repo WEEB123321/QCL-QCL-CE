@@ -424,18 +424,26 @@ public final class GlassDrawable extends Drawable {
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
         float dm = owner != null ? owner.getResources().getDisplayMetrics().widthPixels : 1080f;
         float dh = owner != null ? owner.getResources().getDisplayMetrics().heightPixels : 2340f;
-        float r = radius >= 0 ? radius : 14f * d;
+        float r = radius >= 0 ? radius : 24f * d;
         // ★★★ v4.0：参数按 ReGlass 的语义重新映射。
         //   · thickness = 原来的「折射带宽度」= **玻璃厚度**（像素）
         //   · amount    = 外缘最大位移，单位是**归一化 UV**（不是像素！）
         //   ReGlass 的剖面在 depth >= thickness 处把位移归零，所以厚度同时也是
         //   「折射影响范围」—— 一个参数表达一件事，和它的实现一致。
         float thickness = Math.max(bandDp * d, 1f);
-        // ★★★ 0.08 是 ReGlass 写死的系数（refrOffset = -normal * edgeFactor * 0.08 * 宽高比）。
-        //   它的强度不可调，我们的「折射强度」滑杆按 strengthDp/32dp 线性缩放 ——
-        //   默认 50%（strengthDp = 32dp）正好落在 ReGlass 的原值上，
-        //   调到 0 就是完全没有折射，调到 100 是它的 1.375 倍。
-        float amount = 0.08f * (Math.max(strengthDp, 0f) / 32f);
+        // ★★★ v4.1：系数从 0.08 提到 0.22，而且**语义变了** ——
+        //   现在它表示「位移占**面板高度**的比例」（着色器里乘 uPanelSize.y），
+        //   不再是「占屏幕高度的比例」。
+        //
+        //   为什么必须改：0.08 是 ReGlass 在**竖屏手机**上的取值（面板≈屏幕宽），
+        //   而我之前拿它乘的是屏幕高度。横屏 499 高时位移只有 40px，
+        //   比带宽 48px 还小 ⇒ 位移搬过来的是同一块像素 ⇒ 用户报「和没有一样」。
+        //   改成按面板高度后，同一块面板横竖屏拿到的位移是一样的。
+        //
+        //   0.22 这个数：面板高 415px 时位移 125px，配 66px 带宽 ⇒ 位移是带宽的 1.9 倍。
+        //   低于 1.5 倍就「搬不动」（v3.2 的结论），高于 2.5 倍边缘内容会折叠成条纹
+        //   （预览图里 0.28 那一档左边缘的树被压成一条纯红竖带，已经失真）。
+        float amount = 0.22f * (Math.max(strengthDp, 0f) / 32f);
         // ★ 深浅色：面板现在整块是玻璃，不再有原来的白底托着，
         //   所以色调必须跟着主题走 —— 否则夜间模式的浅色文字会落在浅色玻璃上。
         //   （用户报的「左侧 UI 文字颜色有问题」就是这一条：夜间 colorPureBlack 是
@@ -543,7 +551,7 @@ public final class GlassDrawable extends Drawable {
             }
         }
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
-        float r = radius >= 0 ? radius : 14f * d;
+        float r = radius >= 0 ? radius : 24f * d;
         float band = Math.min(bandDp * d, Math.min(w, h) * 0.45f);
 
         float sx = bg.getWidth() / (float) Math.max(1, sW);

@@ -69,11 +69,16 @@ public final class GlassApplier {
      * 折射带宽度（dp）—— **v3.3 起由「折射强度」百分比算出来，不再是常量**。
      *
      * <p>★ 数值区间参考 kyant0 的 Backdrop 库：它在按钮上用 12dp、底部导航和对话框上用 16~24dp。
-     * 本项目面板尺寸跨度大（62dp 的导航条到整屏对话框），所以给一段 10~22dp 的可调区间，
-     * 默认 50% ⇒ 16dp，与 v3.2 的定值完全一致（老用户升级后观感不变）。
+     * 本项目面板尺寸跨度大（62dp 的导航条到整屏对话框），所以给一段可调区间。
+     *
+     * <p>★★★ v4.1：区间从 10~22dp 提到 <b>14~30dp</b>，默认 50% ⇒ 22dp（66px）。
+     * 原因：用户报「背景扭曲加大，这个样子和没有一样」。原来 16dp 的带在横屏
+     * 380px 高的面板上只占 12.6%，又窄又淡；22dp 占 17%，压缩带能看清走向。
+     * ★ 带宽加大必须同时加大位移 —— 两者由 {@link #strengthDp()} 绑成 2 倍关系，
+     * 不会出现「带变宽但搬不动」的死区。
      */
-    private static final float BAND_DP_MIN = 10f;
-    private static final float BAND_DP_MAX = 22f;
+    private static final float BAND_DP_MIN = 14f;
+    private static final float BAND_DP_MAX = 30f;
 
     /**
      * ★★★ v3.3：折射强度百分比（0~100，默认 50）。
@@ -145,8 +150,6 @@ public final class GlassApplier {
     private static float strengthDp() {
         return 2f * bandDp();
     }
-    /** 统一圆角（dp）—— **只在读不到面板真实圆角时才用**（v3.5 起不再是硬编码值）。 */
-    private static final float RADIUS_DP = 14f;
 
     private static final Handler sMain = new Handler(Looper.getMainLooper());
 
@@ -433,7 +436,7 @@ public final class GlassApplier {
         }
 
         GlassDrawable glass = new GlassDrawable(v)
-                .radiusPx(radiusOfBackground(bg, RADIUS_DP * d))
+                .radiusPx(glassRadius(bg, d, Math.min(v.getWidth(), v.getHeight())))
                 .band(bandDp())
                 .strength(strengthDp())
                 .depthEffect(true)
@@ -450,6 +453,34 @@ public final class GlassApplier {
         v.setBackground(glass);
         v.setTag(TAG_APPLIED, "v31");
         sApplied.put(v, glass);
+    }
+
+    /**
+    /**
+     * 玻璃圆角的下限（dp）。
+     *
+     * <p>★★★ v4.1：用户报「圆角加多点」。原来完全跟随面板背景的圆角（实测 3~16dp），
+     * 大部分面板落在 8~12dp，在整块玻璃上看起来偏「方」，缺少玻璃该有的圆润感。
+     *
+     * <p>这里取「面板真实圆角」与「24dp」中的**较大者** —— 只放大、不缩小：
+     * 原本就是 16dp 的面板会变成 24dp，原本 3dp 的小按钮也会变圆一些。
+     * 不直接写死 24dp 是因为某些面板本身是直角（{@code radius == 0} 是有效答案），
+     * 硬盖上去会让玻璃轮廓跑到面板外面。
+     */
+    private static final float GLASS_RADIUS_DP = 24f;
+
+    /**
+     * 玻璃实际使用的圆角（像素）：跟随面板真实圆角，但**不低于 24dp**，且不超过短边的 28%。
+     *
+     * <p>★ 短边 28% 这个上限是必须的：圆角超过短边一半就成了胶囊，
+     * 一条 40dp 高的按钮会被圆成药丸，和它原本的方形观感冲突。
+     */
+    private static float glassRadius(Drawable bg, float density, int minSidePx) {
+        float floor = GLASS_RADIUS_DP * density;
+        float real = radiusOfBackground(bg, floor);
+        float r = Math.max(real, floor);
+        float cap = minSidePx > 0 ? minSidePx * 0.28f : r;
+        return Math.min(r, cap);
     }
 
     /**

@@ -284,9 +284,15 @@ public final class GlassShader {
             //   我第一版把它当成像素直接加到 uv0 上（uv0 是 0~1 的归一化值），
             //   于是偏移量 96 被当成「96 个屏幕宽度」⇒ clamp 到边界 ⇒
             //   整个边缘带采样同一个角落像素，看起来像一块纯色涂抹。
-            //   x 分量乘宽高比：让横向和纵向的**视觉**位移量一致。
+            //
+            // ★★★ v4.1 修：定标基准从**屏幕高度**改成**面板高度**。
+            //   原来用 uScreenSize.y，横屏时屏幕只有 499 高，位移 = 0.08*499 = 40px，
+            //   比带宽（48px）还小 ⇒ 位移搬过来的是同一块像素 ⇒ 用户报「和没有一样」。
+            //   竖屏 2340 高时同样的 0.08 却有 187px —— 同一个参数在两种朝向下差 4.7 倍。
+            //   ReGlass 的 inSize 本来就是**面板尺寸**，这里对齐它：
+            //   位移 = uRefrAmount × 面板高度，横向再除以屏幕宽度换算成归一化 UV。
             + "    float2 off = -nrm * edgeF * uRefrAmount\n"
-            + "            * float2(uScreenSize.y / max(uScreenSize.x, 1.0), 1.0)\n"
+            + "            * (uPanelSize.y / max(uScreenSize, float2(1.0)))\n"
             + "            * (1.0 + 0.45 * uPressT);\n"
             + "\n"
             + "    float2 uv0 = (uPanelOrigin + fragCoord) / max(uScreenSize, float2(1.0));\n"
