@@ -634,9 +634,15 @@ implements View.OnClickListener {
     /**
      * ★★★ 社区版：**页面切换后**补扫一次玻璃。
      *
-     * <p>为什么必须延到下一帧：被切进来的页面在这一刻刚 {@code setVisibility(VISIBLE)}，
+     * <p>为什么必须延到布局之后：被切进来的页面在这一刻刚 {@code setVisibility(VISIBLE)}，
      * 还没 measure/layout，尺寸是 0。给尺寸 0 的控件造玻璃之后不会重来（tag 已打上），
      * 结果就是「这一页永远没有玻璃，切走再切回来才有」。
+     *
+     * <p>★★★ v4.3：**不能只用 {@code post()}**。post 跑在消息队列的下一条消息上，
+     * 通常在下一次 layout **之前** —— 那时尺寸还是 0，等于什么都没扫到，
+     * 于是这一帧画的是面板原背景。用户看到的就是「切换时玻璃闪没了，切完又好了」。
+     * 现在交给 {@link com.qcl.launcher.launcher.glass.GlassApplier#requestScan}：
+     * 它在 {@code OnGlobalLayout}（layout 之后、draw 之前）补扫，新页面第一帧就是玻璃。
      *
      * <p>★ v3.1：模式为关时直接跳过，不做无谓的全树遍历。
      */
@@ -646,15 +652,8 @@ implements View.OnClickListener {
                     == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 return;
             }
-            this.getWindow().getDecorView().post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        com.qcl.launcher.launcher.glass.GlassApplier.apply(MainActivity.this);
-                    } catch (Throwable ignored) {
-                    }
-                }
-            });
+            com.qcl.launcher.launcher.glass.GlassApplier.attachLayoutHook(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.requestScan(this);
         } catch (Throwable ignored) {
         }
     }
@@ -966,65 +965,78 @@ implements View.OnClickListener {
         this.uiManager.uis.add(this.uiManager.mainUI);
     }
 
+    /**
+     * ★★★ v3.0.3：关掉当前二级页。
+     *
+     * <p>为什么整段重写：原先是 14 个 {@code removeUIIfExist} + 14 个
+     * {@code if (currentUI == xxxUI) xxxUI.onStop()}，**一处 try/catch 都没有**，
+     * 而且 {@code uis.get(uis.size() - 1)} 在栈空时直接
+     * {@code IndexOutOfBoundsException} —— 这就是「点关闭就闪退」。
+     *
+     * <p>★ 语义与原版**逐条对齐**，没有偷偷改行为：摘掉的仍然是原来那 14 个二级页
+     * （不是「所有非首页页」—— 底部导航的 Tab 页也要留在栈里，否则按 X 会被踢回首页），
+     * 停掉的仍然是 {@code currentUI}，露出的仍然是新的栈顶。
+     */
     public void closeCurrentUI() {
-        this.uiManager.removeUIIfExist(this.uiManager.exportWorldUI);
-        this.uiManager.removeUIIfExist(this.uiManager.installPackageUI);
-        this.uiManager.removeUIIfExist(this.uiManager.exportPackageTypeUI);
-        this.uiManager.removeUIIfExist(this.uiManager.exportPackageInfoUI);
-        this.uiManager.removeUIIfExist(this.uiManager.exportPackageFileUI);
-        this.uiManager.removeUIIfExist(this.uiManager.installGameUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadForgeUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadFabricUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadLegacyFabricUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadFabricAPIUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadLiteLoaderUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadOptifineUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadQuiltUI);
-        this.uiManager.removeUIIfExist(this.uiManager.downloadQuiltAPIUI);
-        this.uiManager.uis.get(this.uiManager.uis.size() - 1).onStart();
-        if (this.uiManager.currentUI == this.uiManager.exportWorldUI) {
-            this.uiManager.exportWorldUI.onStop();
+        try {
+            UIManager m = this.uiManager;
+            if (m == null) {
+                return;
+            }
+            // ① 原来那 14 个二级页，一个不多一个不少
+            java.util.ArrayList<com.qcl.launcher.launcher.uis.tools.BaseUI> closable =
+                    new java.util.ArrayList<>();
+            closable.add(m.exportWorldUI);
+            closable.add(m.installPackageUI);
+            closable.add(m.exportPackageTypeUI);
+            closable.add(m.exportPackageInfoUI);
+            closable.add(m.exportPackageFileUI);
+            closable.add(m.installGameUI);
+            closable.add(m.downloadForgeUI);
+            closable.add(m.downloadFabricUI);
+            closable.add(m.downloadLegacyFabricUI);
+            closable.add(m.downloadFabricAPIUI);
+            closable.add(m.downloadLiteLoaderUI);
+            closable.add(m.downloadOptifineUI);
+            closable.add(m.downloadQuiltUI);
+            closable.add(m.downloadQuiltAPIUI);
+            for (int i = 0; i < closable.size(); i++) {
+                m.removeUIIfExist(closable.get(i));
+            }
+            // ② 停掉当前页（原版是 14 个 if 逐个比，这里一次搞定，语义等价）
+            com.qcl.launcher.launcher.uis.tools.BaseUI cur = m.currentUI;
+            if (cur != null && closable.contains(cur)) {
+                try {
+                    cur.onStop();
+                } catch (Throwable ignored) {
+                }
+            }
+            // ③ 露出上一层 —— ★ 栈空时必须兜底，原版这里会 IndexOutOfBounds
+            if (m.uis == null || m.uis.isEmpty()) {
+                if (m.mainUI != null) {
+                    m.uis.add(m.mainUI);
+                }
+            }
+            if (m.uis != null && !m.uis.isEmpty()) {
+                m.currentUI = m.uis.get(m.uis.size() - 1);
+                try {
+                    m.currentUI.onStart();
+                } catch (Throwable ignored) {
+                }
+            }
+        } catch (Throwable t) {
+            // 兜底：任何意外都退回首页，绝不让「关闭」把启动器带走
+            try {
+                UIManager m = this.uiManager;
+                if (m != null && m.mainUI != null) {
+                    m.uis.clear();
+                    m.uis.add(m.mainUI);
+                    m.currentUI = m.mainUI;
+                    m.mainUI.onStart();
+                }
+            } catch (Throwable ignored) {
+            }
         }
-        if (this.uiManager.currentUI == this.uiManager.installPackageUI) {
-            this.uiManager.installPackageUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.exportPackageTypeUI) {
-            this.uiManager.exportPackageTypeUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.exportPackageInfoUI) {
-            this.uiManager.exportPackageInfoUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.exportPackageFileUI) {
-            this.uiManager.exportPackageFileUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.installGameUI) {
-            this.uiManager.installGameUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadForgeUI) {
-            this.uiManager.downloadForgeUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadFabricUI) {
-            this.uiManager.downloadFabricUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadLegacyFabricUI) {
-            this.uiManager.downloadLegacyFabricUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadFabricAPIUI) {
-            this.uiManager.downloadFabricAPIUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadLiteLoaderUI) {
-            this.uiManager.downloadLiteLoaderUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadOptifineUI) {
-            this.uiManager.downloadOptifineUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadQuiltUI) {
-            this.uiManager.downloadQuiltUI.onStop();
-        }
-        if (this.uiManager.currentUI == this.uiManager.downloadQuiltAPIUI) {
-            this.uiManager.downloadQuiltAPIUI.onStop();
-        }
-        this.uiManager.currentUI = this.uiManager.uis.get(this.uiManager.uis.size() - 1);
     }
 
     public void backToDeskTop() {

@@ -50,16 +50,18 @@ import android.view.View;
  * <b>「图片还保留在一个板块上面滑动」</b>：3.0 在面板里画了背景副本，
  * 面板一滚动副本跟着走，看起来就像图片被粘在板块上。
  *
- * <h3>★★ 两层降级（任何一层失效都不会崩，也不会画出假效果）</h3>
+ * <h3>★★ 降级链（任何一层失效都不会崩，也不会画出假效果）</h3>
  * <pre>
- *   ① AGSL 边缘折射      —— RuntimeShader 可用时（API 33+ 且驱动能编译）
- *   ② 环状放大透镜        —— 着色器不可用：只画边缘一圈，把背景放大 1.25x 填进去
- *   ③ 什么都不画          —— 连背景位图都没有：完全透明，等于没开效果
+ *   ① AGSL 边缘折射        —— RuntimeShader 可用时（API 33+ 且驱动能编译）
+ *   ② 磨砂填充 + 放大环     —— 着色器不可用：整块填「模糊背景 + 色调」（v4.2 新增），
+ *                              再在边缘一圈画 1.25x 放大的同图
+ *   ③ 原背景 + 放大环       —— 模糊图缺失：退回面板自己的底色，保证面板不消失
+ *   ④ 直接 return          —— 连原图都没有（{@code backdrop()==null}）：什么都不画
  * </pre>
- * ★ ② 是**真实的光学放大**（位图矩阵缩放 + 环形裁剪），不是画的假光斑；
- *   它没有剖面曲线和深度感，观感弱一档，但**不会**出现白色描边或色块。
- * ★ ③ 明确选择「什么都不画」而不是「涂个半透明色」—— 涂色会盖住背景，
- *   与「面板内部要透出真实背景」的整个设计相矛盾。
+ * ★ v4.2 之前 ② 只有「一圈放大」，面板内部是空的 ⇒ Android 13 以下的机器看起来
+ *   **几乎完全没有玻璃**。模糊图本身是纯 Java 算的（任何 API 都能生成），
+ *   所以内部完全可以照 ReGlass 的做法填模糊背景，只把边缘换成放大环。
+ * ★ ③ 是最后一道保险：宁可退回原底色，也不能让面板凭空消失（v3.6 踩过）。
  */
 public final class GlassDrawable extends Drawable {
 
@@ -98,10 +100,31 @@ public final class GlassDrawable extends Drawable {
 
     /** 圆角（像素）。 */
     private float radius = -1f;
-    /** 折射带宽度（dp）。v3.2 起 16dp（参考实现同量级）。 */
-    private float bandDp = 16f;
-    /** 最大偏移（dp）。v3.2 起 32dp —— 参考实现是带宽的 1.5~2 倍，太弱就看不出折射。 */
-    private float strengthDp = 32f;
+    /** 折射带宽度（dp）。实际像素值还会被面板短边夹住，见 {@link #drawShader}。 */
+    private float bandDp = 22f;
+
+    /** 默认折射增益。{@link GlassApplier} 直接用它，不再按带宽二次换算。 */
+    public static final float REFR_GAIN_DEFAULT = 2.2f;
+
+    /** 增益的允许区间 —— 越界就是「搬不动」或「折叠成条纹」，不允许调出去。 */
+    private static final float REFR_GAIN_MIN = 1.2f;
+    private static final float REFR_GAIN_MAX = 2.6f;
+
+    /**
+     * ★★★ v4.2：外缘最大位移 = 带宽 × 这个倍数（**无量纲**，不是 dp）。
+     *
+     * <p>为什么从「面板高度的比例」改成「带宽的倍数」：v4.1 用的是面板高度，
+     * 结果是同一台手机上强弱差 15 倍 —— 40dp 的列表项位移 36px（带宽 66px，搬不动），
+     * 整屏面板位移 708px（10.7 倍，边缘折叠成条纹）。
+     * 用户报的「一坨屎」「有些手机不行」就是这一条：**同一个效果，面板一大就烂、一小就看不见**。
+     *
+     * <p>改成带宽的倍数后，位移/带宽 恒等于 {@code 0.983 × refrGain}，
+     * 与屏幕尺寸、密度、朝向、面板大小全部无关。
+     *
+     * <p>区间 [1.2, 2.6]：低于 1.5 搬不动（v3.2 的结论），高于 2.5 边缘内容会折叠。
+     * 2.2 ⇒ 实际约 2.16 倍，中间偏强，对应「背景扭曲加大」的要求。
+     */
+    private float refrGain = REFR_GAIN_DEFAULT;
     /** 是否叠加「指向圆心的径向分量」—— 这一项是「玻璃有厚度」的观感来源。 */
     private boolean depthEffect = true;
 
@@ -212,6 +235,15 @@ public final class GlassDrawable extends Drawable {
     private float lastDepth = Float.NaN;
     private int lastW = -1, lastH = -1;
     private long lastBgVersion = -1;
+    /**
+     * ★★★ v4.2：屏幕尺寸单独缓存。
+     *
+     * <p>原来 {@code uScreenSize} 跟「背景版本」一起设 ⇒ 横竖屏切换时背景没换、
+     * 版本号不变，这个 uniform 就一直停在旧值。而位移是「像素 ÷ 屏幕尺寸」换算的，
+     * 分母错了整块面板的折射方向/幅度就全错 —— 旋转后要么不动、要么乱扭。
+     * 这是「有些方向不行」的成因，和面板尺寸那条是两个独立的 bug。
+     */
+    private float lastScreenW = Float.NaN, lastScreenH = Float.NaN;
     /** v3.7：两个动画量的缓存，避免每帧都走 JNI。 */
     private float lastPressT = Float.NaN;
     private float lastAppear = Float.NaN;
@@ -248,6 +280,14 @@ public final class GlassDrawable extends Drawable {
     private final Path outerPath = new Path();
     private final Path innerPath = new Path();
 
+    // 降级②的磨砂填充（v4.2）—— RectF / Path / Paint 全部复用，避免每帧分配
+    // ★ 源矩形必须是 Rect（int）：Canvas.drawBitmap 没有「两个 RectF」的重载
+    private final Rect srcRect = new Rect();
+    private final RectF dstRectF = new RectF();
+    private final Path fillPath = new Path();
+    private final Paint fillPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+    private final Paint tintPaint = new Paint();
+
     public GlassDrawable(View owner) {
         this.owner = owner;
     }
@@ -271,9 +311,15 @@ public final class GlassDrawable extends Drawable {
         return this;
     }
 
-    /** 最大偏移（dp）。越大，边缘折射越明显。 */
-    public GlassDrawable strength(float dp) {
-        this.strengthDp = dp;
+    /**
+     * 折射增益（带宽的倍数）。默认 {@link #REFR_GAIN_DEFAULT}。
+     *
+     * <p>★ 参数是**无量纲倍数**，不是 dp。v4.2 之前这里是 {@code strength(dp)}，
+     * 再除以 32 换算成「占面板高度的比例」—— 那个量纲错误正是「面板一大就烂」的来源。
+     * 现在直接给倍数，调用方不可能再传错单位。
+     */
+    public GlassDrawable refrGain(float gain) {
+        this.refrGain = Math.max(REFR_GAIN_MIN, Math.min(REFR_GAIN_MAX, gain));
         return this;
     }
 
@@ -375,7 +421,19 @@ public final class GlassDrawable extends Drawable {
             }
         }
         if (!drawn) {
-            if (originalBackground != null) {
+            // ★★★ v4.2：降级路径也要有「玻璃内部」。
+            //   原来这里只画原背景的 16% + 一圈放大 ⇒ Android 13 以下的机器看到的
+            //   几乎是一块纯色卡片，等于「液态玻璃没有」。而模糊图在**任何 API 上都能生成**
+            //   （见 GlassBackdrop.buildBlur，纯 Java 盒式模糊），所以内部完全可以照
+            //   ReGlass 的做法填「模糊后的背景 + 色调」，只把边缘换成放大环。
+            boolean frosted = false;
+            try {
+                frosted = drawFrostedFill(canvas, w, h);
+            } catch (Throwable ignored) {
+            }
+            // ★ 只有磨砂填充失败时才画回原背景 —— 两者都画会变成「磨砂 + 白底」的双层，
+            //   正是用户反复报的「白灰色」。同时它也是「面板凭空消失」的最后一道保险。
+            if (!frosted && originalBackground != null) {
                 try {
                     originalBackground.setBounds(bnd.left, bnd.top, bnd.right, bnd.bottom);
                     originalBackground.draw(canvas);
@@ -383,10 +441,61 @@ public final class GlassDrawable extends Drawable {
                 }
             }
             try {
-                drawRing(canvas, w, h, bg);
+                Bitmap ringSrc = GlassBackdrop.blurred();
+                drawRing(canvas, w, h,
+                        (ringSrc != null && !ringSrc.isRecycled()) ? ringSrc : bg);
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    /**
+     * ② 降级路径的整块磨砂填充：把**模糊背景**按屏幕坐标裁一块画进面板，再压一层色调。
+     *
+     * <p>坐标必须用屏幕坐标裁：面板只是背景上的一扇窗，画自己的副本就会变成
+     * 「图片粘在板块上滑动」（3.0 被否掉的做法）。这里每一帧都按面板**当前**的屏幕位置
+     * 去裁，滚动时内容不跟随。
+     *
+     * @return true = 画成功了；false = 没有模糊图，调用方应退回原背景。
+     */
+    private boolean drawFrostedFill(Canvas canvas, int w, int h) {
+        Bitmap blur = GlassBackdrop.blurred();
+        if (blur == null || blur.isRecycled()) {
+            return false;
+        }
+        Rect bnd = getBounds();
+        int ox = 0, oy = 0;
+        if (owner != null) {
+            try {
+                owner.getLocationOnScreen(locBuf);
+                ox = locBuf[0] + bnd.left;
+                oy = locBuf[1] + bnd.top;
+            } catch (Throwable ignored) {
+            }
+        }
+        float sx = blur.getWidth() / (float) Math.max(1, sW);
+        float sy = blur.getHeight() / (float) Math.max(1, sH);
+        srcRect.set(Math.round(ox * sx), Math.round(oy * sy),
+                Math.round((ox + w) * sx), Math.round((oy + h) * sy));
+        dstRectF.set(0f, 0f, w, h);
+
+        float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
+        float r = radius >= 0 ? radius : 24f * d;
+
+        int save = canvas.save();
+        canvas.translate(bnd.left, bnd.top);
+        // 面板是圆角的，方角填充会在四角漏出来
+        fillPath.reset();
+        fillPath.addRoundRect(0f, 0f, w, h, r, r, Path.Direction.CW);
+        canvas.clipPath(fillPath);
+        canvas.drawBitmap(blur, srcRect, dstRectF, fillPaint);
+        // 色调：与着色器的 mix(col, uTint, uTintA * 0.8) 完全对齐
+        boolean night = isNightMode();
+        tintPaint.setColor(night ? 0xFF000000 : 0xFFFFFFFF);
+        tintPaint.setAlpha(Math.round((night ? 0.30f : 0.12f) * 0.8f * 255f));
+        canvas.drawRect(0f, 0f, w, h, tintPaint);
+        canvas.restoreToCount(save);
+        return true;
     }
 
     /** ① AGSL 边缘畸变。返回 false = 这条路径不可用。 */
@@ -427,23 +536,23 @@ public final class GlassDrawable extends Drawable {
         float r = radius >= 0 ? radius : 24f * d;
         // ★★★ v4.0：参数按 ReGlass 的语义重新映射。
         //   · thickness = 原来的「折射带宽度」= **玻璃厚度**（像素）
-        //   · amount    = 外缘最大位移，单位是**归一化 UV**（不是像素！）
+        //   · refrGain  = 外缘最大位移，单位是**带宽的倍数**
         //   ReGlass 的剖面在 depth >= thickness 处把位移归零，所以厚度同时也是
         //   「折射影响范围」—— 一个参数表达一件事，和它的实现一致。
-        float thickness = Math.max(bandDp * d, 1f);
-        // ★★★ v4.1：系数从 0.08 提到 0.22，而且**语义变了** ——
-        //   现在它表示「位移占**面板高度**的比例」（着色器里乘 uPanelSize.y），
-        //   不再是「占屏幕高度的比例」。
         //
-        //   为什么必须改：0.08 是 ReGlass 在**竖屏手机**上的取值（面板≈屏幕宽），
-        //   而我之前拿它乘的是屏幕高度。横屏 499 高时位移只有 40px，
-        //   比带宽 48px 还小 ⇒ 位移搬过来的是同一块像素 ⇒ 用户报「和没有一样」。
-        //   改成按面板高度后，同一块面板横竖屏拿到的位移是一样的。
-        //
-        //   0.22 这个数：面板高 415px 时位移 125px，配 66px 带宽 ⇒ 位移是带宽的 1.9 倍。
-        //   低于 1.5 倍就「搬不动」（v3.2 的结论），高于 2.5 倍边缘内容会折叠成条纹
-        //   （预览图里 0.28 那一档左边缘的树被压成一条纯红竖带，已经失真）。
-        float amount = 0.22f * (Math.max(strengthDp, 0f) / 32f);
+        // ★★★ v4.2：带宽必须按**面板短边**夹住，否则同一套参数在不同面板上是两种东西：
+        //   · 22dp=66px 的带套在 30dp(90px) 高的横条上 ⇒ 整块都是带，内部不存在；
+        //   · 套在整屏面板上只占 3% ⇒ 看不出是「一圈」，像整块被轻微抹了一下。
+        //   两个上限：
+        //     · 短边 35% —— 再宽就不是「边缘」而是「整块」；
+        //     · 短边/2 − 圆角 —— 两条对边的带不能在圆角处相交。
+        int minSide = Math.min(w, h);
+        float bandCap = Math.max(2f, Math.min(minSide * 0.35f, minSide * 0.5f - r));
+        float thickness = Math.max(2f, Math.min(bandDp * d, bandCap));
+        // ★★★ v4.2：位移量 = 带宽 × 增益。
+        //   v4.1 是 0.22 × (strengthDp/32) 再乘面板高度 —— 面板高度一变大就爆炸。
+        //   现在这个式子与面板尺寸、屏幕尺寸、密度、朝向全部无关。
+        float amount = refrGain;
         // ★ 深浅色：面板现在整块是玻璃，不再有原来的白底托着，
         //   所以色调必须跟着主题走 —— 否则夜间模式的浅色文字会落在浅色玻璃上。
         //   （用户报的「左侧 UI 文字颜色有问题」就是这一条：夜间 colorPureBlack 是
@@ -460,8 +569,13 @@ public final class GlassDrawable extends Drawable {
             Bitmap blur = GlassBackdrop.blurred();
             Bitmap forSize = (blur != null && !blur.isRecycled()) ? blur : bg;
             shader.setFloatUniform("uBgSize", forSize.getWidth(), forSize.getHeight());
-            shader.setFloatUniform("uScreenSize", dm, dh);
             lastBgVersion = bgVer;
+        }
+        // ★★★ v4.2：屏幕尺寸独立判断（原因见 lastScreenW 的注释）
+        if (lastScreenW != dm || lastScreenH != dh) {
+            shader.setFloatUniform("uScreenSize", dm, dh);
+            lastScreenW = dm;
+            lastScreenH = dh;
         }
         // 光学常量：一个着色器实例一辈子不变，设一次就够。
         // ★ 数值全部照 ReGlassConfig 的默认值，不要凭感觉改 ——
@@ -552,7 +666,11 @@ public final class GlassDrawable extends Drawable {
         }
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
         float r = radius >= 0 ? radius : 24f * d;
-        float band = Math.min(bandDp * d, Math.min(w, h) * 0.45f);
+        // ★★★ v4.2：与 drawShader 用**同一条**夹取规则 —— 降级路径和主路径
+        //   的带宽必须一致，否则着色器编译失败前后会看到两种不同宽度的带。
+        int minSide = Math.min(w, h);
+        float band = Math.max(2f, Math.min(bandDp * d,
+                Math.min(minSide * 0.35f, minSide * 0.5f - r)));
 
         float sx = bg.getWidth() / (float) Math.max(1, sW);
         float sy = bg.getHeight() / (float) Math.max(1, sH);

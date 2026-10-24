@@ -221,7 +221,7 @@ public final class GlassShader {
             + "uniform float uRefThickness;\n"     // 玻璃厚度（像素）
             + "uniform float uRefFactor;\n"        // 折射率 IOR
             + "uniform float uRefDisp;\n"          // 色散强度
-            + "uniform float uRefrAmount;\n"       // 边缘最大位移（像素）
+            + "uniform float uRefrAmount;\n"       // 边缘最大位移（× 玻璃厚度，无量纲）
             + "uniform float uFresRange;\n"
             + "uniform float uFresHard;\n"
             + "uniform float uFresFac;\n"
@@ -285,14 +285,20 @@ public final class GlassShader {
             //   于是偏移量 96 被当成「96 个屏幕宽度」⇒ clamp 到边界 ⇒
             //   整个边缘带采样同一个角落像素，看起来像一块纯色涂抹。
             //
-            // ★★★ v4.1 修：定标基准从**屏幕高度**改成**面板高度**。
-            //   原来用 uScreenSize.y，横屏时屏幕只有 499 高，位移 = 0.08*499 = 40px，
-            //   比带宽（48px）还小 ⇒ 位移搬过来的是同一块像素 ⇒ 用户报「和没有一样」。
-            //   竖屏 2340 高时同样的 0.08 却有 187px —— 同一个参数在两种朝向下差 4.7 倍。
-            //   ReGlass 的 inSize 本来就是**面板尺寸**，这里对齐它：
-            //   位移 = uRefrAmount × 面板高度，横向再除以屏幕宽度换算成归一化 UV。
+            // ★★★ v4.2 修：定标基准改成**玻璃厚度（带宽）**，不再用面板高度。
+            //
+            //   为什么面板高度是错的（用户报「一坨屎」「有些手机不行」的根因）：
+            //   位移 = 0.30 × 面板高度 ⇒ 同一台手机上效果强弱差 15 倍 ——
+            //     · 40dp 的列表项（120px 高）→ 位移 36px，比 66px 带宽还窄 ⇒ 搬不动；
+            //     · 整屏面板（2340px 高）→ 位移 708px = 带宽 10.7 倍 ⇒ 边缘折叠成条纹。
+            //   用户看到的是同一套「液态玻璃」，不该因为面板大小变成两种东西。
+            //
+            //   物理上也该如此：透镜剖面定义在 depth ∈ [0, thickness]，
+            //   位移量级 = 最大斜率 × 厚度，**面板高度根本不参与这个式子**。
+            //   改成带宽定标后，位移/带宽 恒等于 0.983 × uRefrAmount，
+            //   与屏幕尺寸、密度、朝向、面板大小全部无关 —— 这才是全手机适配。
             + "    float2 off = -nrm * edgeF * uRefrAmount\n"
-            + "            * (uPanelSize.y / max(uScreenSize, float2(1.0)))\n"
+            + "            * (float2(thick) / max(uScreenSize, float2(1.0)))\n"
             + "            * (1.0 + 0.45 * uPressT);\n"
             + "\n"
             + "    float2 uv0 = (uPanelOrigin + fragCoord) / max(uScreenSize, float2(1.0));\n"

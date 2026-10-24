@@ -74,8 +74,8 @@ public final class GlassApplier {
      * <p>★★★ v4.1：区间从 10~22dp 提到 <b>14~30dp</b>，默认 50% ⇒ 22dp（66px）。
      * 原因：用户报「背景扭曲加大，这个样子和没有一样」。原来 16dp 的带在横屏
      * 380px 高的面板上只占 12.6%，又窄又淡；22dp 占 17%，压缩带能看清走向。
-     * ★ 带宽加大必须同时加大位移 —— 两者由 {@link #strengthDp()} 绑成 2 倍关系，
-     * 不会出现「带变宽但搬不动」的死区。
+     * ★ 带宽加大必须同时加大位移 —— 两者由 {@link #refrGain()} 绑成固定倍数关系，
+     * 不会出现「带变宽但搬不动」的死区；而且这个倍数**与面板大小无关**（v4.2）。
      */
     private static final float BAND_DP_MIN = 14f;
     private static final float BAND_DP_MAX = 30f;
@@ -135,20 +135,29 @@ public final class GlassApplier {
                 + " 模糊图=" + blur;
     }
 
-    /** 百分比 → 带宽 dp。p=0 → 10dp，p=50 → 16dp（v3.2 的定值），p=100 → 22dp。 */
+    /** 百分比 → 带宽 dp。p=0 → 14dp，p=50 → 22dp，p=100 → 30dp（v4.1 起）。 */
     private static float bandDp() {
         return BAND_DP_MIN + (BAND_DP_MAX - BAND_DP_MIN) * (sStrengthPercent / 100f);
     }
 
     /**
-     * 百分比 → 最大偏移 dp。
+     * ★★★ v4.2：折射增益不再从带宽二次换算，直接给固定倍数。
      *
-     * <p>★★★ 固定取带宽的 **2 倍**，不单独暴露 —— 这是 v3.2 得出的硬结论：
-     * 偏移必须明显大于带宽（参考实现 1.5~2 倍）。v3.1 用 9dp 偏移配 14dp 带宽（0.64 倍），
-     * 折射根本搬不动，观感只是「边缘发虚」。把两者绑在一起，用户怎么调都不会调出那个死区。
+     * <h3>为什么删掉了 {@code strengthDp()}</h3>
+     * v4.1 这里是 {@code 2 * bandDp()}（dp），再在 {@link GlassDrawable} 里除以 32
+     * 换成「占面板高度的比例」。那个换算把一个**无量纲的位移倍数**和
+     * **面板高度**绑在了一起 —— 结果同一台手机上，40dp 的列表项位移 36px
+     * （比带宽还窄，搬不动），整屏面板位移 708px（带宽的 10.7 倍，折叠成条纹）。
+     * 用户报的「一坨屎」「有些手机不行」就是这个：面板越大越烂，越小越看不见。
+     *
+     * <p>现在位移 = 带宽 × {@link GlassDrawable#REFR_GAIN_DEFAULT}，
+     * 位移/带宽 恒为 2.16 倍 —— 任何屏幕、任何密度、任何朝向、任何面板尺寸都一样。
+     *
+     * <p>★ 「折射强度」滑杆仍然有效，它改的是**带宽**（见 {@link #bandDp()}），
+     * 位移按固定倍数跟随。一个设置项只表达一件事：带越宽，被扭曲的那一圈越大。
      */
-    private static float strengthDp() {
-        return 2f * bandDp();
+    private static float refrGain() {
+        return GlassDrawable.REFR_GAIN_DEFAULT;
     }
 
     private static final Handler sMain = new Handler(Looper.getMainLooper());
@@ -211,6 +220,8 @@ public final class GlassApplier {
             return;
         }
         sHooked = new java.lang.ref.WeakReference<>(activity);
+        // ★ v4.3：同时装「布局完成即补扫」—— 没有它，切页时会先画一帧原背景
+        attachLayoutHook(activity);
         try {
             hookTree(activity, activity.getWindow().getDecorView(), 0);
         } catch (Throwable t) {
@@ -260,7 +271,94 @@ public final class GlassApplier {
      */
     private static boolean sScanPending = false;
 
+    /**
+     * ★★★ v4.3：是否有「待处理」的扫描请求。
+     *
+     * <p>和 {@link #sScanPending} 的区别：那个只用来合并同一帧内的多次 {@code post}，
+     * 这个表示「有一页刚切进来、还没被扫到」，必须活到**下一次 layout 完成**为止。
+     */
+    private static volatile boolean sPendingScan = false;
+
+    /** 已经装过 layout 监听的 Activity（每个 Activity 只装一次）。 */
+    private static java.lang.ref.WeakReference<Activity> sLayoutHooked =
+            new java.lang.ref.WeakReference<>(null);
+
+    /**
+     * ★★★ v4.3：装「布局完成即补扫」监听 —— 修「切页时玻璃闪一下变回原样」。
+     *
+     * <h3>为什么 {@code post()} 不够（这就是那个 bug）</h3>
+     * 页面切换的时序是：{@code setVisibility(GONE/VISIBLE)} → 请求 layout → 遍历（measure/layout/draw）。
+     * 而 {@code View.post()} 投递的 Runnable 跑在**消息队列的下一条消息**上，
+     * 通常在**下一次遍历之前**就执行了 —— 那一刻刚变可见的页面还没 measure，
+     * 所有面板 {@code getWidth()==0}，{@link #maybeApply} 直接跳过。
+     * 于是这一帧画的是**面板原来的背景**（没有玻璃），要等下一次扫描才补上 ——
+     * 用户看到的就是「切换时玻璃没了，切完又好了」。
+     *
+     * <h3>为什么 OnGlobalLayout 是对的</h3>
+     * 它在 {@code performLayout()} 末尾、{@code performDraw()} **之前**触发
+     * ⇒ 在这里补扫，新页面**第一帧画出来就已经是玻璃**，没有中间态。
+     *
+     * <p>★ 只在 {@link #sPendingScan} 为真时才扫：正常滚动/动画每帧都会 layout，
+     * 无条件扫等于每帧全树遍历几百个 View。
+     */
+    public static void attachLayoutHook(final Activity activity) {
+        if (activity == null || sLayoutHooked.get() == activity) {
+            return;
+        }
+        sLayoutHooked = new java.lang.ref.WeakReference<>(activity);
+        try {
+            final View decor = activity.getWindow().getDecorView();
+            decor.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            if (!sPendingScan || sMode == MODE_OFF) {
+                                return;
+                            }
+                            sPendingScan = false;
+                            apply(activity);
+                        }
+                    });
+        } catch (Throwable t) {
+            Log.w(TAG, "布局监听安装失败（仍会在每次切页后 post 补扫一次）", t);
+        }
+    }
+
+    /**
+     * ★★★ v4.3：请求一次补扫。
+     *
+     * <p>两条路同时铺：
+     * <ol>
+     *   <li>置 {@link #sPendingScan} —— 下一次 layout 完成时由
+     *       {@link #attachLayoutHook} 的监听器扫（**正确的那一帧**）；</li>
+     *   <li>再 {@code post} 一次兜底 —— 万一这次切换根本没触发 layout
+     *       （例如页面本来就已测量过），也得扫。</li>
+     * </ol>
+     * ★ 兜底那次**不清** {@code sPendingScan}：清了就把第 ① 条路废掉，
+     *   又回到「先扫一遍 0 尺寸、然后永远不补」的老 bug。
+     */
+    public static void requestScan(final Activity activity) {
+        if (activity == null) {
+            return;
+        }
+        sPendingScan = true;
+        try {
+            activity.getWindow().getDecorView().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (sMode == MODE_OFF) {
+                        return;
+                    }
+                    apply(activity);
+                }
+            });
+        } catch (Throwable ignored) {
+        }
+    }
+
     private static void scheduleScan(final Activity activity) {
+        // ★ v4.3：新加进来的子 View 同样要等 layout 完成才能扫（否则尺寸是 0）
+        sPendingScan = true;
         if (sScanPending) {
             return;
         }
@@ -438,7 +536,7 @@ public final class GlassApplier {
         GlassDrawable glass = new GlassDrawable(v)
                 .radiusPx(glassRadius(bg, d, Math.min(v.getWidth(), v.getHeight())))
                 .band(bandDp())
-                .strength(strengthDp())
+                .refrGain(refrGain())
                 .depthEffect(true)
                 // ★★★ v3.6/v3.7：把面板原来的背景交给它，**按 16% 压成半透明**画回来。
                 //   1:1 画回 ⇒ 一块白灰卡片（用户报「白灰色的」）；

@@ -54,6 +54,49 @@
                 android:textColor="@color/colorPureBlack"
                 android:textSize="@dimen/text_size_middle" />
 
+            <!-- ── 常驻警告：选之前就要看见（v3.0.3） ────────────────────────
+                 ★★★ 为什么放在选项**上面**而不是下面：
+                   用户原话是「如果你下载游戏前有这个提示的话，请一定一定要选择其他地区」。
+                   这条是**事前劝阻**，必须赶在手指点到选项之前出现；放到下面就等于
+                   先让人选完才告诉人家选错了。
+                 ★ 为什么常驻、而不是像下面那条 20sp 警告一样「选中中国大陆才显示」：
+                   下面那条是「选错的后果」，这条是「怎么选才对」。目的不同，时机也不同。
+                 ★ 字号 16sp 标题 + 14sp 正文：比普通提示（13sp）大、比选错警告（20sp）小，
+                   三档字号各自表达一件事，不靠颜色硬抢注意力。
+                 ★ 一份 XML 三处复用（下载页覆盖层 / 设置页对话框 / 「去设置修改」），
+                   所以三个场景都会带上这条 —— 这正是想要的。 -->
+            <LinearLayout
+                android:id="@+id/region_gate_must_read_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/launcher_view_light_gray"
+                android:orientation="vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:id="@+id/region_gate_must_read_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/region_gate_must_read_title"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/region_gate_must_read"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/region_gate_must_read"
+                    android:textColor="@color/colorPureBlack"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
             <!-- ── 选项一：中国大陆 ────────────────────────────────────────── -->
             <LinearLayout
                 android:id="@+id/region_gate_cn"

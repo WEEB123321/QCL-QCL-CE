@@ -2,6 +2,8 @@
 <resources>
     <string name="region_gate_title">Where are you from?</string>
     <string name="region_gate_desc">Your region decides whether this launcher can fetch the original Minecraft packages for you. You can change it later in Settings → Download.</string>
+    <string name="region_gate_must_read_title">Read this before you download</string>
+    <string name="region_gate_must_read">Please note: if you see this prompt before downloading the game, you must choose Other regions, and you must not choose Mainland China. This setting is not a mirror selector — it decides whether you can download the game at all.</string>
     <string name="region_gate_cn">Mainland China</string>
     <string name="region_gate_other">Other regions</string>
     <string name="region_gate_warn_cn">Mainland China users cannot download the original Minecraft here.</string>

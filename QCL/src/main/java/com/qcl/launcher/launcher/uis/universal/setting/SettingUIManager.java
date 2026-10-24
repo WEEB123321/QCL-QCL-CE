@@ -58,6 +58,25 @@ public class SettingUIManager {
         switchSettingUIs(universalGameSettingUI);
     }
 
+    /**
+     * ★★★ v3.0.3：onStart 失败即拉黑的页面名单。
+     *
+     * <p>为什么必须有：{@link #switchSettingUIs} 早先是裸的 {@code onStart()/onStop()}，
+     * 8 个设置子页里任意一个抛异常都会冒泡到主线程 = 整机闪退。
+     * 用户报的「点设置就闪退」正是这一类，而堆栈跟他的操作看起来毫无关系。
+     */
+    private final java.util.LinkedHashSet<BaseUI> brokenUIs = new java.util.LinkedHashSet<>();
+
+    /**
+     * ★ v3.0.3：本类是否有页面被隔离过（给诊断页用）。
+     *
+     * <p>★ 为什么必须暴露：被隔离的页面在界面上就是「点了没反应」，
+     * 不暴露出来的话用户只会以为功能坏了，而日志在另一台设备上。
+     */
+    public boolean hasBrokenPages() {
+        return !brokenUIs.isEmpty();
+    }
+
     public void switchSettingUIs(BaseUI baseUI) {
         int i = 0;
         while (true) {
@@ -70,10 +89,25 @@ public class SettingUIManager {
                 rescanGlass(baseUI);
                 return;
             }
-            if (baseUIArr[i] == baseUI) {
-                baseUIArr[i].onStart();
+            // ★★★ v3.0.3：逐个包起来。见 UiDispatch 的类注释 ——
+            //   这里原先一处 try/catch 都没有，一个子页崩 = 整个启动器崩。
+            final BaseUI ui = baseUIArr[i];
+            if (ui == baseUI) {
+                com.qcl.launcher.launcher.uis.tools.UiDispatch.run("onStart", ui,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                ui.onStart();
+                            }
+                        }, true, brokenUIs);
             } else {
-                baseUIArr[i].onStop();
+                com.qcl.launcher.launcher.uis.tools.UiDispatch.run("onStop", ui,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                ui.onStop();
+                            }
+                        }, false, brokenUIs);
             }
             i++;
         }
@@ -90,21 +124,48 @@ public class SettingUIManager {
         }
     }
 
+    // ★★★ v3.0.3：下面三个循环同样逐个包起来。
+    //   「从文件选择器返回就闪退」「从后台切回来就闪退」就是这里出去的 ——
+    //   onActivityResult 的调用方是系统，用户只会觉得「我选了张图就崩了」。
+
     public void onActivityResult(int i, int i2, Intent intent) {
         for (BaseUI baseUI : this.settingUIs) {
-            baseUI.onActivityResult(i, i2, intent);
+            final BaseUI ui = baseUI;
+            final int req = i, res = i2;
+            final Intent data = intent;
+            com.qcl.launcher.launcher.uis.tools.UiDispatch.run("onActivityResult", ui,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            ui.onActivityResult(req, res, data);
+                        }
+                    }, false, brokenUIs);
         }
     }
 
     public void onPause() {
         for (BaseUI baseUI : this.settingUIs) {
-            baseUI.onPause();
+            final BaseUI ui = baseUI;
+            com.qcl.launcher.launcher.uis.tools.UiDispatch.run("onPause", ui,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            ui.onPause();
+                        }
+                    }, false, brokenUIs);
         }
     }
 
     public void onResume() {
         for (BaseUI baseUI : this.settingUIs) {
-            baseUI.onResume();
+            final BaseUI ui = baseUI;
+            com.qcl.launcher.launcher.uis.tools.UiDispatch.run("onResume", ui,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            ui.onResume();
+                        }
+                    }, false, brokenUIs);
         }
     }
 }
