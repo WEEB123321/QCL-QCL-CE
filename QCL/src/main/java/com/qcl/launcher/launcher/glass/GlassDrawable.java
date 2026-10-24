@@ -225,6 +225,24 @@ public final class GlassDrawable extends Drawable {
     private final Paint fallbackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] locBuf = new int[2];
 
+    /** 面板内容左上角的屏幕坐标（含动画位移），由 {@link #panelOrigin} 填写。 */
+    private final int[] originBuf = new int[2];
+    /** 换算祖先局部坐标用的窗口坐标缓冲。 */
+    private final int[] winBuf = new int[2];
+
+    /** ★★★ v4.4：读「正在跑的 View Animation」用到的三个复用对象（每帧都会用，不能 new）。 */
+    private final android.view.animation.Transformation animTf =
+            new android.view.animation.Transformation();
+    private final Matrix animMtx = new Matrix();
+    private final float[] animPts = new float[2];
+
+    /**
+     * ★★★ v4.4：着色器绘制矩形被裁到**圆角路径**上用的路径（见 {@link #drawShader}）。
+     *
+     * <p>为什么不每帧 new：滚动时几百块面板每帧都要用一次。
+     */
+    private final Path shaderClipPath = new Path();
+
     private RuntimeShader shader;
 
     // ★★ uniform 缓存：位置每帧都变，但尺寸/圆角/带宽不变。
@@ -276,6 +294,14 @@ public final class GlassDrawable extends Drawable {
     private BitmapShader magShader;
     private Bitmap magShaderBg;
     private int magW = -1, magH = -1;
+    /**
+     * ★★★ v4.4：放大环的缓存还必须带上**面板当时的屏幕位置**。
+     *
+     * <p>漏了它的后果：缓存键只看「图 / 宽 / 高」，于是面板一移动（滚动、切页动画），
+     * 放大环的采样窗口还停在第一次绘制时那个位置 —— 表现为「边框那一圈的内容不跟着走」。
+     * 这是「切换界面时框不动」的成因之一。
+     */
+    private int magOx = Integer.MIN_VALUE, magOy = Integer.MIN_VALUE;
     private final Path ringPath = new Path();
     private final Path outerPath = new Path();
     private final Path innerPath = new Path();
@@ -376,6 +402,131 @@ public final class GlassDrawable extends Drawable {
 
     // ───────────────── 绘制 ─────────────────
 
+    /**
+     * ★★★ v4.4：面板内容左上角的**屏幕坐标** —— 含正在跑的 View Animation 位移。
+     *
+     * <h3>为什么不能直接用 {@code getLocationOnScreen()}</h3>
+     * 页面切换用的是 {@code view.setAnimation(AnimationUtils.makeInAnimation(...))}，
+     * 那是**老的 View Animation**：它在绘制时把变换矩阵塞进 RenderNode 的
+     * {@code animationMatrix}（或软件渲染时 concat 到 canvas），
+     * <b>完全不改 {@code mLeft/mTop}</b>。
+     *
+     * <p>于是动画期间 {@code getLocationOnScreen()} 返回的是**布局位置（终点位置）**，
+     * 而面板实际画在**滑动中的位置**。玻璃按布局位置去背景上取样 ⇒
+     * 面板外形在滑、里面的画面却钉在终点不动。用户报的
+     * <b>「液态玻璃界面在动但是框不动」</b>就是这一条。
+     *
+     * <h3>为什么用 {@code Animation.getTransformation} 而不是 {@code canvas.getMatrix()}</h3>
+     * 硬件加速下每块面板有自己的 RenderNode，传给 {@code Drawable.draw} 的 canvas
+     * 矩阵是**单位矩阵**，动画矩阵在 RenderNode 上（{@code setAnimationMatrix}），
+     * 从 canvas 里根本读不到。而 {@code getAnimation()} 拿到的是同一个 Animation 对象，
+     * 用同一个时钟求值，结果与 View 自己算的那一份**逐位相同**。
+     *
+     * <p>★ 只做「加法补偿」：动画为空 / 已结束时增量为 0，
+     * 静止时的取值与改之前**完全一致** —— 不会把原本正常的界面改坏。
+     *
+     * @param bndLeft bounds 左边界（Drawable 坐标，含 View 的 padding）
+     * @param bndTop  bounds 上边界
+     * @param out     输出 [x, y]（屏幕坐标）
+     */
+    private void panelOrigin(int bndLeft, int bndTop, int[] out) {
+        int scrX = 0, scrY = 0;
+        if (owner != null) {
+            try {
+                owner.getLocationOnScreen(locBuf);
+                scrX = locBuf[0];
+                scrY = locBuf[1];
+            } catch (Throwable ignored) {
+            }
+        }
+        out[0] = scrX + bndLeft;
+        out[1] = scrY + bndTop;
+        if (owner == null) {
+            return;
+        }
+        // ★★★ 动画增量。注意：**动画挂在页面根视图上**（CustomAnimationUtils 传的是
+        //   page root），面板自己是 getAnimation()==null 的 —— 所以必须沿祖先链向上找，
+        //   只查 owner 一层等于没做。
+        try {
+            owner.getLocationInWindow(winBuf);
+            final float px = winBuf[0] + bndLeft;
+            final float py = winBuf[1] + bndTop;
+            float dx = 0f, dy = 0f;
+            View cur = owner;
+            int depth = 0;
+            while (cur != null && depth < 32) {
+                android.view.animation.Animation a = cur.getAnimation();
+                if (a != null && !a.hasEnded()) {
+                    animTf.clear();
+                    long now = android.view.animation.AnimationUtils.currentAnimationTimeMillis();
+                    // 返回 false = 这一帧动画已经走完（终态），终态增量本来就是 0
+                    if (a.getTransformation(now, animTf)) {
+                        animMtx.set(animTf.getMatrix());
+                        // 把「面板内容左上角」换算到**这一层祖先**的局部坐标，
+                        // 过一遍它的动画矩阵，差值就是这一层贡献的位移。
+                        // ★ 页面切换用的是纯 TranslateAnimation，对任意点差值都相同；
+                        //   写成映射而不是直接取平移分量，是为了缩放类动画也算得对。
+                        cur.getLocationInWindow(winBuf);
+                        animPts[0] = px - winBuf[0];
+                        animPts[1] = py - winBuf[1];
+                        float lx = animPts[0];
+                        float ly = animPts[1];
+                        animMtx.mapPoints(animPts);
+                        dx += animPts[0] - lx;
+                        dy += animPts[1] - ly;
+                    }
+                }
+                android.view.ViewParent p = cur.getParent();
+                cur = (p instanceof View) ? (View) p : null;
+                depth++;
+            }
+            out[0] = Math.round(out[0] + dx);
+            out[1] = Math.round(out[1] + dy);
+        } catch (Throwable ignored) {
+            // 读不到动画就按布局位置画 —— 退化成改之前的行为，不会更差
+        }
+    }
+
+    /**
+     * ★★★ v4.4：清空 uniform 的「已设置」缓存。
+     *
+     * <h3>为什么必须清（这是「没有圆角的框」的根因）</h3>
+     * {@code shader} 是从**全局池**里取的（见 {@link #acquireShader()}），
+     * {@link #release()} 会把它还回去。还回去时本对象的
+     * {@code lastW / lastH / lastRadius / lastBand / lastBgVersion ...} <b>并没有清</b>。
+     *
+     * <p>于是「释放过、又拿到另一块面板用过的实例」时，下面这段判断
+     * <pre>
+     *   if (lastW != w || lastH != h) { shader.setFloatUniform("uPanelSize", w, h); }
+     * </pre>
+     * 认为「尺寸没变」而**跳过设置** ⇒ 着色器里的 {@code uPanelSize / uRadius /
+     * uRefThickness / uTint / uBg} 全是**上一块面板的值**。
+     *
+     * <p>后果：SDF 与真正绘制的那个 {@code w×h} 矩形对不上。若池里那块面板更大，
+     * 整个矩形都落在 {@code sd < 0} 里 ⇒ {@code aa = clamp(-sd,0,1) = 1}
+     * ⇒ <b>整块矩形被涂满、四个角是直角</b>（因为 {@code drawShader} 画的是
+     * {@code drawRect}，而形状态全靠 SDF 自己裁）。这正是用户描述的
+     * <b>「有一个没有圆角的框」</b>。
+     *
+     * <p>{@code releaseTree()} 在 {@code onChildViewRemoved} 上被调用 ——
+     * 切页时视图的增删、列表回收都会走到它，所以这个 bug 表现为「一切换界面就出现」。
+     */
+    private void resetUniformCache() {
+        lastBand = Float.NaN;
+        lastStrength = Float.NaN;
+        lastRadius = Float.NaN;
+        lastDepth = Float.NaN;
+        lastW = -1;
+        lastH = -1;
+        lastBgVersion = -1;
+        lastScreenW = Float.NaN;
+        lastScreenH = Float.NaN;
+        lastPressT = Float.NaN;
+        lastAppear = Float.NaN;
+        lastNight = -1;
+        opticsSet = false;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         Rect bnd = getBounds();
@@ -464,15 +615,12 @@ public final class GlassDrawable extends Drawable {
             return false;
         }
         Rect bnd = getBounds();
-        int ox = 0, oy = 0;
-        if (owner != null) {
-            try {
-                owner.getLocationOnScreen(locBuf);
-                ox = locBuf[0] + bnd.left;
-                oy = locBuf[1] + bnd.top;
-            } catch (Throwable ignored) {
-            }
-        }
+        // ★★★ v4.4：走 panelOrigin —— 它会叠加切页动画的位移。
+        //   直接用 getLocationOnScreen 的话，动画期间取到的是布局位置（终点），
+        //   面板在滑、画面却钉住不动。
+        panelOrigin(bnd.left, bnd.top, originBuf);
+        int ox = originBuf[0];
+        int oy = originBuf[1];
         float sx = blur.getWidth() / (float) Math.max(1, sW);
         float sy = blur.getHeight() / (float) Math.max(1, sH);
         srcRect.set(Math.round(ox * sx), Math.round(oy * sy),
@@ -509,6 +657,11 @@ public final class GlassDrawable extends Drawable {
         }
         if (shader == null) {
             shader = acquireShader();
+            // ★★★ v4.4：从池里取到的是**别人用过的**实例，uniform 还停在上一块面板的值。
+            //   而下面所有 uniform 都靠 lastXxx 缓存决定「要不要设」—— 那些缓存是
+            //   本对象的、与 shader 归属无关，不清就会出现「尺寸/圆角沿用别的面板」
+            //   ⇒ SDF 与绘制矩形不一致 ⇒ 整块画成方角不透明矩形（见 resetUniformCache）。
+            resetUniformCache();
         }
         if (shader == null) {
             return false;
@@ -519,16 +672,11 @@ public final class GlassDrawable extends Drawable {
         //   paddingLeft/Top..），所以「内容左上角」= View 屏幕坐标 + bounds.left/top。
         //   早期版本直接用 View 坐标并在 (0,0) 画，控件有 padding 时
         //   畸变圈会整体偏移 padding 那么多，看起来像「玻璃没对准边缘」。
+        //   ★ v4.4：改走 panelOrigin，额外叠加切页动画的位移（见该方法注释）。
         Rect bnd = getBounds();
-        int ox = 0, oy = 0;
-        if (owner != null) {
-            try {
-                owner.getLocationOnScreen(locBuf);
-                ox = locBuf[0] + bnd.left;
-                oy = locBuf[1] + bnd.top;
-            } catch (Throwable ignored) {
-            }
-        }
+        panelOrigin(bnd.left, bnd.top, originBuf);
+        int ox = originBuf[0];
+        int oy = originBuf[1];
 
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
         float dm = owner != null ? owner.getResources().getDisplayMetrics().widthPixels : 1080f;
@@ -629,6 +777,24 @@ public final class GlassDrawable extends Drawable {
         //    在 (0,0) 画才能保证 fragCoord 落在 [0,w]×[0,h]，SDF 的圆心才对得上。
         int save = canvas.save();
         canvas.translate(bnd.left, bnd.top);
+        // ★★★ v4.4：把绘制矩形**裁到圆角路径**上（以前完全靠 SDF 自己裁）。
+        //
+        //   为什么以前是隐患：形状正确性 100% 依赖 uPanelSize / uRadius / uPanelOrigin
+        //   三个 uniform 与这个 w×h 矩形严格一致。一旦哪个 uniform 是错的
+        //   （池里取到别人的实例、尺寸刚变、动画中途），SDF 会把整块矩形判成「内部」
+        //   ⇒ alpha 恒为 1 ⇒ 画出来就是**一块直角矩形**。
+        //   这正是用户报的「有一个没有圆角的框」—— 玻璃面板里冒出一个方角色块。
+        //
+        //   加裁切后：uniform 再错，最多是**内容**错，形状永远是这个圆角矩形。
+        //   ★ 不改观感：着色器的抗锯齿斜坡在 sd∈(-1,0) 即形状**内部**，
+        //     而这里裁的是 sd=0 的边界 ⇒ 斜坡一个像素都不被切掉。
+        shaderClipPath.reset();
+        // ★ 与着色器里 `radius = min(uRadius, min(halfSize.x, halfSize.y))` 同一条夹取，
+        //   否则半径超过短边一半时 Path 自己会被钳成别的东西，裁切边界就和 SDF 错开。
+        shaderClipPath.addRoundRect(0f, 0f, w, h,
+                Math.min(r, Math.min(w, h) * 0.5f), Math.min(r, Math.min(w, h) * 0.5f),
+                Path.Direction.CW);
+        canvas.clipPath(shaderClipPath);
         // ★★★ v4.0：整块面板都要画。
         //   v3.3~v3.7 只画四条边带，是为了省片元（当时「内部全透明」，
         //   中间那些像素画了也是白画）。但 ReGlass 的渲染方式里**内部就是模糊背景**，
@@ -655,15 +821,11 @@ public final class GlassDrawable extends Drawable {
             return;
         }
         Rect bnd = getBounds();
-        int ox = 0, oy = 0;
-        if (owner != null) {
-            try {
-                owner.getLocationOnScreen(locBuf);
-                ox = locBuf[0] + bnd.left;
-                oy = locBuf[1] + bnd.top;
-            } catch (Throwable ignored) {
-            }
-        }
+        // ★★★ v4.4：同 drawShader —— 必须叠加切页动画位移，否则面板在滑、
+        //   放大环里的画面却钉在终点不动。
+        panelOrigin(bnd.left, bnd.top, originBuf);
+        int ox = originBuf[0];
+        int oy = originBuf[1];
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
         float r = radius >= 0 ? radius : 24f * d;
         // ★★★ v4.2：与 drawShader 用**同一条**夹取规则 —— 降级路径和主路径
@@ -674,7 +836,11 @@ public final class GlassDrawable extends Drawable {
 
         float sx = bg.getWidth() / (float) Math.max(1, sW);
         float sy = bg.getHeight() / (float) Math.max(1, sH);
-        if (magShader == null || magShaderBg != bg || magW != w || magH != h) {
+        // ★★★ v4.4：缓存键必须带**屏幕位置** —— 只看「图/宽/高」的话，
+        //   面板一移动（滚动、切页动画）放大环仍按第一次那个位置采样，
+        //   表现为「边缘那一圈的内容不跟着面板走」。
+        if (magShader == null || magShaderBg != bg || magW != w || magH != h
+                || magOx != ox || magOy != oy) {
             float cx = (ox + w * 0.5f) * sx;
             float cy = (oy + h * 0.5f) * sy;
             float halfW = w * sx / (2f * RING_MAGNIFY);
@@ -689,6 +855,8 @@ public final class GlassDrawable extends Drawable {
             magShaderBg = bg;
             magW = w;
             magH = h;
+            magOx = ox;
+            magOy = oy;
         }
 
         outerPath.reset();
@@ -736,6 +904,10 @@ public final class GlassDrawable extends Drawable {
     protected void onBoundsChange(Rect bounds) {
         magW = -1;
         magH = -1;
+        // ★ v4.4：尺寸变了，放大环的采样窗口也得重算（缓存键里带了 ox/oy，
+        //   这里一起清掉，避免「尺寸回到旧值 + 位置刚好相同」时取到过期缓存）
+        magOx = Integer.MIN_VALUE;
+        magOy = Integer.MIN_VALUE;
     }
 
     /**

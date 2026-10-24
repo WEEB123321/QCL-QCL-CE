@@ -67,14 +67,18 @@ android {
         //
         //   versionCode 必须**严格单调递增**，否则 Android 会拒绝覆盖安装
         //   （INSTALL_FAILED_VERSION_DOWNGRADE）。所以用：
-        //     versionCode = major*1000 + minor*100 + patch
-        //   v1.1.0 → 1100，v1.1.9 → 1109，v1.2.0 → 1200（进位后仍递增）。
-        //   ★ 1100 > 上一版 CE 的 343 → 可直接覆盖升级，**不用卸载**。
+        //     versionCode = major*10000 + minor*100 + patch
+        //   v1.1.0 → 10100，v1.1.9 → 10109，v1.2.0 → 10200（进位后仍递增）。
+        //   ★ 必须是 *10000 而不是 *1000：*1000 时 minor 只要到 10 就和下一个 major 撞号
+        //     （2.10.0 算成 2000+1000+0 = 3000 = 3.0.0），patch 到 100 又和下一个 minor 撞号。
+        //     本项目 1.5.x 时期踩过一次 VERSION_DOWNGRADE（版本号算出来比已发布的小 ⇒ 装不上）。
+        //     *10000 给 minor / patch 各留两位，实际用到 3.0.5 = 30005 完全够。
+        //   ★ 10100 > 上一版 CE 的 343 → 可直接覆盖升级，**不用卸载**。
         //
         //   ⚠️ 以后每次发版：versionName 末位 +1，versionCode 按同一公式重算，
         //      两者必须一起改（只改 versionName 会导致装不上）。
-        versionCode 30004
-        versionName "3.0.4"
+        versionCode 30005
+        versionName "3.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -1,0 +1,89 @@
+{
+ "note": "Mojang's April Fools builds. Every one of these is a real, officially released joke version - none of them is a mod or a fan remake. Two sources: the official version manifest (most of them are published there as type=snapshot, indistinguishable from a normal weekly snapshot) and the Betacraft archive (2.0, which Mojang never published metadata for). The launcher uses this list for two things: the dedicated 愚人节 filter on the download page, and to keep these builds out of the 正式版 / 测试版 / 远古版 filters so the normal lists stay clean.",
+ "entries": [
+  {
+   "id": "2.0-red",
+   "name": "2.0 (red)",
+   "date": "2013-04-01",
+   "source": "archive",
+   "note": "Minecraft 2.0 - the 2013 joke release. Red / blue / purple are the three colour variants shipped that day."
+  },
+  {
+   "id": "2.0-blue",
+   "name": "2.0 (blue)",
+   "date": "2013-04-01",
+   "source": "archive",
+   "note": "Colour variant of the 2013 joke release."
+  },
+  {
+   "id": "2.0-purple",
+   "name": "2.0 (purple)",
+   "date": "2013-04-01",
+   "source": "archive",
+   "note": "Colour variant of the 2013 joke release."
+  },
+  {
+   "id": "15w14a",
+   "name": "15w14a",
+   "date": "2015-04-01",
+   "source": "manifest",
+   "note": "Love and Hugs Update."
+  },
+  {
+   "id": "1.RV-Pre1",
+   "name": "1.RV-Pre1",
+   "date": "2016-03-31",
+   "source": "manifest",
+   "note": "Trendy Update - released one day early, still the 2016 joke build."
+  },
+  {
+   "id": "3D Shareware v1.34",
+   "name": "3D Shareware v1.34",
+   "date": "2019-04-01",
+   "source": "manifest",
+   "note": "3D Shareware."
+  },
+  {
+   "id": "20w14infinite",
+   "name": "20w14infinite",
+   "date": "2020-04-01",
+   "source": "manifest",
+   "note": "Infinite Dimensions. The in-game name is 20w14infinity; the manifest id is 20w14infinite."
+  },
+  {
+   "id": "22w13oneblockatatime",
+   "name": "22w13oneBlockAtATime",
+   "date": "2022-04-01",
+   "source": "manifest",
+   "note": "One Block At A Time."
+  },
+  {
+   "id": "23w13a_or_b",
+   "name": "23w13a_or_b",
+   "date": "2023-04-01",
+   "source": "manifest",
+   "note": "Vote Update."
+  },
+  {
+   "id": "24w14potato",
+   "name": "24w14potato",
+   "date": "2024-04-01",
+   "source": "manifest",
+   "note": "Poisonous Potato Update."
+  },
+  {
+   "id": "25w14craftmine",
+   "name": "25w14craftmine",
+   "date": "2025-04-01",
+   "source": "manifest",
+   "note": "Craftmine."
+  },
+  {
+   "id": "26w14a",
+   "name": "26w14a",
+   "date": "2026-04-01",
+   "source": "manifest",
+   "note": "The 2026 joke build. Same w14 naming pattern as every earlier April Fools snapshot; the normal release that day was 26.1.1."
+  }
+ ]
+}

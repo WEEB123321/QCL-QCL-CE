@@ -463,9 +463,29 @@ public class LegacyArchiveInstallTask extends AsyncTask<VersionManifest.Version,
         return "";
     }
 
+    /**
+     * ★ v3.0.5：归档条目现在不只有 a/b/c 和 1.0.0-rc，还有 11w47a–13w12~ 的周快照、
+     * 1.x 预发布版和 2.0 愚人节版。原来的三分法（b* → old_beta、1.* → release、
+     * 其余 old_alpha）会把「11w47a」这种周快照标成 {@code old_alpha}，
+     * 装完之后实例列表里显示成「远古版」，与它其实是 1.1 的快照完全对不上。
+     *
+     * <p>改成按<b>版本号形状</b>判定：纯数字加点是正式版；以数字开头的其余形态
+     * （{@code 11w47a} / {@code 13w12~-1439} / {@code 1.2-pre} / {@code 2.0-red}）
+     * 都是快照型构建；{@code b*} 是 beta；剩下以字母开头的是 alpha / classic / indev。
+     */
     private static String legacyTypeFor(String id) {
-        if (id.startsWith("b")) return "old_beta";
-        if (id.startsWith("1.")) return "release";
+        if (id == null || id.isEmpty()) {
+            return "old_alpha";
+        }
+        if (VersionKind.looksLikeRelease(id)) {
+            return "release";
+        }
+        if (id.startsWith("b")) {
+            return "old_beta";
+        }
+        if (Character.isDigit(id.charAt(0))) {
+            return "snapshot";
+        }
         return "old_alpha";
     }
 

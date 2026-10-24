@@ -39,24 +39,40 @@ public class DownloadGameListAdapter extends BaseAdapter {
         }
     }
 
-    private String getType(String str) {
-        if (str.equals("release")) {
+    /**
+     * ★★★ v3.0.5：标签改成按「版本对象」判定，不再只看 {@code type} 字符串。
+     *
+     * <p>两个原因：① 愚人节版在官方清单里就是 {@code snapshot}，只看 type 会被标成「测试版」；
+     * ② 官方清单把 1.3 / 1.4 / 1.4.1 / 1.4.3 / 1.5 标成了 {@code snapshot}，
+     * 只看 type 会把五个正式版标成「测试版」。判定逻辑统一放在
+     * {@link com.qcl.launcher.launcher.download.game.VersionKind} 与
+     * {@link com.qcl.launcher.launcher.download.game.AprilFools}，这里只负责取字符串。
+     */
+    private String getType(VersionManifest.Version version) {
+        if (com.qcl.launcher.launcher.download.game.AprilFools.is(this.context, version.id)) {
+            return this.context.getString(R.string.download_minecraft_ui_april);
+        }
+        if (com.qcl.launcher.launcher.download.game.VersionKind.isRelease(this.context, version)) {
             return this.context.getString(R.string.download_minecraft_ui_release);
         }
-        if (str.equals("snapshot")) {
+        if (com.qcl.launcher.launcher.download.game.VersionKind.isSnapshot(this.context, version)) {
             return this.context.getString(R.string.download_minecraft_ui_snapshot);
         }
-        if ("archive".equals(str)) {
+        if ("archive".equals(version.type)) {
             return this.context.getString(R.string.download_minecraft_ui_archive);
         }
         return this.context.getString(R.string.download_minecraft_ui_old);
     }
 
-    private Drawable getIcon(String str) {
-        if (str.equals("release")) {
+    private Drawable getIcon(VersionManifest.Version version) {
+        if (com.qcl.launcher.launcher.download.game.AprilFools.is(this.context, version.id)) {
+            // 愚人节版本质是快照，用快照图标（草方块=正式版、命令方块=快照、旧命令方块=远古/归档）
+            return this.context.getDrawable(R.drawable.ic_command);
+        }
+        if (com.qcl.launcher.launcher.download.game.VersionKind.isRelease(this.context, version)) {
             return this.context.getDrawable(R.drawable.ic_grass);
         }
-        if (str.equals("snapshot")) {
+        if (com.qcl.launcher.launcher.download.game.VersionKind.isSnapshot(this.context, version)) {
             return this.context.getDrawable(R.drawable.ic_command);
         }
         return this.context.getDrawable(R.drawable.ic_command_block);
@@ -97,9 +113,9 @@ public class DownloadGameListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
         final VersionManifest.Version version = this.versions.get(i);
-        viewHolder.icon.setImageDrawable(getIcon(version.type));
+        viewHolder.icon.setImageDrawable(getIcon(version));
         viewHolder.mcId.setText(version.id);
-        viewHolder.type.setText(getType(version.type));
+        viewHolder.type.setText(getType(version));
         viewHolder.releaseTime.setText(version.releaseTime == null ? "" : DateTimeFormatter.ofPattern(this.context.getString(R.string.time_pattern)).withZone(ZoneId.systemDefault()).format(version.releaseTime.toInstant()));
         viewHolder.item.setOnClickListener(new View.OnClickListener() { // from class: com.qcl.launcher.launcher.list.download.minecraft.DownloadGameListAdapter$$ExternalSyntheticLambda0
             @Override // android.view.View.OnClickListener

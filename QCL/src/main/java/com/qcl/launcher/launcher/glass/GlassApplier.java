@@ -600,7 +600,34 @@ public final class GlassApplier {
             return; // 背景本身就是要显示的内容
         }
 
-        // ④ 已标记过 → 跳过（幂等）
+        // ④ ★★★ v4.4：**全屏的透明背景容器不是面板**，绝不能套玻璃。
+        //
+        //   实测：几乎所有页面根布局都是
+        //     <LinearLayout android:background="@color/launcher_ui_background"
+        //                   android:layout_width="match_parent"
+        //                   android:layout_height="match_parent">
+        //   而 launcher_ui_background = #00000000（**全透明**）。
+        //   它的语义是「我什么都不画，让壁纸透出来」，压根不是一块面板。
+        //
+        //   套上玻璃的后果正是用户报的那一条：
+        //   <ul>
+        //     <li>整页变成一张**铺满内容区的不透明模糊壁纸** —— 这就是「一个框」。
+        //         它左边贴着导航栏边界（76dp 的直边）、右边贴着屏幕边缘，
+        //         24dp 的圆角全被裁在屏幕外 ⇒ 看起来「没有圆角」。</li>
+        //     <li>这张底图的取样点是 {@code getLocationOnScreen()}（**布局位置**），
+        //         而切页动画期间显示列表只录制一次、之后靠 RenderNode 的动画矩阵平移
+        //         ⇒ 底图内容被**烤死**在终点位置。于是页面里的控件在滑，
+        //         这张底图却像钉住不动 —— 「液态玻璃界面在动但是框不动」。</li>
+        //   </ul>
+        //
+        //   ★ 只排除「全透明 + 几乎铺满整屏」这一种组合：
+        //     有可见底色的全屏面板、以及任何正常尺寸的面板（卡片 / 按钮 / 列表项 /
+        //     底部导航 / 对话框）一律照旧套，行为不变。
+        if (isTransparentBackdrop(bg) && isFullPageContainer(v)) {
+            return;
+        }
+
+        // ⑤ 已标记过 → 跳过（幂等）
         Object tag = v.getTag(TAG_APPLIED);
         if (tag instanceof String && "v31".equals(tag)) {
             return;
@@ -761,6 +788,65 @@ public final class GlassApplier {
         } catch (Throwable ignored) {
         }
         return false;
+    }
+
+    /**
+     * ★★★ v4.4：背景是不是「完全透明」—— 也就是画上去什么都看不见。
+     *
+     * <p>为什么要单独判：{@code @color/launcher_ui_background} 是 {@code #00000000}，
+     * 它会被 inflate 成一个 alpha=0 的 {@link android.graphics.drawable.ColorDrawable}，
+     * 既不是 {@code null} 也不是图片 ⇒ 老的判断全放过去了，
+     * 于是「什么都没有」的页面根被当成一块面板套上了玻璃（见 {@link #maybeApply} ④）。
+     *
+     * <p>★ 只认 {@code ColorDrawable}：那是 {@code @color/...} 的落地类型，
+     * 也正是页面根用的那种。别的类型 {@code getAlpha()} 语义不可靠
+     * （例如 {@code GradientDrawable} 返回的是 setAlpha 设的值，不是颜色的 alpha），
+     * 猜错会把本该套玻璃的面板排除掉，宁可漏判。
+     */
+    private static boolean isTransparentBackdrop(Drawable bg) {
+        try {
+            if (bg instanceof android.graphics.drawable.ColorDrawable) {
+                int c = ((android.graphics.drawable.ColorDrawable) bg).getColor();
+                return android.graphics.Color.alpha(c) == 0;
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * ★★★ v4.4：这个 View 是不是「整页容器」（页面根布局 / 整页子页）。
+     *
+     * <h3>为什么不能用「面积 ≥ 屏幕 92%」来判</h3>
+     * 页面根挂在 {@code launcher_layout} 里，而后者有 {@code paddingStart="76dp"}（竖排导航栏），
+     * 于是页面根的宽度只有屏宽的 <b>约 79%</b>、面积约 79% —— 用 92% 根本命不中，
+     * 又不敢往下降到 70%（那会开始误伤大对话框）。
+     *
+     * <h3>改用「撑满高度 + 够宽」</h3>
+     * 页面根的特征是**高度等于整屏**：它没有任何上/下留白。
+     * 而卡片、按钮、列表项、底部导航、对话框都不可能占满屏高。
+     *
+     * <p>★ 阈值取 78% / 60%，不用更紧的值：页面根被状态栏、导航栏、
+     * 以及 {@code launcher_layout} 的 padding 吃掉一部分后，
+     * 实测只占屏高 80%~95%（看设备是否沉浸式），阈值卡太高会漏判 ——
+     * 漏判就等于这个 bug 还在。
+     * <p>★ 也不会误伤：走到这一步的前提是「背景**完全透明**」，
+     * 而真正的面板（卡片 / 按钮 / 对话框）都有可见底色，早在上一道判断就被分开了。
+     * 透明背景的对话框本来就看不见，不存在「套不套玻璃」的问题。
+     */
+    private static boolean isFullPageContainer(View v) {
+        try {
+            android.util.DisplayMetrics dm = v.getResources().getDisplayMetrics();
+            int sw = dm.widthPixels;
+            int sh = dm.heightPixels;
+            if (sw <= 0 || sh <= 0) {
+                return false;
+            }
+            return (long) v.getHeight() * 100L >= (long) sh * 78L
+                    && (long) v.getWidth() * 100L >= (long) sw * 60L;
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     /** 递归重新套（一个容器下的所有子控件）。 */

@@ -631,6 +631,12 @@ public class LobbyUI extends BaseUI implements View.OnClickListener {
                 return "beta";
             case "release-candidate/variant":
                 return "RC";
+            // ★ v3.0.5：归档清单新增的三类（周快照 / 预发布 / 愚人节），
+            //   不加映射会在日历里原样显示 "april-fools" 这种内部串。
+            case "april-fools":
+                return "April Fools";
+            case "pre-release":
+                return "pre-release";
             default:
                 return category;
         }

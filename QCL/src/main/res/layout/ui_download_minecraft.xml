@@ -68,43 +68,71 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <CheckBox
-                    android:singleLine="true"
-                    android:tag="tint_accent_color"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
+            <!-- ★★★ v3.0.5：四个分类（正式 / 测试 / 远古 / 愚人节）。
+                 为什么把三个 CheckBox 包进 HorizontalScrollView：
+                   中文标签各 3 个字，4 个并排 + 右侧刷新按钮，在 360dp 宽的机器上刚好放不下，
+                   窄屏（320dp）会直接把第 4 个挤出去。挤出去等于「入口不存在」——
+                   这个项目已经吃过一次亏（功能有、用户说没有）。
+                   包一层可横向滚动，宽屏照常一排放得下、不需要滚，窄屏至少能滑到。
+                 ★ 用 layout_width=0dp + weight=1 而不是 wrap_content：
+                   否则滚动区会按内容宽度撑开，把刷新按钮顶出屏幕。 -->
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scrollbars="none"
+                android:fillViewport="true">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/download_minecraft_ui_release"
-                    android:id="@+id/checkbox_release"/>
+                    android:orientation="horizontal">
 
-                <CheckBox
-                    android:singleLine="true"
-                    android:tag="tint_accent_color"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/download_minecraft_ui_snapshot"
-                    android:id="@+id/checkbox_snapshot"/>
+                    <CheckBox
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/download_minecraft_ui_release"
+                        android:id="@+id/checkbox_release"/>
 
-                <CheckBox
-                    android:singleLine="true"
-                    android:tag="tint_accent_color"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/download_minecraft_ui_old"
-                    android:id="@+id/checkbox_old"/>
+                    <CheckBox
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/download_minecraft_ui_snapshot"
+                        android:id="@+id/checkbox_snapshot"/>
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                    <CheckBox
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/download_minecraft_ui_old"
+                        android:id="@+id/checkbox_old"/>
+
+                    <CheckBox
+                        android:singleLine="true"
+                        android:tag="tint_accent_color"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/download_minecraft_ui_april"
+                        android:id="@+id/checkbox_april"/>
+                </LinearLayout>
+            </HorizontalScrollView>
 
                 <LinearLayout
                     android:id="@+id/refresh_game_list"
