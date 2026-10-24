@@ -29,4 +29,93 @@
         <item name="android:textColor">@color/colorPureBlack</item>
         <item name="android:textSize">11sp</item>
     </style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ★★★ v3.0.4：液态玻璃设置页的五行基础样式。
+         抽成 style 而不是在每个 TextView 上重复写属性 ——
+         这个页面有 20+ 个「标题 + 小字」对，逐处写等于给未来的自己埋雷
+         （改一处忘一处，最后标题和小字的字号对不上，层级就乱了）。
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- 分组标题：一条细线 + 小字，不另做卡片背景 -->
+    <style name="GlassDebugGroupTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textColor">@color/colorPureBlack</item>
+        <item name="android:alpha">0.55</item>
+    </style>
+
+    <!-- 一行属性：标题在左，当前值/开关在右 -->
+    <style name="GlassDebugRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <!-- 属性标题：15sp，和小字差两级 -->
+    <style name="GlassDebugRowTitle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/colorPureBlack</item>
+    </style>
+
+    <!-- ★ 大白话小字：12sp + 60% 透明度。字号差本身就是语义 -->
+    <style name="GlassDebugRowHint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">3dp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/colorPureBlack</item>
+        <item name="android:alpha">0.6</item>
+    </style>
+
+    <!-- 覆盖范围的二选一按钮 -->
+    <style name="GlassDebugChoice">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">9dp</item>
+        <item name="android:paddingBottom">9dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/colorPureBlack</item>
+        <item name="android:background">@drawable/launcher_region_option</item>
+    </style>
+
+    <!-- 底部动作按钮 -->
+    <style name="GlassDebugAction">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">11dp</item>
+        <item name="android:paddingBottom">11dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorPureBlack</item>
+        <item name="android:background">@drawable/launcher_region_option</item>
+    </style>
+
 </resources>

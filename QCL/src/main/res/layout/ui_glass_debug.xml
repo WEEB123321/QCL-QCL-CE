@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============================================================================
+     ★★★ v3.0.4：液态玻璃设置 / 调试页。
+
+     设计要点（为什么这么写）：
+       ① 每个属性**两行**：第一行是标题 + 当前值，第二行是 12sp 的大白话解释。
+          用户原话是「一些属性要有大白话小字再下面解释」。这不是装饰 ——
+          这项目的玻璃参数被反复调错，一半原因是术语和实际效果对不上
+          （用户说「扭曲加大」，代码里叫 refrGain；用户说「那一圈太宽」，
+           代码里叫 bandDp）。所以标题用**效果**命名，小字用**后果**解释。
+       ② 解释小字用 alpha 0.6 + 12sp，和标题（15sp）拉开两级。
+          参考地区闸门那三条警告的做法：字号差本身就是语义。
+       ③ 四个分组用一条 1dp 细线 + 全大写感的组标题，不另做卡片背景 ——
+          面板本身已经是玻璃了，再套卡片会叠成「玻璃里的玻璃」。
+       ④ 根节点 visibility=gone：页面是预加载的，由 GlassDebugUI.onStart 显示。
+     ========================================================================= -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/ui_glass_debug"
+    android:background="@color/launcher_ui_background"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_centerInParent="true"
+            android:layout_width="440dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="3dp"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textColor="@color/colorPureBlack"
+                    android:alpha="0.75"
+                    android:text="@string/glass_debug_subtitle" />
+
+                <!-- ═══ 分组一：开关与范围 ═══════════════════════════ -->
+
+                <TextView
+                    style="@style/GlassDebugGroupTitle"
+                    android:text="@string/glass_debug_group_switch" />
+
+                <!-- 总开关 -->
+                <LinearLayout style="@style/GlassDebugRow">
+
+                    <TextView
+                        style="@style/GlassDebugRowTitle"
+                        android:text="@string/glass_debug_enable" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/glass_debug_enable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_enable_hint" />
+
+                <!-- 覆盖范围 -->
+                <TextView
+                    style="@style/GlassDebugRowTitle"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/glass_debug_scope" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/glass_debug_scope_light"
+                        style="@style/GlassDebugChoice"
+                        android:text="@string/glass_debug_scope_light" />
+
+                    <TextView
+                        android:id="@+id/glass_debug_scope_full"
+                        style="@style/GlassDebugChoice"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/glass_debug_scope_full" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_scope_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_scope_desc"
+                    style="@style/GlassDebugRowHint"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/colorAccent"
+                    android:alpha="0.9" />
+
+                <!-- ═══ 分组二：看起来怎么样 ═════════════════════════ -->
+
+                <TextView
+                    style="@style/GlassDebugGroupTitle"
+                    android:text="@string/glass_debug_group_look" />
+
+                <!-- 折射带宽度 -->
+                <LinearLayout style="@style/GlassDebugRow">
+
+                    <TextView
+                        style="@style/GlassDebugRowTitle"
+                        android:text="@string/glass_debug_band" />
+
+                    <TextView
+                        android:id="@+id/glass_debug_band_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"
+                        android:alpha="0.7"
+                        android:text="22 dp" />
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/glass_debug_band_seek"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:max="100" />
+
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_band_hint" />
+
+                <!-- 折射位移 -->
+                <LinearLayout style="@style/GlassDebugRow">
+
+                    <TextView
+                        style="@style/GlassDebugRowTitle"
+                        android:text="@string/glass_debug_gain" />
+
+                    <TextView
+                        android:id="@+id/glass_debug_gain_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_middle"
+                        android:textColor="@color/colorPureBlack"
+                        android:alpha="0.7"
+                        android:text="44 (2.20 x)" />
+                </LinearLayout>
+
+                <SeekBar
+                    android:id="@+id/glass_debug_gain_seek"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:max="100" />
+
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_gain_hint" />
+
+                <!-- 位移/带宽比：全手机适配的判据，必须亮出来 -->
+                <TextView
+                    android:id="@+id/glass_debug_gain_ratio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/launcher_view_light_gray"
+                    android:padding="10dp"
+                    android:textSize="@dimen/text_size_middle"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent" />
+
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/glass_debug_gain_ratio_hint" />
+
+                <!-- ═══ 分组三：现在的状态 ═══════════════════════════ -->
+
+                <TextView
+                    style="@style/GlassDebugGroupTitle"
+                    android:text="@string/glass_debug_group_status" />
+
+                <TextView
+                    android:id="@+id/glass_debug_status_render"
+                    style="@style/GlassDebugRowTitle"
+                    android:layout_marginTop="4dp" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_status_render_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_status_mounted"
+                    style="@style/GlassDebugRowTitle"
+                    android:layout_marginTop="14dp" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_status_mounted_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_status_blur"
+                    style="@style/GlassDebugRowTitle"
+                    android:layout_marginTop="14dp" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_status_blur_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_status_bgver"
+                    style="@style/GlassDebugRowTitle"
+                    android:layout_marginTop="14dp" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_status_bgver_hint" />
+
+                <!-- ═══ 分组四：操作 ════════════════════════════════ -->
+
+                <TextView
+                    style="@style/GlassDebugGroupTitle"
+                    android:text="@string/glass_debug_group_action" />
+
+                <TextView
+                    android:id="@+id/glass_debug_rescan"
+                    style="@style/GlassDebugAction"
+                    android:text="@string/glass_debug_rescan" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_rescan_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_copy"
+                    style="@style/GlassDebugAction"
+                    android:text="@string/glass_debug_copy" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_copy_hint" />
+
+                <TextView
+                    android:id="@+id/glass_debug_reset"
+                    style="@style/GlassDebugAction"
+                    android:text="@string/glass_debug_reset" />
+                <TextView
+                    style="@style/GlassDebugRowHint"
+                    android:text="@string/glass_debug_reset_hint" />
+
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+</LinearLayout>

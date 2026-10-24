@@ -216,6 +216,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
+            <!-- ★★★ v3.0.4：液态玻璃设置/调试页。
+                 入口在左侧导航栏（第 6 项，开启玻璃后才出现），
+                 不走「我的」—— 它是玻璃的专属页，不是通用设置。
+                 和这里其它 include 一样预加载，由 GlassDebugUI.onStart 显示。 -->
+            <include
+                layout="@layout/ui_glass_debug"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
         </RelativeLayout>
 
     </LinearLayout>

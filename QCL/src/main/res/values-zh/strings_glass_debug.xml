@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ v3.0.4：液态玻璃设置/调试页的全部文案。
+     ★ 大白话解释是这个页面的核心要求 —— 每个属性下面那行小字不是装饰，
+       是让用户「不读代码也能判断该拧哪边」的唯一手段。
+       （历史上这项目的玻璃参数被反复调错，一半原因是术语和实际效果对不上：
+        用户说「扭曲加大」，代码里叫 refrGain；用户说「那一圈太宽」，
+        代码里叫 bandDp。所以这里的标题用**效果**命名，小字用**后果**解释。）
+     ★ 只加 values（英文默认）+ values-zh（中文）两份；其余语言回退英文，
+       不会 aapt 失败。新增字符串一律不带裸单引号。 -->
+<resources>
+
+    <!-- ── 页面标题与分组 ─────────────────────────────────────────── -->
+    <string name="glass_debug_title">液态玻璃</string>
+    <string name="glass_debug_subtitle">这一页管两件事：玻璃长什么样，以及它现在到底有没有在正常工作。改动即时生效，不用重启。</string>
+    <string name="glass_debug_group_switch">开关与范围</string>
+    <string name="glass_debug_group_look">看起来怎么样</string>
+    <string name="glass_debug_group_status">现在的状态</string>
+    <string name="glass_debug_group_action">操作</string>
+
+    <!-- ── ① 总开关 ─────────────────────────────────────────────── -->
+    <string name="glass_debug_enable">启用液态玻璃</string>
+    <string name="glass_debug_enable_hint">关掉之后所有面板立刻变回原来的样子，一点都不影响启动游戏。这是唯一的总闸，下面每一项都听它的。</string>
+
+    <!-- ── ② 覆盖范围 ───────────────────────────────────────────── -->
+    <string name="glass_debug_scope">覆盖范围</string>
+    <string name="glass_debug_scope_hint">决定「哪些面板才配用玻璃」。小按钮和细线条套上去只会看到一圈噪点，还白费性能，所以只给够大的面板用。</string>
+    <string name="glass_debug_scope_light">轻量</string>
+    <string name="glass_debug_scope_full">标准</string>
+    <string name="glass_debug_scope_light_desc">只套大块头：导航栏、底部操作栏、整张卡片。最省电，观感也够。</string>
+    <string name="glass_debug_scope_full_desc">连中等面板一起套：列表项、输入框、小卡片。更好看，也明显更费电。手机发烫或者卡，就调回轻量。</string>
+
+    <!-- ── ③ 折射带宽度 ─────────────────────────────────────────── -->
+    <string name="glass_debug_band">折射带宽度</string>
+    <string name="glass_debug_band_hint">就是「被扭曲的那一圈有多宽」。窄了像描边，宽了像整块糊住。这一项同时决定位移的上限，两个数是绑在一起的。</string>
+    <string name="glass_debug_band_value">%1$d dp</string>
+
+    <!-- ── ④ 折射位移 ───────────────────────────────────────────── -->
+    <string name="glass_debug_gain">折射位移</string>
+    <string name="glass_debug_gain_hint">边缘那一圈的画面被搬动多远。拧小了画面搬不动，看着「和没有一样」；拧大了边缘会叠成条纹。默认 2.2 倍是能看清又不叠的量。</string>
+    <string name="glass_debug_gain_value">%1$d（%2$s 倍）</string>
+    <string name="glass_debug_gain_ratio">现在的位移是折射带的 %s 倍</string>
+    <string name="glass_debug_gain_ratio_hint">这个倍数在所有手机、所有大小的面板上都一样。它要是随面板大小变，那就是 bug —— 上一版正是这么坏的：同一台手机上，小面板 0.55 倍（搬不动），整屏面板 10.7 倍（叠成条纹）。</string>
+
+    <!-- ── ⑤ 状态区 ─────────────────────────────────────────────── -->
+    <string name="glass_debug_status_render">渲染方式</string>
+    <string name="glass_debug_status_render_hint">Android 13 以上走真折射（斯涅尔 + 色散 + 菲涅尔）；以下没有这个能力，只能近似，观感会弱一档 —— 这是系统限制，不是没调好。</string>
+    <string name="glass_debug_status_mounted">已套上的面板</string>
+    <string name="glass_debug_status_mounted_hint">当前界面上正在用玻璃的面板数量。切页面这个数会变，是正常的。</string>
+    <string name="glass_debug_status_blur">模糊背景</string>
+    <string name="glass_debug_status_blur_hint">玻璃采样的是这张模糊图，所以折射看起来才像玻璃而不是画面错位。缺失时会自动退回原图，效果变差但不报错。</string>
+    <string name="glass_debug_status_bgver">背景版本</string>
+    <string name="glass_debug_status_bgver_hint">每换一次壁纸就 +1。玻璃靠它判断要不要重新绑定贴图，卡住不动说明换背景没被通知到。</string>
+
+    <!-- ── ⑥ 操作 ───────────────────────────────────────────────── -->
+    <string name="glass_debug_rescan">立即重新扫一遍</string>
+    <string name="glass_debug_rescan_hint">改了壁纸或者觉得哪里没套上，点这个。它会整棵树重新找一遍该套玻璃的面板。</string>
+    <string name="glass_debug_copy">复制诊断信息</string>
+    <string name="glass_debug_copy_hint">把上面这些状态拼成一段文字放进剪贴板，出问题时直接粘贴给我就行，不用自己去翻目录。</string>
+    <string name="glass_debug_reset">全部恢复默认</string>
+    <string name="glass_debug_reset_hint">带宽 22dp、位移 2.2 倍、范围轻量。拧乱了就按这个，不用卸载重装。</string>
+    <string name="glass_debug_copied">诊断信息已复制</string>
+    <string name="glass_debug_reset_done">已恢复默认</string>
+    <string name="glass_debug_rescan_done">已重新扫描</string>
+
+    <!-- ── 导航栏入口 ────────────────────────────────────────────── -->
+    <string name="nav_v_glass" translatable="false">玻璃\n调试</string>
+    <string name="nav_numeral_6" translatable="false">VI</string>
+
+</resources>

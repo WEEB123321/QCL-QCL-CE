@@ -30,11 +30,22 @@ public class BottomNavHelper implements View.OnClickListener {
     public static final int TAB_DOWNLOAD = 2;
     public static final int TAB_PLUGIN = 3;
     public static final int TAB_MINE = 4;
+    /**
+     * ★★★ v3.0.4：液态玻璃调试。**第 6 项，且只在玻璃开着时出现**。
+     *
+     * <p>为什么不是常量而是"可有可无的一项"：它服务的是"正在调玻璃的人"，
+     * 对没开玻璃的用户没有任何意义。常驻会白白占掉侧栏一格、把 5 个 Tab 全压矮，
+     * 所以由 {@link #syncGlassTab()} 按开关决定显隐。
+     */
+    public static final int TAB_GLASS = 5;
+
+    /** Tab 总数（含条件显示的那一个）。 */
+    public static final int TAB_COUNT = 6;
 
     private final MainActivity activity;
     private final View navBar;
     private final View searchFab;
-    private final View[] tabs = new View[5];
+    private final View[] tabs = new View[TAB_COUNT];
 
     /** 导航条**宽度**对应的像素值，用于给内容区让位（2.x 起导航在左侧竖排） */
     private final int navWidthPx;
@@ -58,6 +69,7 @@ public class BottomNavHelper implements View.OnClickListener {
         this.tabs[TAB_DOWNLOAD] = activity.findViewById(R.id.nav_tab_download);
         this.tabs[TAB_PLUGIN] = activity.findViewById(R.id.nav_tab_plugin);
         this.tabs[TAB_MINE] = activity.findViewById(R.id.nav_tab_mine);
+        this.tabs[TAB_GLASS] = activity.findViewById(R.id.nav_tab_glass);
         this.navWidthPx = Math.round(76f * activity.getResources().getDisplayMetrics().density);
         for (View tab : tabs) {
             if (tab != null) {
@@ -81,9 +93,52 @@ public class BottomNavHelper implements View.OnClickListener {
             if (m.currentUI == m.downloadUI) return TAB_DOWNLOAD;
             if (m.currentUI == m.pluginUI) return TAB_PLUGIN;
             if (m.currentUI == m.settingUI) return TAB_MINE;
+            if (m.currentUI == m.glassDebugUI) return TAB_GLASS;
         } catch (Throwable ignored) {
         }
         return TAB_NONE;
+    }
+
+    /**
+     * ★★★ v3.0.4：按「玻璃开没开」决定侧栏第 6 项显不显。
+     *
+     * <h3>为什么要一个独立方法，而不是搭在 {@link #syncWithCurrentUI()} 里</h3>
+     * 显隐的触发时机和选中态**不是同一个事件**：
+     * <ul>
+     *   <li>开关切换（设置页 / 玻璃页里）→ 只该改显隐，不该动选中态；</li>
+     *   <li>页面切换 → 只该改选中态，显隐由开关决定（这时再查一次也无害，但会把
+     *       「切页面」和「改设置」耦在一起，将来加第三种触发条件时必然漏）。</li>
+     * </ul>
+     * 分开写，两个调用方各自只说自己那一半，漏不掉。
+     *
+     * <p>★ 关掉玻璃时如果人正停在玻璃调试页：不强行踢走。那一页本身有返回入口，
+     * 而且「关掉之后还能把参数调回去」是合理需求 —— 把人踢回首页反而打断他。
+     *
+     * <p>★ 排版层要求隐藏整条导航栏时（ZL2）一并藏掉，否则会留下一个孤零零的
+     * 第 6 项浮在已隐藏的导航栏里。
+     */
+    public void syncGlassTab() {
+        try {
+            boolean on = false;
+            try {
+                on = activity.launcherSetting != null
+                        && activity.launcherSetting.liquidGlassMode != 0;
+            } catch (Throwable ignored) {
+            }
+            boolean hidden = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.navHiddenByStyle();
+            View g = tabs[TAB_GLASS];
+            if (g != null) {
+                g.setVisibility((on && !hidden) ? View.VISIBLE : View.GONE);
+            }
+            // ★ 藏起来的时候顺便清掉它的选中态，否则下次显示时它还是"亮着"的
+            if (!on && selectedTab == TAB_GLASS) {
+                selectedTab = TAB_NONE;
+                if (g != null) {
+                    g.setSelected(false);
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     /**
@@ -241,12 +296,16 @@ public class BottomNavHelper implements View.OnClickListener {
 
     private BaseUI pageOf(int tab) {
         UIManager m = activity.uiManager;
+        if (m == null) {
+            return null;
+        }
         switch (tab) {
             case TAB_HOME:     return m.mainUI;
             case TAB_INSTANCE: return m.versionListUI;
             case TAB_DOWNLOAD: return m.downloadUI;
             case TAB_PLUGIN:   return m.pluginUI;
             case TAB_MINE:     return m.settingUI;
+            case TAB_GLASS:    return m.glassDebugUI;
             default:           return null;
         }
     }

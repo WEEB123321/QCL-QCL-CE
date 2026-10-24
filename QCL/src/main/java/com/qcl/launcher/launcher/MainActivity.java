@@ -145,6 +145,10 @@ implements View.OnClickListener {
                 //   页面里的 showBarTitle/hideBarTitle 会走空判断跳过；建好后主动 sync 一次补上。
                 MainActivity.this.bottomNav = new com.qcl.launcher.launcher.uis.tools.BottomNavHelper(MainActivity.this);
                 MainActivity.this.bottomNav.syncWithCurrentUI();
+                // ★★★ v3.0.4：「液态玻璃调试」这一项要按开关决定显隐。
+                //   必须在 bottomNav 建好之后立刻调一次 —— XML 里它写死是 gone，
+                //   不在这里补，开了玻璃的人也看不到入口。
+                MainActivity.this.bottomNav.syncGlassTab();
                 StartupTrace.mark("MainActivity：底部导航完成");
                 // ★★★ 社区版路标：这一小段原先没有埋点，是「底部导航完成」与
                 //   「全部完成」之间的盲区 —— 一旦崩在这里，路标只会停在上一行，
@@ -517,6 +521,10 @@ implements View.OnClickListener {
             //   与 v3.2 的定值等价，老用户升级后观感不变。
             int pct = this.launcherSetting == null ? 0 : this.launcherSetting.liquidGlassStrength;
             com.qcl.launcher.launcher.glass.GlassApplier.setStrength(pct > 0 ? pct : 50);
+            // ★ v3.0.4：折射位移增益。0 = 未设置 → 用 44%（= 2.2 倍，v4.2 定稿值）。
+            int gain = this.launcherSetting == null ? 0 : this.launcherSetting.liquidGlassGain;
+            com.qcl.launcher.launcher.glass.GlassApplier.setGainPercent(
+                    gain > 0 ? gain : com.qcl.launcher.launcher.glass.GlassApplier.GAIN_PERCENT_DEFAULT);
             if (mode == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 return; // ★ 默认路径：什么都不做
             }
@@ -577,11 +585,17 @@ implements View.OnClickListener {
             com.qcl.launcher.launcher.glass.GlassApplier.setMode(eff);
             if (eff == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
-                return;
+            } else {
+                com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
+                com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+                rescanLiquidGlass();
             }
-            com.qcl.launcher.launcher.glass.GlassApplier.attachToWindow(this);
-            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
-            rescanLiquidGlass();
+            // ★★★ v3.0.4：开关变了 ⇒ 侧栏「液态玻璃调试」那一条要跟着显隐。
+            //   放在这里而不是只放在玻璃页里：外观设置页也有一个同样的开关，
+            //   两个入口必须走同一条同步路径，否则会「在设置里开了、导航栏没有」。
+            if (this.bottomNav != null) {
+                this.bottomNav.syncGlassTab();
+            }
         } catch (Throwable ignored) {
         }
     }
@@ -620,6 +634,30 @@ implements View.OnClickListener {
     public void setLiquidGlassStrength(int percent) {
         try {
             com.qcl.launcher.launcher.glass.GlassApplier.setStrength(percent);
+            if (com.qcl.launcher.launcher.glass.GlassApplier.getMode()
+                    == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
+                return; // 没开玻璃，只记住数值即可
+            }
+            com.qcl.launcher.launcher.glass.GlassApplier.detachAll(this);
+            com.qcl.launcher.launcher.glass.GlassApplier.refreshBackdrop(this, this.launcherLayout);
+            rescanLiquidGlass();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * ★★★ v3.0.4：设置里拖动「折射位移」时调这个。
+     *
+     * <p>和 {@link #setLiquidGlassStrength(int)} 同一套理由：位移倍数也是在
+     * {@code maybeApply()} 构造 GlassDrawable 时写进实例的，已挂上的那批不会自动跟上，
+     * 而且 {@code TAG_APPLIED} 会让重扫直接跳过它们 —— 不先摘掉就是「拖了没反应」。
+     *
+     * <p>★ 位移/带宽 恒定这个结论**不因为这个滑杆而失效**：滑杆改的是那个恒定倍数本身，
+     * 不是定标基准。任何面板、任何手机上，比值仍然处处相等。
+     */
+    public void setLiquidGlassGain(int percent) {
+        try {
+            com.qcl.launcher.launcher.glass.GlassApplier.setGainPercent(percent);
             if (com.qcl.launcher.launcher.glass.GlassApplier.getMode()
                     == com.qcl.launcher.launcher.glass.GlassApplier.MODE_OFF) {
                 return; // 没开玻璃，只记住数值即可

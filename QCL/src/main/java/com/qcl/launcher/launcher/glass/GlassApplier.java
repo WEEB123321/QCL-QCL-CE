@@ -97,6 +97,44 @@ public final class GlassApplier {
     }
 
     /**
+     * ★★★ v3.0.4：折射位移增益（**无量纲倍数**，不是 dp、不是百分比）。
+     *
+     * <p>为什么从常量变成可调：v4.2 把定标基准从「面板高度」改成「折射带宽度」之后，
+     * 位移/带宽 恒为 2.16 倍 —— 这个数对**所有手机都一样对了**，但它是不是用户
+     * 想要的强度，仍然取决于他的壁纸纹理密度。带宽已经有滑杆了，位移没有，
+     * 于是「想再强一点」的人没有任何旋钮可拧。
+     *
+     * <p>★ 存的是**倍数**，不是设置里的百分比。百分比 → 倍数的换算只在这一处
+     * （{@code GAIN_PERCENT_DIV}），调用方拿到手就是能直接喂给
+     * {@link GlassDrawable#refrGain(float)} 的量，不可能再传错单位。
+     */
+    private static volatile float sRefrGain = GlassDrawable.REFR_GAIN_DEFAULT;
+
+    /** 设置项百分比 → 倍数的除数。20% = 1.0×，44% = 2.2×，55% = 2.75×。 */
+    public static final int GAIN_PERCENT_DIV = 20;
+
+    /** 百分比的最小/最大值（对应 1.0× ~ 2.75×，略宽于 GlassDrawable 的 [1.2, 2.6] 夹取）。 */
+    public static final int GAIN_PERCENT_MIN = 20;
+    public static final int GAIN_PERCENT_MAX = 55;
+
+    /** 默认百分比：44 / 20 = 2.2，即 v4.2 定稿值。 */
+    public static final int GAIN_PERCENT_DEFAULT = 44;
+
+    public static void setGainPercent(int percent) {
+        int p = Math.max(GAIN_PERCENT_MIN, Math.min(GAIN_PERCENT_MAX, percent));
+        sRefrGain = p / (float) GAIN_PERCENT_DIV;
+    }
+
+    public static int getGainPercent() {
+        return Math.round(sRefrGain * GAIN_PERCENT_DIV);
+    }
+
+    /** 当前生效的位移倍数（已按 {@link GlassDrawable} 的区间夹好）。 */
+    public static float refrGain() {
+        return sRefrGain;
+    }
+
+    /**
      * ★★★ 诊断用的一行摘要（给「我的 → 启动诊断」用）。
      *
      * <p><b>为什么必须暴露这一行</b>：玻璃「看起来没效果」有三种**完全不同**的原因 ——
@@ -130,9 +168,40 @@ public final class GlassApplier {
             blur = "未知";
         }
         return "模式=" + mode + " 强度=" + sStrengthPercent
+                + " 位移增益=" + String.format("%.2f", sRefrGain) + "x"
                 + " 已挂载=" + n + " 个控件"
                 + " 背景版本=" + GlassBackdrop.version()
                 + " 模糊图=" + blur;
+    }
+
+    /** 当前已挂上玻璃的控件数（给设置页实时显示用）。 */
+    public static int appliedCount() {
+        try {
+            return sApplied.size();
+        } catch (Throwable ignored) {
+            return 0;
+        }
+    }
+
+    /**
+     * ★ v3.0.4：**位移 ÷ 带宽**的实际倍数。
+     *
+     * <h3>为什么要把这个数暴露出来</h3>
+     * 它是「全手机适配」的唯一可验证判据：v4.2 之前位移按**面板高度**定标，
+     * 同一台手机上这个比值能在 0.55× ~ 10.7× 之间飘（差 15 倍）。
+     * 现在它只由增益决定，**与屏幕尺寸、密度、朝向、面板大小全部无关** ——
+     * 所以设置页上把这个数亮出来，用户一眼就能确认「这台手机也是对的」。
+     *
+     * <p>0.983 是 IOR = 1.4 时 {@code max(-tan(thetaT - thetaI))} 的解析值
+     * （见 {@link GlassShader} 的剖面推导），不是拟合常数。
+     */
+    public static float displacementRatio() {
+        return 0.983f * sRefrGain;
+    }
+
+    /** 当前折射带宽度（dp）—— 设置页显示用。 */
+    public static float bandDpPublic() {
+        return bandDp();
     }
 
     /** 百分比 → 带宽 dp。p=0 → 14dp，p=50 → 22dp，p=100 → 30dp（v4.1 起）。 */
@@ -150,13 +219,17 @@ public final class GlassApplier {
      * （比带宽还窄，搬不动），整屏面板位移 708px（带宽的 10.7 倍，折叠成条纹）。
      * 用户报的「一坨屎」「有些手机不行」就是这个：面板越大越烂，越小越看不见。
      *
-     * <p>现在位移 = 带宽 × {@link GlassDrawable#REFR_GAIN_DEFAULT}，
-     * 位移/带宽 恒为 2.16 倍 —— 任何屏幕、任何密度、任何朝向、任何面板尺寸都一样。
+     * <p>现在位移 = 带宽 × {@link #sRefrGain}（v3.0.4 起可由设置调整），
+     * 位移/带宽 对所有屏幕、密度、朝向、面板尺寸都一样。
      *
      * <p>★ 「折射强度」滑杆仍然有效，它改的是**带宽**（见 {@link #bandDp()}），
      * 位移按固定倍数跟随。一个设置项只表达一件事：带越宽，被扭曲的那一圈越大。
+     *
+     * @deprecated v3.0.4 起请用 {@link #refrGain()} —— 那个读的是可调字段。
+     *             本方法保留只为不打断旧调用点，返回的仍是 v4.2 的定稿值。
      */
-    private static float refrGain() {
+    @Deprecated
+    private static float refrGainDefault() {
         return GlassDrawable.REFR_GAIN_DEFAULT;
     }
 

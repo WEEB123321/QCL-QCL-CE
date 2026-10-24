@@ -69,6 +69,8 @@ public class UIManager {
     public ResourceConflictUI resourceConflictUI;
     public CompatUI compatUI;
     public ModCheckUI modCheckUI;
+    /** ★★★ v3.0.4：液态玻璃调试页（左侧导航栏第 6 个入口，开启玻璃后才出现）。 */
+    public com.qcl.launcher.launcher.uis.glass.GlassDebugUI glassDebugUI;
 
     public ModUpdateUI modUpdateUI;
     public PackMcManagerUI packMcManagerUI;
@@ -135,6 +137,8 @@ public class UIManager {
         try { resourceConflictUI = new ResourceConflictUI(context, activity); } catch (Throwable t) { resourceConflictUI = null; recordBootFail("ResourceConflictUI", t); }
         try { compatUI = new CompatUI(context, activity); } catch (Throwable t) { compatUI = null; recordBootFail("CompatUI", t); }
         try { modCheckUI = new ModCheckUI(context, activity); } catch (Throwable t) { modCheckUI = null; recordBootFail("ModCheckUI", t); }
+        // ★★★ v3.0.4：液态玻璃设置/调试页（左侧导航栏第 6 个入口，开启玻璃后才出现）
+        try { glassDebugUI = new com.qcl.launcher.launcher.uis.glass.GlassDebugUI(context, activity); } catch (Throwable t) { glassDebugUI = null; recordBootFail("GlassDebugUI", t); }
 
         try { modUpdateUI = new ModUpdateUI(context, activity); } catch (Throwable t) { modUpdateUI = null; recordBootFail("ModUpdateUI", t); }
         try { packMcManagerUI = new PackMcManagerUI(context, activity); } catch (Throwable t) { packMcManagerUI = null; recordBootFail("PackMcManagerUI", t); }
@@ -179,6 +183,7 @@ public class UIManager {
         bootUI("ResourceConflictUI", resourceConflictUI);
         bootUI("CompatUI", compatUI);
         bootUI("ModCheckUI", modCheckUI);
+        bootUI("GlassDebugUI", glassDebugUI);
 
         bootUI("ModUpdateUI", modUpdateUI);
         bootUI("PackMcManagerUI", packMcManagerUI);
@@ -236,7 +241,8 @@ public class UIManager {
                 autoTaskUI,
                 resourceConflictUI,
                 compatUI,
-                modCheckUI
+                modCheckUI,
+                glassDebugUI
         };
         // ★ 社区版：把初始化失败的页面剔出去。它们处于半初始化状态，
         //   绝不能再被 onPause / onResume / onActivityResult 这几个遍历 mainUIs 的循环派发到。

@@ -264,6 +264,54 @@
     </LinearLayout>
 
 
+    <!-- ★★★ v3.0.4：液态玻璃调试（第 6 项，**默认隐藏**）。
+
+         为什么要做成「条件出现的第 6 项」而不是塞进「我的」：
+           用户原话是「开启液态玻璃后再左侧导航栏中出现液态玻璃调试」。
+           玻璃的调试是高频操作（拧一下带宽就看一眼效果），埋在三级菜单里
+           意味着每次调试都要多点三下；而它对**没开玻璃的人毫无意义**，
+           常驻又会白白占掉侧栏一格、把 5 个 Tab 都压矮。
+
+         ★ 用 weight=1 而不是固定高度：隐藏时 5 个 Tab 等分（与改造前逐像素一致），
+           显示时 6 个等分。这样不需要在显隐时重算其它 Tab 的高度，
+           也就不会出现「切一下导航条抖一下」。
+         ★ visibility=gone 是初始值，真正确认显隐的是 BottomNavHelper.syncGlassTab()
+           —— XML 只负责「第一帧别闪出来」。 -->
+    <LinearLayout
+        android:id="@+id/nav_tab_glass"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/qcl_nav_tab_bg"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:singleLine="true"
+            android:text="@string/nav_numeral_6"
+            android:textSize="9sp"
+            android:letterSpacing="0.1"
+            android:textColor="@color/colorPureBlack"
+            android:alpha="0.5"
+            android:layout_marginEnd="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/nav_text_glass"
+            android:text="@string/nav_v_glass"
+            android:textSize="11sp"
+            android:lineSpacingExtra="1dp"
+            android:letterSpacing="0.08"
+            android:textColor="@color/colorPureBlack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
     <!-- ★★★ 侧栏底部：版本号（参考图里侧栏最下方那个 V2.4）。
          上面一条细线，下面小字。由 MainUI 填入真实版本号。 -->
     <View

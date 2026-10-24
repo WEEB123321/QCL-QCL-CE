@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ★★★ v3.0.4: Liquid glass settings / debug page.
+     ★ Convention in this project: values/ = English (default fallback),
+       values-zh/ = Simplified Chinese. Every string here MUST also exist in
+       values-zh/, otherwise the default is what ships to most users.
+     ★ The plain-language line under each property is the whole point of this
+       page: the user should be able to tell which knob to turn without reading
+       code. Historically half the parameter churn came from terms not matching
+       the visible effect (users say "more distortion", code says refrGain).
+     ★ No bare apostrophes in any string. -->
+<resources>
+
+    <!-- ── Page title and groups ─────────────────────────────────── -->
+    <string name="glass_debug_title">Liquid Glass</string>
+    <string name="glass_debug_subtitle">This page does two things: how the glass looks, and whether it is actually working right now. Changes apply immediately, no restart needed.</string>
+    <string name="glass_debug_group_switch">Switch and coverage</string>
+    <string name="glass_debug_group_look">How it looks</string>
+    <string name="glass_debug_group_status">Current status</string>
+    <string name="glass_debug_group_action">Actions</string>
+
+    <!-- ── ① Master switch ──────────────────────────────────────── -->
+    <string name="glass_debug_enable">Enable liquid glass</string>
+    <string name="glass_debug_enable_hint">Turn this off and every panel snaps back to how it was, with zero effect on launching games. This is the only master switch; everything below obeys it.</string>
+
+    <!-- ── ② Coverage ───────────────────────────────────────────── -->
+    <string name="glass_debug_scope">Coverage</string>
+    <string name="glass_debug_scope_hint">Decides which panels get glass at all. Small buttons and thin dividers only show a ring of noise and cost performance for nothing, so only big enough panels qualify.</string>
+    <string name="glass_debug_scope_light">Light</string>
+    <string name="glass_debug_scope_full">Standard</string>
+    <string name="glass_debug_scope_light_desc">Big pieces only: nav bar, bottom action bar, whole cards. Cheapest, and looks good enough.</string>
+    <string name="glass_debug_scope_full_desc">Medium panels too: list rows, input boxes, small cards. Prettier, noticeably heavier on battery. If the phone gets hot or laggy, switch back to Light.</string>
+
+    <!-- ── ③ Refraction band width ──────────────────────────────── -->
+    <string name="glass_debug_band">Refraction band width</string>
+    <string name="glass_debug_band_hint">How wide the distorted ring is. Too narrow reads as an outline; too wide looks like the whole panel is smeared. This also caps the displacement, the two are tied together.</string>
+    <string name="glass_debug_band_value">%1$d dp</string>
+
+    <!-- ── ④ Refraction displacement ────────────────────────────── -->
+    <string name="glass_debug_gain">Refraction displacement</string>
+    <string name="glass_debug_gain_hint">How far the picture along the edge gets pushed. Too small and nothing moves, which looks like there is no effect at all; too large and the edge folds into stripes. The default 2.2x is visible without folding.</string>
+    <string name="glass_debug_gain_value">%1$d (%2$s x)</string>
+    <string name="glass_debug_gain_ratio">Displacement is currently %s x the band width</string>
+    <string name="glass_debug_gain_ratio_hint">This ratio is identical on every phone and every panel size. If it ever changes with panel size, that is a bug, and it is exactly how the previous version broke: on one phone a small panel got 0.55x (nothing moved) while a full screen panel got 10.7x (folded into stripes).</string>
+
+    <!-- ── ⑤ Status ──────────────────────────────────────────────── -->
+    <string name="glass_debug_status_render">Render path</string>
+    <string name="glass_debug_status_render_hint">Android 13 and up use real refraction (Snell + dispersion + Fresnel). Below that the capability does not exist, so an approximation is used and the look is one tier weaker. That is a system limit, not a misconfiguration.</string>
+    <string name="glass_debug_status_mounted">Panels using glass</string>
+    <string name="glass_debug_status_mounted_hint">How many panels on screen currently have glass. This number changes as you switch pages, which is normal.</string>
+    <string name="glass_debug_status_blur">Blurred backdrop</string>
+    <string name="glass_debug_status_blur_hint">The glass samples this blurred image, which is why refraction reads as glass instead of a shifted picture. If it is missing the original image is used automatically: worse, but silent.</string>
+    <string name="glass_debug_status_bgver">Backdrop version</string>
+    <string name="glass_debug_status_bgver_hint">Goes up by one on every wallpaper change. Glass uses it to decide whether to rebind its texture; if it stops moving, wallpaper changes are not being announced.</string>
+
+    <!-- ── ⑥ Actions ────────────────────────────────────────────── -->
+    <string name="glass_debug_rescan">Rescan now</string>
+    <string name="glass_debug_rescan_hint">Use this after changing wallpaper or when some panel looks like it never got glass. It walks the whole tree again looking for panels that qualify.</string>
+    <string name="glass_debug_copy">Copy diagnostics</string>
+    <string name="glass_debug_copy_hint">Puts the status above into the clipboard as plain text. When something breaks, paste it straight to me instead of hunting through folders.</string>
+    <string name="glass_debug_reset">Restore defaults</string>
+    <string name="glass_debug_reset_hint">Band 22dp, displacement 2.2x, coverage Light. Press this when things get tangled; no need to reinstall.</string>
+    <string name="glass_debug_copied">Diagnostics copied</string>
+    <string name="glass_debug_reset_done">Defaults restored</string>
+    <string name="glass_debug_rescan_done">Rescanned</string>
+
+    <!-- ── Nav entry ────────────────────────────────────────────── -->
+    <string name="nav_v_glass" translatable="false">玻璃\n调试</string>
+    <string name="nav_numeral_6" translatable="false">VI</string>
+
+</resources>
