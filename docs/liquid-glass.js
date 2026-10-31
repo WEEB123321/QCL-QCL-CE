@@ -192,32 +192,32 @@
 
   function optionsFor(el) {
     if (el.tagName === 'NAV') {
-      return { thickness: 20, ior: 1.45, blur: 0.28, spec: 0.26, scale: 0.7 };
+      return { thickness: 70, ior: 2.35, blur: 0.35, spec: 0.55, scale: 1.6 };
     }
     if (el.classList.contains('phone')) {
-      return { thickness: 50, ior: 1.9, blur: 0.35, spec: 0.45, scale: 0.9 };
+      return { thickness: 90, ior: 2.5, blur: 0.45, spec: 0.6, scale: 1.4 };
     }
     if (el.classList.contains('qr-card')) {
-      return { thickness: 42, ior: 1.75, blur: 0.3, spec: 0.38, scale: 1 };
+      return { thickness: 80, ior: 2.3, blur: 0.4, spec: 0.5, scale: 1.4 };
     }
     if (el.tagName === 'ASIDE') {
-      return { thickness: 28, ior: 1.55, blur: 0.3, spec: 0.32, scale: 1 };
+      return { thickness: 60, ior: 2.1, blur: 0.35, spec: 0.42, scale: 1.3 };
     }
     if (el.classList.contains('box')) {
-      return { thickness: 32, ior: 1.6, blur: 0.28, spec: 0.32, scale: 1 };
+      return { thickness: 60, ior: 2.1, blur: 0.3, spec: 0.42, scale: 1.3 };
     }
     if (el.classList.contains('btn-ghost')) {
-      return { thickness: 14, ior: 1.4, blur: 0.15, spec: 0.25, scale: 1 };
+      return { thickness: 22, ior: 1.7, blur: 0.2, spec: 0.32, scale: 1.2 };
     }
-    return { thickness: 40, ior: 1.7, blur: 0.28, spec: 0.38, scale: 1 };
+    return { thickness: 70, ior: 2.3, blur: 0.32, spec: 0.5, scale: 1.4 };
   }
 
   function mapScaleFor(w, h) {
     var m = Math.max(w, h);
-    if (m > 1100) return 0.4;
-    if (m > 720) return 0.5;
-    if (m > 420) return 0.6;
-    return 0.72;
+    if (m > 1100) return 0.55;
+    if (m > 720) return 0.6;
+    if (m > 420) return 0.7;
+    return 0.8;
   }
 
   function getMaps(w, h, radius, opts) {
