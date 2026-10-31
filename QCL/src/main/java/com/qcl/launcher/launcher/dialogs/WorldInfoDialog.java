@@ -193,10 +193,10 @@ public final class WorldInfoDialog {
     private static void shareFile(Context context, String path) {
         try {
             File f = new File(path);
-            // ★ 复用 FilePicker 模块已经声明好的那个 FileProvider —— 它的 authority 是
-            //   @string/filebrowser_provider，CE 版里就是 com.qcl.launcher.ce.filepicker.provider。
-            //   这里用 getPackageName() 拼而不是直接读 R.string：既避开库模块 R 类的可见性问题，
-            //   也让同一个 apk 在「CE 版 / 官方版」下都能算对。
+            // ★ 复用 FilePicker 模块已经声明好的那个 FileProvider —— 清单里写成
+            //   ${applicationId}.filepicker.provider，正式版 / Beta 会自动带上各自包名。
+            //   这里用 getPackageName() 拼而不是直接读某个常量：既避开库模块 R 类的可见性问题，
+            //   也让同一个 apk 在「CE 版 / 官方版 / Beta」下都能算对。
             //   它的路径表是 external-path path="."（整个外部存储），/sdcard/QCL 在其中。
             Uri uri = androidx.core.content.FileProvider.getUriForFile(
                     context, context.getPackageName() + ".filepicker.provider", f);

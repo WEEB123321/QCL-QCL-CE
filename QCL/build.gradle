@@ -33,6 +33,10 @@ android {
     //   调试单架构示例：./gradlew :QCL:assembleRelease -Darch=x86_64
     //   注意：AGP 禁止 splits.abi 与 ndk.abiFilters 共存，QCL 单 APK 方案只走 abiFilters。
     def qclArch = System.getProperty("arch", "all")
+    // ★★★ Beta 通道：默认构建 Beta 包，-Dchannel=stable 可切回正式版。
+    //   Beta 使用独立 applicationId，可与正式版同时安装；游戏目录仍共用 /sdcard/QCL。
+    def qclChannel = System.getProperty("channel", "beta")
+    def qclIsBeta = qclChannel == "beta"
 
     defaultConfig {
         if (qclArch != "all") {
@@ -55,7 +59,10 @@ android {
         //   官方版占用 com.qcl.launcher，若沿用同一个包名，安装时会直接冲突（覆盖/失败）。
         //   注意：这里只改 applicationId，**不动 Java 包名**（namespace 仍由清单 package 决定），
         //   所以 R 类、JNI 的 FindClass("com/qcl/...")、getPackageName() 全部无需改动。
-        applicationId "com.qcl.launcher.ce"
+        //
+        //   Beta 通道再套一层 .beta 后缀：正式版与 Beta 可同时安装，内部 filesDir /
+        //   SharedPreferences 天然隔离；外部游戏目录仍共用 /sdcard/QCL。
+        applicationId qclIsBeta ? "com.qcl.launcher.ce.beta" : "com.qcl.launcher.ce"
         minSdk 26
         targetSdk 34
         // ★★★ 社区版（CE）**独立版本线**：从 v1.1.0 起，与上游 QCL 的 1.4.x 脱钩。
@@ -77,8 +84,12 @@ android {
         //
         //   ⚠️ 以后每次发版：versionName 末位 +1，versionCode 按同一公式重算，
         //      两者必须一起改（只改 versionName 会导致装不上）。
-        versionCode 30005
-        versionName "3.0.5"
+        //
+        //   Beta 通道从 v1.0.0 重新起算（独立包名，不存在与正式版的 versionCode 比较）。
+        versionCode qclIsBeta ? 10000 : 30106
+        versionName qclIsBeta ? "1.0.0-beta" : "3.1.6"
+        buildConfigField "boolean", "BETA_CHANNEL", qclIsBeta.toString()
+        manifestPlaceholders = [qclAppLabel: qclIsBeta ? "QCL-CE Beta" : "@string/app_name"]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -99,7 +110,7 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def abiTag = (qclArch == "all") ? "universal" : qclArch
-            outputFileName = "QCL-${variant.buildType.name}-${variant.versionName}-${abiTag}.apk"
+            outputFileName = "QCL-CE-${variant.versionName}-${abiTag}-${variant.buildType.name}.apk"
         }
     }
     compileOptions {
@@ -121,6 +132,54 @@ android {
         exclude("META-INF/*.kotlin_module")
     }
 
+}
+
+def qclRequestedArch = System.getProperty("arch", "all")
+def qclAssetArch = System.getProperty("assetArch",
+        qclRequestedArch == "all" ? "arm64" : qclRequestedArch)
+def qclAssetAbiDir
+def qclAssetJreTag
+switch (qclAssetArch) {
+    case "arm64":
+        qclAssetAbiDir = "arm64-v8a"
+        qclAssetJreTag = "arm64"
+        break
+    case "arm":
+        qclAssetAbiDir = "armeabi-v7a"
+        qclAssetJreTag = "arm"
+        break
+    case "x86_64":
+        qclAssetAbiDir = "x86_64"
+        qclAssetJreTag = "x86_64"
+        break
+    case "x86":
+        qclAssetAbiDir = "x86"
+        qclAssetJreTag = "x86"
+        break
+    default:
+        throw new GradleException("Unsupported assets arch: " + qclAssetArch)
+}
+def qclFilteredAssetsDir = file("$buildDir/generated/qclAssets/$qclAssetAbiDir")
+def prepareQclAssets = tasks.register("prepareQclAssets", Sync) {
+    from("src/main/assets") {
+        ["arm64-v8a", "armeabi-v7a", "x86_64", "x86"].each { abi ->
+            if (abi != qclAssetAbiDir) {
+                exclude "**/${abi}/**"
+            }
+        }
+        ["arm64", "arm", "x86_64", "x86"].each { tag ->
+            if (tag != qclAssetJreTag) {
+                exclude "**/bin-${tag}.tar.xz"
+            }
+        }
+    }
+    into qclFilteredAssetsDir
+}
+android.sourceSets.main.assets.srcDirs = [qclFilteredAssetsDir]
+tasks.configureEach { task ->
+    if (task.name.startsWith("merge") && task.name.endsWith("Assets")) {
+        task.dependsOn(prepareQclAssets)
+    }
 }
 
 dependencies {

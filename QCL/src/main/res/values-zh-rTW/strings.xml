@@ -802,14 +802,15 @@
     <string name="dialog_delete_rocker_positive">刪除</string>
     <string name="dialog_delete_rocker_content">確定要刪除該方向控制盤嗎？</string>
     <string name="dialog_delete_rocker_title">提示</string>
-    <string name="dialog_manage_controller_import">從本地導入布局方案</string>
+    <string name="dialog_manage_controller_import">從本地導入布局</string>
     <string name="dialog_manage_controller_create">創建新的布局方案</string>
     <string name="dialog_manage_controller_exit">完成</string>
     <string name="export_control_pattern_title">導出布局方案</string>
     <string name="dialog_manage_controller_export_dialog">正在導出本地布局方案…</string>
     <string name="dialog_manage_controller_import_dialog">正在導入觸控布局方案…</string>
     <string name="dialog_manage_controller_import_exist">您導入的布局方案已存在！</string>
-    <string name="dialog_manage_controller_import_error">導入失敗，請檢查文件是否為HMCL-PE布局文件</string>
+    <string name="dialog_manage_controller_import_error">導入失敗，請檢查文件是否為 FCL / Zalith Launcher / HMCL-PE 布局文件</string>
+    <string name="dialog_manage_controller_import_success">已導入 %1$s 布局：%2$s</string>
     <string name="dialog_manage_controller_import_warn">當前版本啟動器不支持您導入的布局方案，如果強行導入，可能會造成崩潰，是否繼續？</string>
     <string name="dialog_create_control_pattern_title">創建新的布局方案</string>
     <string name="dialog_create_control_pattern_title_sec">編輯布局方案信息</string>

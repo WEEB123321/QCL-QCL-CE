@@ -229,6 +229,8 @@ implements View.OnClickListener {
      */
     private String pendingInstancePath = null;
 
+    private String pendingDirectServer = null;
+
     // ★★★ 1.1.0：原 `libsecurity.so`（防篡改校验库，随已删除的 Boat 模块一起没了）曾提供
     //   下面这些 native 方法。这里改成等价的**纯 Java 实现**，彻底摘掉对它的依赖。
     @Override
@@ -286,6 +288,11 @@ implements View.OnClickListener {
                     this.pendingInstancePath = inst;
                 }
                 this.getIntent().removeExtra("qcl_instance");
+                String directServer = extras.getString("qcl_server");
+                if (directServer != null && !directServer.isEmpty()) {
+                    this.pendingDirectServer = directServer;
+                }
+                this.getIntent().removeExtra("qcl_server");
             }
         } catch (Throwable ignored) {
         }
@@ -477,6 +484,10 @@ implements View.OnClickListener {
             android.os.Bundle b = new android.os.Bundle();
             b.putString("setting_path", finalPath);
             b.putBoolean("test", false);
+            if (this.pendingDirectServer != null && !this.pendingDirectServer.isEmpty()) {
+                b.putString("server", this.pendingDirectServer);
+            }
+            this.pendingDirectServer = null;
             StartupTrace.mark("社区版：桌面快捷方式一键启动 → " + version);
             com.qcl.launcher.launcher.launch.check.LaunchTools.launch(this, this, version, b);
         } catch (Throwable t) {

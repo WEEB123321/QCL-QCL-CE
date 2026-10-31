@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 import com.google.gson.Gson;
+import com.qcl.launcher.BuildConfig;
 import com.qcl.launcher.launcher.MainActivity;
 import com.qcl.launcher.update.LauncherVersion;
 import com.qcl.launcher.update.UpdateDialog;
@@ -154,7 +155,16 @@ public class UpdateChecker {
                                 if (parsed == null) {
                                     continue;
                                 }
-                                int code = parsed.latestRelease == null ? -1 : parsed.latestRelease.versionCode;
+                                // ★ Beta 独立包只认 latestPrerelease：
+                                //   正式版 30106 的 versionCode 远大于 Beta 的 10000，
+                                //   若一起比较，Beta 会永远把正式版当成「可更新」并去装
+                                //   另一个包名的 APK。稳定包仍按原逻辑取两者较大值。
+                                int code;
+                                if (BuildConfig.BETA_CHANNEL) {
+                                    code = parsed.latestPrerelease == null ? -1 : parsed.latestPrerelease.versionCode;
+                                } else {
+                                    code = parsed.latestRelease == null ? -1 : parsed.latestRelease.versionCode;
+                                }
                                 if (code > bestCode) {
                                     bestCode = code;
                                     json = parsed;
@@ -177,10 +187,16 @@ public class UpdateChecker {
 
                         // 3) 遍历候选，找第一个版本比本机大的（跟 FCL 一样）
                         List<LauncherVersion> candidates = new ArrayList<LauncherVersion>();
-                        if (getBetaVersion && json.latestPrerelease != null) {
-                            candidates.add(json.latestPrerelease);
+                        if (BuildConfig.BETA_CHANNEL) {
+                            if (json.latestPrerelease != null) {
+                                candidates.add(json.latestPrerelease);
+                            }
+                        } else {
+                            if (getBetaVersion && json.latestPrerelease != null) {
+                                candidates.add(json.latestPrerelease);
+                            }
+                            candidates.add(json.latestRelease);
                         }
-                        candidates.add(json.latestRelease);
 
                         int current = UpdateChecker.this.getPackageVersionCode();
                         for (LauncherVersion version : candidates) {

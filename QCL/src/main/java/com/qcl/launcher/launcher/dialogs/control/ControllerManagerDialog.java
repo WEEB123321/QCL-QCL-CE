@@ -15,11 +15,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
-import com.leo618.zip.IZipCallback;
-import com.leo618.zip.ZipManager;
 import com.tungsten.filepicker.Constants;
 import com.tungsten.filepicker.FileChooser;
 import com.qcl.launcher.R;
+import com.qcl.launcher.control.importer.ExternalLayoutImporter;
 import com.qcl.launcher.launcher.MainActivity;
 import com.qcl.launcher.launcher.dialogs.LoadingDialog;
 import com.qcl.launcher.launcher.list.local.controller.ControlPattern;
@@ -31,7 +30,9 @@ import com.qcl.launcher.utils.file.FileUtils;
 import com.qcl.launcher.utils.file.UriUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ControllerManagerDialog extends Dialog implements View.OnClickListener {
 
@@ -81,87 +82,74 @@ public class ControllerManagerDialog extends Dialog implements View.OnClickListe
     }
 
     public void onResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            LoadingDialog dialog = new LoadingDialog(getContext());
-            dialog.setLoadingText(getContext().getString(R.string.dialog_manage_controller_import_dialog));
-            new Thread(() -> {
-                activity.runOnUiThread(dialog::show);
-                Uri uri = data.getData();
-                String path = UriUtils.getRealPathFromUri_AboveApi19(getContext(),uri);
-                String name = UriUtils.getRealPathFromUri_AboveApi19(getContext(),uri).substring(UriUtils.getRealPathFromUri_AboveApi19(getContext(),uri).lastIndexOf("/"));
-                FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                FileUtils.createDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                FileUtils.copyFile(path,AppManifest.DEFAULT_CACHE_DIR + "/import/" + name);
-                FileUtils.rename(AppManifest.DEFAULT_CACHE_DIR + "/import/" + name,name.substring(0,name.lastIndexOf(".")) + ".zip");
-                ZipManager.unzip(AppManifest.DEFAULT_CACHE_DIR + "/import/" + name.substring(0, name.lastIndexOf(".")) + ".zip", AppManifest.DEFAULT_CACHE_DIR + "/import","HMCL-PE-Password", new IZipCallback() {
-                    @Override
-                    public void onStart() {
-
-                    }
-
-                    @Override
-                    public void onProgress(int percentDone) {
-
-                    }
-
-                    @Override
-                    public void onFinish(boolean success) {
-                        if (success) {
-                            String[] string = new File(AppManifest.DEFAULT_CACHE_DIR + "/import/").list();
-                            String importName = "";
-                            for (String str : string){
-                                if (new File(AppManifest.DEFAULT_CACHE_DIR + "/import/" + str).isDirectory()) {
-                                    importName = str;
-                                    break;
-                                }
-                            }
-                            if (new File(AppManifest.DEFAULT_CACHE_DIR + "/import/" + importName + "/info.json").exists()) {
-                                String info = FileStringUtils.getStringFromFile(AppManifest.DEFAULT_CACHE_DIR + "/import/" + importName + "/info.json");
-                                Gson gson = new Gson();
-                                ControlPattern controlPattern = gson.fromJson(info, ControlPattern.class);
-                                if (controlPattern.name != null && !controlPattern.name.equals("")) {
-                                    ArrayList<String> names = new ArrayList<>();
-                                    for (ControlPattern pattern : SettingUtils.getControlPatternList()) {
-                                        names.add(pattern.name);
-                                    }
-                                    if (!names.contains(importName) && importName.equals(controlPattern.name)) {
-                                        FileUtils.copyDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/" + importName,AppManifest.CONTROLLER_DIR + "/" + importName);
-                                        FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                                        loadList();
-                                        activity.runOnUiThread(dialog::dismiss);
-                                    }
-                                    else if (!importName.equals(controlPattern.name)) {
-                                        Toast.makeText(getContext(),getContext().getString(R.string.dialog_manage_controller_import_error),Toast.LENGTH_SHORT).show();
-                                        FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                                        activity.runOnUiThread(dialog::dismiss);
-                                    }
-                                    else {
-                                        Toast.makeText(getContext(),getContext().getString(R.string.dialog_manage_controller_import_exist),Toast.LENGTH_SHORT).show();
-                                        FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                                        activity.runOnUiThread(dialog::dismiss);
-                                    }
-                                }
-                                else {
-                                    Toast.makeText(getContext(),getContext().getString(R.string.dialog_manage_controller_import_error),Toast.LENGTH_SHORT).show();
-                                    FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                                    activity.runOnUiThread(dialog::dismiss);
-                                }
-                            }
-                            else {
-                                Toast.makeText(getContext(),getContext().getString(R.string.dialog_manage_controller_import_error),Toast.LENGTH_SHORT).show();
-                                FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                                activity.runOnUiThread(dialog::dismiss);
-                            }
-                        }
-                        else {
-                            Toast.makeText(getContext(),getContext().getString(R.string.dialog_manage_controller_import_error),Toast.LENGTH_SHORT).show();
-                            FileUtils.deleteDirectory(AppManifest.DEFAULT_CACHE_DIR + "/import/");
-                            activity.runOnUiThread(dialog::dismiss);
-                        }
-                    }
-                });
-            }).start();
+        if (resultCode != RESULT_OK || data == null) {
+            return;
         }
+        LoadingDialog dialog = new LoadingDialog(getContext());
+        dialog.setLoadingText(getContext().getString(R.string.dialog_manage_controller_import_dialog));
+        new Thread(() -> {
+            activity.runOnUiThread(dialog::show);
+            String successMessage = null;
+            String errorMessage = null;
+            File importDir = new File(AppManifest.DEFAULT_CACHE_DIR, "import");
+            try {
+                Uri uri = data.getData();
+                if (uri == null) {
+                    throw new IOException("empty uri");
+                }
+                String path = UriUtils.getRealPathFromUri_AboveApi19(getContext(), uri);
+                if (path == null || path.isEmpty()) {
+                    throw new IOException("unreadable path");
+                }
+                File sourceFile = new File(path);
+                String fileName = sourceFile.getName();
+                String baseName = fileName;
+                int dot = fileName.lastIndexOf('.');
+                if (dot > 0) {
+                    baseName = fileName.substring(0, dot);
+                }
+
+                FileUtils.deleteDirectory(importDir.getAbsolutePath());
+                FileUtils.createDirectory(importDir.getAbsolutePath());
+                File cacheFile = new File(importDir, fileName);
+                FileUtils.copyFile(path, cacheFile.getAbsolutePath());
+
+                ExternalLayoutImporter.Result result;
+                if (fileName.toLowerCase(Locale.ROOT).endsWith(".hmclpe")
+                        || ExternalLayoutImporter.isZip(cacheFile)) {
+                    result = ExternalLayoutImporter.parseHmclPeZip(cacheFile,
+                            new File(importDir, "unzip"), baseName);
+                } else {
+                    result = ExternalLayoutImporter.parseJson(
+                            FileStringUtils.getStringFromFile(cacheFile.getAbsolutePath()), baseName);
+                }
+                String savedName = ExternalLayoutImporter.saveAsNewPattern(getContext(), result);
+                successMessage = getContext().getString(
+                        R.string.dialog_manage_controller_import_success, result.format, savedName);
+            } catch (Throwable t) {
+                android.util.Log.w("jrelog", "[控键导入] 失败", t);
+                errorMessage = t.getMessage();
+                if (errorMessage == null || errorMessage.trim().isEmpty()) {
+                    errorMessage = t.getClass().getSimpleName();
+                }
+            } finally {
+                FileUtils.deleteDirectory(importDir.getAbsolutePath());
+            }
+            final String ok = successMessage;
+            final String error = errorMessage;
+            activity.runOnUiThread(() -> {
+                dialog.dismiss();
+                if (ok != null) {
+                    Toast.makeText(getContext(), ok, Toast.LENGTH_LONG).show();
+                    loadList();
+                } else {
+                    Toast.makeText(getContext(),
+                            getContext().getString(R.string.dialog_manage_controller_import_error)
+                                    + (error == null ? "" : " (" + error + ")"),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
     }
 
     @Override
@@ -169,9 +157,11 @@ public class ControllerManagerDialog extends Dialog implements View.OnClickListe
         if (view == importPattern){
             Intent intent = new Intent(getContext(), FileChooser.class);
             intent.putExtra(Constants.SELECTION_MODE, Constants.SELECTION_MODES.SINGLE_SELECTION.ordinal());
-            intent.putExtra(Constants.ALLOWED_FILE_EXTENSIONS, "hmclpe");
+            intent.putExtra(Constants.ALLOWED_FILE_EXTENSIONS, "hmclpe;json;zip");
             intent.putExtra(Constants.INITIAL_DIRECTORY, new File(Environment.getExternalStorageDirectory().getAbsolutePath()).getAbsolutePath());
-            activity.startActivityForResult(intent, IMPORT_PATTERN_REQUEST_CODE);
+            // 实例独立设置页（VersionSettingUI）只转发 3900，全局设置页转发 3200
+            activity.startActivityForResult(intent,
+                    isolate ? IMPORT_PATTERN_REQUEST_CODE_ISOLATED : IMPORT_PATTERN_REQUEST_CODE);
         }
         if (view == createNewPattern){
             CreateControlPatternDialog dialog = new CreateControlPatternDialog(getContext(),activity, new CreateControlPatternDialog.OnPatternCreateListener() {

@@ -19,6 +19,8 @@
     <uses-permission
         android:name="android.permission.VIBRATE"/>
     <uses-permission
+        android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission
         android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE" />
@@ -30,6 +32,8 @@
         android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission
         android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"
         tools:ignore="HighSamplingRate" />
@@ -63,7 +67,8 @@
         android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true"
         android:icon="@drawable/ic_command_block"
-        android:label="@string/app_name"
+        android:label="${qclAppLabel}"
+        tools:replace="android:label"
         android:roundIcon="@drawable/ic_command_block"
         android:largeHeap="true"
         android:usesCleartextTraffic="true"
@@ -187,12 +192,60 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
+        <service
+            android:name=".launcher.server.MinecraftServerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":server"
+            android:stopWithTask="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-started Minecraft Java server with persistent console" />
+        </service>
+
+        <service
+            android:name=".launcher.server.ForgeInstallService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":server_install"
+            android:stopWithTask="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-started Minecraft Forge server installer" />
+        </service>
+
+        <activity
+            android:name=".launcher.server.ServerListActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition" />
+
+        <activity
+            android:name=".launcher.server.ServerConsoleActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".launcher.server.ServerModsActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition" />
+
+        <activity
+            android:name=".launcher.server.ServerBackupsActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition" />
+
         <!-- ★ 说明（社区版）：分享文件用的 FileProvider **不在这里另建**。
-             FilePicker 模块已经声明了一个 FileProvider（authority = @string/filebrowser_provider，
+             FilePicker 模块已经声明了一个 FileProvider（authority = ${applicationId}.filepicker.provider，
              路径表是 external-path path="." 即整个外部存储），而 FilePicker 是本 App 的
              库模块、清单会合并进来 —— 所以直接用那一个就够了。
              另建一个会因为「同一个类 + 同一个 meta-data 键」和它冲突，清单合并直接失败。
-             分享时代码里用 getPackageName() + ".filepicker.provider" 拿它的 authority。 -->
+             代码里统一用 FileProviderHelper.getAuthority(context) 取 authority，
+             正式版与 Beta 的包名不同，authority 会自动跟着变。 -->
 
         <!-- ★ 社区版新增：桌面小部件（显示当前实例 / 游戏时长 / 备份份数；
              点最下面一行直接一键启动）。

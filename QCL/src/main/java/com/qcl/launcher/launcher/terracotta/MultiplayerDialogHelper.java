@@ -85,6 +85,37 @@ public final class MultiplayerDialogHelper {
                 .create().show();
     }
 
+    /** 手机开服控制台：按需完成协议确认与初始化，然后开始房主流程。 */
+    public static void ensureEnabled(Activity activity, Context context, Runnable ready) {
+        if (activity == null || context == null) {
+            return;
+        }
+        SharedPreferences sp = activity.getSharedPreferences(PREF, Context.MODE_PRIVATE);
+        if (sp.getBoolean("agreed", false) && sp.getBoolean("enabled", false)) {
+            TerracottaHelper.initialize(activity);
+            ready.run();
+            return;
+        }
+        if (!sp.getBoolean("agreed", false)) {
+            new AlertDialog.Builder(context)
+                    .setTitle("多人联机 · 协议与免责声明")
+                    .setMessage(activity.getString(R.string.qcl_multiplayer_disclaimer))
+                    .setCancelable(false)
+                    .setPositiveButton("我已知悉并同意", (d, i) -> {
+                        sp.edit().putBoolean("agreed", true)
+                                .putBoolean("enabled", true).apply();
+                        TerracottaHelper.initialize(activity);
+                        ready.run();
+                    })
+                    .setNegativeButton("取消", null)
+                    .create().show();
+            return;
+        }
+        sp.edit().putBoolean("enabled", true).apply();
+        TerracottaHelper.initialize(activity);
+        ready.run();
+    }
+
     // ==================== 游戏内：使用 ====================
 
     /** 游戏内联机模块：只有游戏外开启过才能使用。 */

@@ -197,8 +197,8 @@ public final class PluginRegistry {
                 PluginActions3::tutorials));
 
         l.add(new PluginSpec(CAT_TOOL, "server_wizard",
-                "一键开服向导",
-                "生成 server.properties 和启动脚本。★ 手机上开服性能差，更适合生成配置给电脑用。",
+                "手机开服管理",
+                "管理多个服务器实例，在手机上运行原版服务端：实时日志、命令、玩家和配置管理。",
                 PluginActions3::serverWizard));
 
 

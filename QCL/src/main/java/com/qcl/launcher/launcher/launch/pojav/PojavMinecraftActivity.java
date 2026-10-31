@@ -86,6 +86,10 @@ extends BaseMainActivity {
             // 某些窗口/设备不支持也不影响启动
         }
         this.gameLaunchSetting = GameLaunchSetting.getGameLaunchSetting(this.getIntent().getExtras().getString("setting_path"), this.getIntent().getExtras().getString("version"));
+        String directServer = this.getIntent().getExtras().getString("server");
+        if (directServer != null && !directServer.trim().isEmpty()) {
+            this.gameLaunchSetting.server = directServer.trim();
+        }
         if (this.getIntent().getExtras().getBoolean("test") || this.gameLaunchSetting.log) {
             // empty if block
         }

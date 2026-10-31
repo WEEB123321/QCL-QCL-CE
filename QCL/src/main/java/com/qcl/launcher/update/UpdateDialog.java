@@ -137,6 +137,13 @@ implements View.OnClickListener {
         return url.replace("-all", "-" + arch);
     }
 
+    /** Beta 包进“全部 Releases”页（含预发布），正式版进 latest 页。 */
+    private String releasePageUrl() {
+        return com.qcl.launcher.BuildConfig.BETA_CHANNEL
+                ? "https://github.com/WEEB123321/QCL-QCL-CE/releases"
+                : "https://github.com/WEEB123321/QCL-QCL-CE/releases/latest";
+    }
+
     /** 下载失败时的兜底提示，照 FCL：给一个「网盘下载」出口。 */
     private void showDownloadFailed(String reason) {
         try {
@@ -149,7 +156,7 @@ implements View.OnClickListener {
                             Intent i = new Intent("android.intent.action.VIEW");
                             i.setData(Uri.parse(netdiskUrl != null && !netdiskUrl.isEmpty()
                                     ? netdiskUrl
-                                    : "https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
+                                    : releasePageUrl()));
                             this.getContext().startActivity(i);
                         } catch (Throwable ignored) {
                         }
@@ -204,7 +211,7 @@ implements View.OnClickListener {
                                 }
                                 Intent intent = new Intent("android.intent.action.VIEW");
                                 intent.addFlags(0x10000000);
-                                Uri apkUri = FileProvider.getUriForFile((Context)UpdateDialog.this.getContext(), (String)UpdateDialog.this.getContext().getString(R.string.filebrowser_provider), apk);
+                                Uri apkUri = FileProvider.getUriForFile((Context)UpdateDialog.this.getContext(), com.tungsten.filepicker.utils.FileProviderHelper.getAuthority(UpdateDialog.this.getContext()), apk);
                                 intent.addFlags(1);
                                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
                                 UpdateDialog.this.getContext().startActivity(intent);
@@ -225,7 +232,7 @@ implements View.OnClickListener {
             try {
                 Intent i = new Intent("android.intent.action.VIEW");
                 i.setData(Uri.parse(netdiskUrl != null && !netdiskUrl.isEmpty()
-                        ? netdiskUrl : "https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
+                        ? netdiskUrl : releasePageUrl()));
                 this.getContext().startActivity(i);
             }
             catch (Throwable ignored) {
@@ -236,7 +243,7 @@ implements View.OnClickListener {
             // ★★★ 1.1.5：GitHub 下载（跳 GitHub Release 页）。
             try {
                 Intent i = new Intent("android.intent.action.VIEW");
-                i.setData(Uri.parse("https://github.com/WEEB123321/QCL-QCL-CE/releases/latest"));
+                i.setData(Uri.parse(releasePageUrl()));
                 this.getContext().startActivity(i);
             }
             catch (Throwable ignored) {

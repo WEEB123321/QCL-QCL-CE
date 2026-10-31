@@ -165,7 +165,7 @@ public class ControlPatternListAdapter extends BaseAdapter {
                         if (success) {
                             if (FileUtils.rename(AppManifest.DEFAULT_CACHE_DIR + "/export/" + pattern.name + ".zip",pattern.name + ".hmclpe")) {
                                 Intent intent = new Intent(Intent.ACTION_SEND);
-                                Uri uri = FileProvider.getUriForFile(context,context.getString(R.string.filebrowser_provider),new File(AppManifest.DEFAULT_CACHE_DIR + "/export/" + pattern.name + ".hmclpe"));
+                                Uri uri = FileProvider.getUriForFile(context, com.tungsten.filepicker.utils.FileProviderHelper.getAuthority(context), new File(AppManifest.DEFAULT_CACHE_DIR + "/export/" + pattern.name + ".hmclpe"));
                                 intent.setType(getMimeType(AppManifest.DEFAULT_CACHE_DIR + "/export/" + pattern.name + ".hmclpe"));
                                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

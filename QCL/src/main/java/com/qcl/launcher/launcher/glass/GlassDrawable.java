@@ -52,20 +52,16 @@ import android.view.View;
  *
  * <h3>★★ 降级链（任何一层失效都不会崩，也不会画出假效果）</h3>
  * <pre>
- *   ① AGSL 边缘折射        —— RuntimeShader 可用时（API 33+ 且驱动能编译）
- *   ② 磨砂填充 + 放大环     —— 着色器不可用：整块填「模糊背景 + 色调」（v4.2 新增），
- *                              再在边缘一圈画 1.25x 放大的同图
- *   ③ 原背景 + 放大环       —— 模糊图缺失：退回面板自己的底色，保证面板不消失
- *   ④ 直接 return          —— 连原图都没有（{@code backdrop()==null}）：什么都不画
+ *   ① AGSL 边缘折射    —— RuntimeShader 可用时（API 33+ 且驱动能编译）
+ *   ② 原背景 + 放大环   —— 着色器不可用：保留面板底色，只在边缘画 1.25x 透镜
+ *   ③ 直接 return      —— 连原图都没有（{@code backdrop()==null}）：什么都不画
  * </pre>
- * ★ v4.2 之前 ② 只有「一圈放大」，面板内部是空的 ⇒ Android 13 以下的机器看起来
- *   **几乎完全没有玻璃**。模糊图本身是纯 Java 算的（任何 API 都能生成），
- *   所以内部完全可以照 ReGlass 的做法填模糊背景，只把边缘换成放大环。
- * ★ ③ 是最后一道保险：宁可退回原底色，也不能让面板凭空消失（v3.6 踩过）。
+ * 降级路径不把模糊壁纸整块填进面板，避免低版本设备首屏出现重复、错位的背景副本。
  */
 public final class GlassDrawable extends Drawable {
 
     private static final String TAG = "QCLGlass";
+    private static boolean sLoggedDrawPath;
 
     // ───────────────── 静态共享资源 ─────────────────
 
@@ -302,17 +298,46 @@ public final class GlassDrawable extends Drawable {
      * 这是「切换界面时框不动」的成因之一。
      */
     private int magOx = Integer.MIN_VALUE, magOy = Integer.MIN_VALUE;
-    private final Path ringPath = new Path();
     private final Path outerPath = new Path();
     private final Path innerPath = new Path();
 
-    // 降级②的磨砂填充（v4.2）—— RectF / Path / Paint 全部复用，避免每帧分配
-    // ★ 源矩形必须是 Rect（int）：Canvas.drawBitmap 没有「两个 RectF」的重载
-    private final Rect srcRect = new Rect();
-    private final RectF dstRectF = new RectF();
-    private final Path fillPath = new Path();
-    private final Paint fillPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
-    private final Paint tintPaint = new Paint();
+    /** {@link #sampleSpace} 的复用缓冲：{x, y, w, h}。避免每帧分配。 */
+    private final int[] spaceBuf = new int[4];
+
+    /**
+     * ★★★ v3.0.6：背景图占据的**屏幕矩形** —— 取样换算的唯一基准。
+     *
+     * <h3>为什么不能直接用屏幕尺寸（「被拉长」的根因）</h3>
+     * 三条绘制路径都做同一件事：把「面板在屏幕上的坐标」换算成「背景位图的像素坐标」。
+     * 这个换算只有在「位图铺满的区域」和「换算用的矩形」完全一致时才正确。
+     *
+     * <p>而位图是 {@code launcher_layout} 的背景，{@code BitmapDrawable} 默认
+     * {@code FILL}（fitXY）⇒ 它铺满的是 <b>host 的 bounds</b>。host 虽然
+     * {@code match_parent}，但挂在 Activity 内容区里，有状态栏/导航栏时
+     * 高度比 {@code displayMetrics.heightPixels} 小一截，左上角也不在 (0,0)。
+     *
+     * <p>以前用 {@code displayMetrics} 当分母、原点当 (0,0)：分母偏大 ⇒ 纵向内容被压缩
+     * ⇒「拉长」；原点没减状态栏 ⇒ 整体下移。两者叠加就是用户报的
+     * 「背景不是在那里的也被粘上去、还被拉长」。
+     *
+     * <p>★ host 还没量过（{@code hostValid()==false}）时退回屏幕尺寸，
+     * 保证任何调用顺序下都不会除零、也不会突然全黑。
+     *
+     * @param out 长度 ≥ 4 的复用数组，写入 {x, y, w, h}
+     */
+    private void sampleSpace(int[] out) {
+        if (GlassBackdrop.hostValid()) {
+            out[0] = GlassBackdrop.hostX();
+            out[1] = GlassBackdrop.hostY();
+            out[2] = Math.max(1, GlassBackdrop.hostWidth());
+            out[3] = Math.max(1, GlassBackdrop.hostHeight());
+        } else {
+            out[0] = 0;
+            out[1] = 0;
+            out[2] = Math.max(1, sW);
+            out[3] = Math.max(1, sH);
+        }
+    }
 
     public GlassDrawable(View owner) {
         this.owner = owner;
@@ -401,6 +426,76 @@ public final class GlassDrawable extends Drawable {
     }
 
     // ───────────────── 绘制 ─────────────────
+
+    /**
+     * ★★★ v3.0.6：上一次「位置自检」看到的屏幕坐标。
+     */
+    private int lastSyncX = Integer.MIN_VALUE, lastSyncY = Integer.MIN_VALUE;
+
+    /**
+     * ★★★ v3.0.6：这块面板这一帧**需不需要重画**（位置变了 / 祖先上有动画在跑）。
+     *
+     * <h3>为什么必须有这个 —— 「背景被粘到板块上」的根因</h3>
+     * 玻璃内部是「按屏幕坐标去背景图上取一块」，取样基准是 {@code uPanelOrigin}
+     * （面板当前的屏幕位置），而这个 uniform 是在 {@link #drawShader} 里设的
+     * ⇒ **只有本 Drawable 被重新绘制时才会更新**。
+     *
+     * <p>而 View 只是被**移动**（滚动、位移动画）时，Android 会复用它的显示列表，
+     * <b>根本不会重新绘制背景</b>。具体到 {@code RecyclerView} 滚动：
+     * 它走 {@code offsetChildrenVertical → offsetTopAndBottom}，改的是子 View 的
+     * {@code mTop} —— 既不是 {@code scrollTo}（所以 {@code OnScrollChangedListener} 不触发），
+     * 也不触发 layout（所以 {@code OnLayoutChangeListener} 不触发）。
+     *
+     * <p>于是面板在屏幕上滑过去了，{@code uPanelOrigin} 却停在原地，
+     * 取到的永远是同一块壁纸 ⇒ 视觉上就是**壁纸被贴在板块上跟着一起滑**。
+     * 用户报的「就算背景不是在那里的也会被粘到板块上」就是这一条。
+     *
+     * <p>★ 为什么是「位置变了才 invalidate」而不是每帧无条件 invalidate：
+     * 静态界面不产生绘制帧，{@link GlassApplier} 的 OnPreDraw 钩子只在真有帧时跑；
+     * 这里再筛一道，位置没变就不打扰 —— 滚动停下就自动归零，不常驻耗电。
+     *
+     * @return true = 调用方应该 {@code view.invalidate()}
+     */
+    boolean needsRedraw() {
+        if (owner == null) {
+            return false;
+        }
+        int x, y;
+        try {
+            owner.getLocationOnScreen(locBuf);
+            x = locBuf[0];
+            y = locBuf[1];
+        } catch (Throwable t) {
+            return false;
+        }
+        if (x != lastSyncX || y != lastSyncY) {
+            lastSyncX = x;
+            lastSyncY = y;
+            return true;
+        }
+        // 位置没变，但**祖先上可能正在跑 View Animation**（切页）。
+        // 那种情况下布局位置全程不变、视觉位置每帧都在变，只能靠动画状态判断。
+        return hasRunningAncestorAnimation();
+    }
+
+    /** 自己或任意祖先上有没有还在跑的 View Animation。 */
+    private boolean hasRunningAncestorAnimation() {
+        try {
+            View cur = owner;
+            int depth = 0;
+            while (cur != null && depth < 32) {
+                android.view.animation.Animation a = cur.getAnimation();
+                if (a != null && !a.hasEnded()) {
+                    return true;
+                }
+                android.view.ViewParent p = cur.getParent();
+                cur = (p instanceof View) ? (View) p : null;
+                depth++;
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
 
     /**
      * ★★★ v4.4：面板内容左上角的**屏幕坐标** —— 含正在跑的 View Animation 位移。
@@ -572,19 +667,7 @@ public final class GlassDrawable extends Drawable {
             }
         }
         if (!drawn) {
-            // ★★★ v4.2：降级路径也要有「玻璃内部」。
-            //   原来这里只画原背景的 16% + 一圈放大 ⇒ Android 13 以下的机器看到的
-            //   几乎是一块纯色卡片，等于「液态玻璃没有」。而模糊图在**任何 API 上都能生成**
-            //   （见 GlassBackdrop.buildBlur，纯 Java 盒式模糊），所以内部完全可以照
-            //   ReGlass 的做法填「模糊后的背景 + 色调」，只把边缘换成放大环。
-            boolean frosted = false;
-            try {
-                frosted = drawFrostedFill(canvas, w, h);
-            } catch (Throwable ignored) {
-            }
-            // ★ 只有磨砂填充失败时才画回原背景 —— 两者都画会变成「磨砂 + 白底」的双层，
-            //   正是用户反复报的「白灰色」。同时它也是「面板凭空消失」的最后一道保险。
-            if (!frosted && originalBackground != null) {
+            if (originalBackground != null) {
                 try {
                     originalBackground.setBounds(bnd.left, bnd.top, bnd.right, bnd.bottom);
                     originalBackground.draw(canvas);
@@ -598,52 +681,12 @@ public final class GlassDrawable extends Drawable {
             } catch (Throwable ignored) {
             }
         }
-    }
-
-    /**
-     * ② 降级路径的整块磨砂填充：把**模糊背景**按屏幕坐标裁一块画进面板，再压一层色调。
-     *
-     * <p>坐标必须用屏幕坐标裁：面板只是背景上的一扇窗，画自己的副本就会变成
-     * 「图片粘在板块上滑动」（3.0 被否掉的做法）。这里每一帧都按面板**当前**的屏幕位置
-     * 去裁，滚动时内容不跟随。
-     *
-     * @return true = 画成功了；false = 没有模糊图，调用方应退回原背景。
-     */
-    private boolean drawFrostedFill(Canvas canvas, int w, int h) {
-        Bitmap blur = GlassBackdrop.blurred();
-        if (blur == null || blur.isRecycled()) {
-            return false;
+        if (!sLoggedDrawPath) {
+            sLoggedDrawPath = true;
+            android.util.Log.i(TAG, "玻璃首帧实际路径=" + (drawn ? "AGSL" : "原背景+边缘透镜")
+                    + "，SDK=" + android.os.Build.VERSION.SDK_INT
+                    + "，检测=" + GlassShader.pathDescription());
         }
-        Rect bnd = getBounds();
-        // ★★★ v4.4：走 panelOrigin —— 它会叠加切页动画的位移。
-        //   直接用 getLocationOnScreen 的话，动画期间取到的是布局位置（终点），
-        //   面板在滑、画面却钉住不动。
-        panelOrigin(bnd.left, bnd.top, originBuf);
-        int ox = originBuf[0];
-        int oy = originBuf[1];
-        float sx = blur.getWidth() / (float) Math.max(1, sW);
-        float sy = blur.getHeight() / (float) Math.max(1, sH);
-        srcRect.set(Math.round(ox * sx), Math.round(oy * sy),
-                Math.round((ox + w) * sx), Math.round((oy + h) * sy));
-        dstRectF.set(0f, 0f, w, h);
-
-        float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
-        float r = radius >= 0 ? radius : 24f * d;
-
-        int save = canvas.save();
-        canvas.translate(bnd.left, bnd.top);
-        // 面板是圆角的，方角填充会在四角漏出来
-        fillPath.reset();
-        fillPath.addRoundRect(0f, 0f, w, h, r, r, Path.Direction.CW);
-        canvas.clipPath(fillPath);
-        canvas.drawBitmap(blur, srcRect, dstRectF, fillPaint);
-        // 色调：与着色器的 mix(col, uTint, uTintA * 0.8) 完全对齐
-        boolean night = isNightMode();
-        tintPaint.setColor(night ? 0xFF000000 : 0xFFFFFFFF);
-        tintPaint.setAlpha(Math.round((night ? 0.30f : 0.12f) * 0.8f * 255f));
-        canvas.drawRect(0f, 0f, w, h, tintPaint);
-        canvas.restoreToCount(save);
-        return true;
     }
 
     /** ① AGSL 边缘畸变。返回 false = 这条路径不可用。 */
@@ -675,12 +718,16 @@ public final class GlassDrawable extends Drawable {
         //   ★ v4.4：改走 panelOrigin，额外叠加切页动画的位移（见该方法注释）。
         Rect bnd = getBounds();
         panelOrigin(bnd.left, bnd.top, originBuf);
-        int ox = originBuf[0];
-        int oy = originBuf[1];
+        // ★★★ v3.0.6：uPanelOrigin 必须是**背景图坐标系**里的原点，
+        //   uScreenSize 必须是背景图实际铺满的尺寸 —— 两者一起换，
+        //   否则「拉长 / 整体偏移」照旧（见 sampleSpace 的注释）。
+        sampleSpace(spaceBuf);
+        int ox = originBuf[0] - spaceBuf[0];
+        int oy = originBuf[1] - spaceBuf[1];
 
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
-        float dm = owner != null ? owner.getResources().getDisplayMetrics().widthPixels : 1080f;
-        float dh = owner != null ? owner.getResources().getDisplayMetrics().heightPixels : 2340f;
+        float dm = spaceBuf[2];
+        float dh = spaceBuf[3];
         float r = radius >= 0 ? radius : 24f * d;
         // ★★★ v4.0：参数按 ReGlass 的语义重新映射。
         //   · thickness = 原来的「折射带宽度」= **玻璃厚度**（像素）
@@ -810,22 +857,24 @@ public final class GlassDrawable extends Drawable {
     /**
      * ② 降级：环状放大透镜。
      *
-     * <p>做法：用 {@code Path.op(DIFFERENCE)} 裁出「外圆角矩形 − 内圆角矩形」的一圈，
-     * 只在这一圈里画放大后的背景。视觉上接近「边缘被撑开」，无色散但也没有假白边。
+     * <p>做法：先在外圆角矩形内画放大背景，再用内圆角矩形把中心恢复原背景。
+     * 不依赖 {@code Path.op}，避免部分 ROM 把中空环异常裁成整面板。
      *
      * <p>★ 放大倍率 1.12 比 3.0 的 1.08 略高：因为现在只剩一圈，
      * 放大不够就完全看不出来了。
      */
     private void drawRing(Canvas canvas, int w, int h, Bitmap bg) {
-        if (bg.isRecycled()) {
+        if (bg.isRecycled() || originalBackground == null) {
             return;
         }
         Rect bnd = getBounds();
         // ★★★ v4.4：同 drawShader —— 必须叠加切页动画位移，否则面板在滑、
         //   放大环里的画面却钉在终点不动。
         panelOrigin(bnd.left, bnd.top, originBuf);
-        int ox = originBuf[0];
-        int oy = originBuf[1];
+        // ★★★ v3.0.6：同 drawShader —— 换算到背景图坐标系（见 sampleSpace）。
+        sampleSpace(spaceBuf);
+        int ox = originBuf[0] - spaceBuf[0];
+        int oy = originBuf[1] - spaceBuf[1];
         float d = owner != null ? owner.getResources().getDisplayMetrics().density : 3f;
         float r = radius >= 0 ? radius : 24f * d;
         // ★★★ v4.2：与 drawShader 用**同一条**夹取规则 —— 降级路径和主路径
@@ -834,8 +883,8 @@ public final class GlassDrawable extends Drawable {
         float band = Math.max(2f, Math.min(bandDp * d,
                 Math.min(minSide * 0.35f, minSide * 0.5f - r)));
 
-        float sx = bg.getWidth() / (float) Math.max(1, sW);
-        float sy = bg.getHeight() / (float) Math.max(1, sH);
+        float sx = bg.getWidth() / (float) spaceBuf[2];
+        float sy = bg.getHeight() / (float) spaceBuf[3];
         // ★★★ v4.4：缓存键必须带**屏幕位置** —— 只看「图/宽/高」的话，
         //   面板一移动（滚动、切页动画）放大环仍按第一次那个位置采样，
         //   表现为「边缘那一圈的内容不跟着面板走」。
@@ -864,17 +913,17 @@ public final class GlassDrawable extends Drawable {
         innerPath.reset();
         float ir = Math.max(0f, r - band);
         innerPath.addRoundRect(band, band, w - band, h - band, ir, ir, Path.Direction.CW);
-        ringPath.reset();
-        ringPath.set(outerPath);
-        if (ringPath.op(innerPath, Path.Op.DIFFERENCE)) {
-            int save = canvas.save();
-            canvas.translate(bnd.left, bnd.top);   // ★ 同 drawShader：对齐 bounds 原点
-            canvas.clipPath(ringPath);
-            fallbackPaint.setShader(magShader);
-            canvas.drawRect(0, 0, w, h, fallbackPaint);
-            fallbackPaint.setShader(null);
-            canvas.restoreToCount(save);
-        }
+        int save = canvas.save();
+        canvas.translate(bnd.left, bnd.top);
+        canvas.clipPath(outerPath);
+        fallbackPaint.setShader(magShader);
+        canvas.drawRect(0, 0, w, h, fallbackPaint);
+        fallbackPaint.setShader(null);
+        // 中心恢复原背景，不再用 Path.op 裁中空环，避免 ROM 差异导致整面板覆盖。
+        canvas.clipPath(innerPath);
+        originalBackground.setBounds(0, 0, w, h);
+        originalBackground.draw(canvas);
+        canvas.restoreToCount(save);
     }
 
     private static int sW = 1080, sH = 2340;

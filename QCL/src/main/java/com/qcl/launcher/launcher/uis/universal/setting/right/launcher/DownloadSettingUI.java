@@ -207,6 +207,13 @@ public class DownloadSettingUI extends BaseUI implements CompoundButton.OnChecke
         this.regionRow = (LinearLayout) this.activity.findViewById(R.id.download_region_row);
         this.regionValue = (TextView) this.activity.findViewById(R.id.download_region_value);
         this.refreshRegion();
+        // ★★★ v3.0.6：地区限制已由 RegionGate.RESTRICTION_ENABLED 全局关闭，
+        //   这一项不再影响任何行为 —— 留着就是「点了没反应的假选项」。
+        //   整行隐藏；将来要恢复限制，只改那一个常量，这里会自动跟着回来。
+        if (this.regionRow != null
+                && !com.qcl.launcher.launcher.uis.game.download.RegionGate.RESTRICTION_ENABLED) {
+            this.regionRow.setVisibility(View.GONE);
+        }
         if (this.regionRow != null) {
             this.regionRow.setOnClickListener(new View.OnClickListener(){
                 @Override

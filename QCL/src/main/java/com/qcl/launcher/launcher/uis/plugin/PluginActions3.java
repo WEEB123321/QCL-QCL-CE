@@ -754,79 +754,13 @@ public final class PluginActions3 {
         }
     }
 
-    /** 一键开服向导：生成 server.properties + 启动脚本。 */
+    /** 手机开服：服务器列表与独立控制台。 */
     public static void serverWizard(MainActivity a) {
         try {
-            LinearLayout col = PluginUiKit.column(a);
-            EditText port = new EditText(a);
-            port.setHint("端口（默认 25565）");
-            port.setText("25565");
-            EditText max = new EditText(a);
-            max.setHint("最大玩家数（默认 20）");
-            max.setText("20");
-            EditText motd = new EditText(a);
-            motd.setHint("服务器名（MOTD）");
-            motd.setText("QCL Server");
-
-            col.addView(PluginUiKit.text(a, "一键开服向导"));
-            col.addView(PluginUiKit.sub(a, "生成 server.properties 和启动脚本。"));
-            col.addView(PluginUiKit.sub(a, " "));
-            col.addView(port);
-            col.addView(max);
-            col.addView(motd);
-            col.addView(PluginUiKit.sub(a, " "));
-            col.addView(PluginUiKit.sub(a, "⚠ **手机上开服性能很差** —— 这更适合"
-                    + "「在手机上生成配置，拷到电脑上跑」。"));
-            col.addView(PluginUiKit.sub(a, "★ 服务器 jar 需要联网从 Mojang / Fabric 官方下载，"
-                    + "本向导**不代下** —— 请自己把 server.jar 放进输出目录。"));
-            col.addView(PluginUiKit.sub(a, "★ 输出到 " + AppManifest.LAUNCHER_DIR + "/server/"));
-
-            PluginUiKit.sheet(a, "一键开服向导", PluginUiKit.scroller(a, col), "生成", () -> {
-                try {
-                    File dir = new File(AppManifest.LAUNCHER_DIR, "server");
-                    if (!dir.exists() && !dir.mkdirs()) {
-                        PluginUiKit.toast(a, "建目录失败");
-                        return;
-                    }
-                    String p = port.getText() == null ? "25565" : port.getText().toString().trim();
-                    String m = max.getText() == null ? "20" : max.getText().toString().trim();
-                    String mo = motd.getText() == null ? "QCL Server" : motd.getText().toString().trim();
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("# 由 QCL-CE 开服向导生成\n");
-                    sb.append("server-port=").append(p).append('\n');
-                    sb.append("max-players=").append(m).append('\n');
-                    sb.append("motd=").append(mo).append('\n');
-                    sb.append("online-mode=true\n");
-                    sb.append("difficulty=easy\n");
-                    sb.append("gamemode=survival\n");
-                    sb.append("pvp=true\n");
-                    sb.append("allow-flight=false\n");
-                    sb.append("spawn-protection=16\n");
-                    sb.append("view-distance=10\n");
-                    sb.append("simulation-distance=10\n");
-                    sb.append("enable-command-block=false\n");
-                    sb.append("white-list=false\n");
-                    sb.append("level-name=world\n");
-                    sb.append("level-seed=\n");
-                    sb.append("enable-rcon=false\n");
-                    write(new File(dir, "server.properties"), sb.toString());
-
-                    String sh = "#!/system/bin/sh\n"
-                            + "# 由 QCL-CE 开服向导生成。需要先放好 server.jar 和 JRE。\n"
-                            + "cd \"$(dirname \"$0\")\"\n"
-                            + "java -Xmx1024M -Xms512M -jar server.jar nogui\n";
-                    write(new File(dir, "start.sh"), sh);
-
-                    log(a, "生成开服配置 → " + dir.getAbsolutePath());
-                    PluginUiKit.toast(a, "已生成到 " + dir.getName() + "/"
-                            + "（server.properties + start.sh）");
-                } catch (Throwable t) {
-                    PluginUiKit.toast(a, "生成失败：" + t);
-                }
-            });
+            a.startActivity(new android.content.Intent(a,
+                    com.qcl.launcher.launcher.server.ServerListActivity.class));
         } catch (Throwable t) {
-            PluginUiKit.toast(a, "失败：" + t);
+            PluginUiKit.toast(a, "打开开服管理失败：" + t);
         }
     }
 

@@ -672,14 +672,15 @@
     <string name="feedback_ui_github_issues">Go to Github</string>
     <string name="donate_ui_text">QCL (Quanta Craft Launcher) is a free, libre and open source Minecraft launcher. You can donate to us on Afdian to support our file hosting and project development. Click here for more information.</string>
     <string name="dialog_manage_controller_title">Manage Touch Layout Pattern</string>
-    <string name="dialog_manage_controller_import">Import layout from local file</string>
+    <string name="dialog_manage_controller_import">Import layout</string>
     <string name="dialog_manage_controller_create">Create new layout pattern</string>
     <string name="dialog_manage_controller_exit">OK</string>
     <string name="export_control_pattern_title">Export layout pattern</string>
     <string name="dialog_manage_controller_export_dialog">Exporting…</string>
     <string name="dialog_manage_controller_import_dialog">Importing…</string>
     <string name="dialog_manage_controller_import_exist">Your imported layout pattern already exists!</string>
-    <string name="dialog_manage_controller_import_error">Import failed, please check if the file is a HMCL-PE layout file</string>
+    <string name="dialog_manage_controller_import_error">Import failed, please check if the file is a FCL / Zalith Launcher / HMCL-PE layout file</string>
+    <string name="dialog_manage_controller_import_success">Imported %1$s layout as “%2$s”</string>
     <string name="dialog_manage_controller_import_warn">The current version of the launcher does not support the layout pattern you imported. If you force the import, it may crash. Do you want to continue?</string>
     <string name="dialog_create_control_pattern_title">Create new layout pattern</string>
     <string name="dialog_create_control_pattern_title_sec">Edit layout pattern info</string>

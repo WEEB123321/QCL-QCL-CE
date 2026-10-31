@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <signal.h>
 #include <xhook.h>
 
 //
@@ -82,4 +85,78 @@ JNIEXPORT void JNICALL Java_net_kdt_pojavlaunch_utils_JREUtils_setupExitTrap(JNI
     xhook_enable_debug(1);
     xhook_register(".*\\.so$","exit",custom_exit,&old_exit);
     xhook_refresh(1);
+}
+
+static int server_stdin_write = -1;
+
+static jboolean redirect_stdout(JNIEnv *env, jstring path, int extra_flags) {
+    if (path == NULL) return JNI_FALSE;
+    const char *native_path = (*env)->GetStringUTFChars(env, path, NULL);
+    if (native_path == NULL) return JNI_FALSE;
+    int fd = open(native_path, O_WRONLY | O_CREAT | O_APPEND | extra_flags, 0644);
+    (*env)->ReleaseStringUTFChars(env, path, native_path);
+    if (fd < 0) return JNI_FALSE;
+    dup2(fd, 1);
+    dup2(fd, 2);
+    if (fd > 2) close(fd);
+    setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+    return JNI_TRUE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_kdt_pojavlaunch_utils_ServerStdio_redirectStdout(JNIEnv *env, jclass clazz, jstring path) {
+    return redirect_stdout(env, path, O_TRUNC);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_kdt_pojavlaunch_utils_ServerStdio_redirectStdoutAppend(JNIEnv *env, jclass clazz, jstring path) {
+    return redirect_stdout(env, path, 0);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_kdt_pojavlaunch_utils_ServerStdio_createStdinPipe(JNIEnv *env, jclass clazz) {
+    int fds[2];
+    if (pipe(fds) != 0) return JNI_FALSE;
+    if (dup2(fds[0], 0) < 0) {
+        close(fds[0]);
+        close(fds[1]);
+        return JNI_FALSE;
+    }
+    close(fds[0]);
+    if (server_stdin_write >= 0) close(server_stdin_write);
+    server_stdin_write = fds[1];
+    signal(SIGPIPE, SIG_IGN);
+    return JNI_TRUE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_kdt_pojavlaunch_utils_ServerStdio_writeStdin(JNIEnv *env, jclass clazz, jbyteArray data) {
+    if (server_stdin_write < 0 || data == NULL) return JNI_FALSE;
+    jsize length = (*env)->GetArrayLength(env, data);
+    jbyte *bytes = (*env)->GetByteArrayElements(env, data, NULL);
+    if (bytes == NULL) return JNI_FALSE;
+    int offset = 0;
+    jboolean ok = JNI_TRUE;
+    while (offset < length) {
+        ssize_t written = write(server_stdin_write, bytes + offset, (size_t) (length - offset));
+        if (written > 0) {
+            offset += (int) written;
+        } else if (written < 0 && errno == EINTR) {
+            continue;
+        } else {
+            ok = JNI_FALSE;
+            break;
+        }
+    }
+    (*env)->ReleaseByteArrayElements(env, data, bytes, JNI_ABORT);
+    return ok;
+}
+
+JNIEXPORT void JNICALL
+Java_net_kdt_pojavlaunch_utils_ServerStdio_closeStdinPipe(JNIEnv *env, jclass clazz) {
+    if (server_stdin_write >= 0) {
+        close(server_stdin_write);
+        server_stdin_write = -1;
+    }
 }

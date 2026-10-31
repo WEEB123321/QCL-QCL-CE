@@ -403,6 +403,20 @@ public class JREUtils {
         }
     }
 
+    public static int launchJavaMain(Context context, String javaHome, String home,
+                                     List<String> args) throws Throwable {
+        relocateLibPath(context, javaHome);
+        Os.setenv("HOME", home, true);
+        Os.setenv("JAVA_HOME", javaHome, true);
+        jvmLibraryPath = getJvmLibDir(javaHome);
+        setLdLibraryPath(jvmLibraryPath + ":" + LD_LIBRARY_PATH);
+        ArrayList<String> argv = new ArrayList<>(args);
+        initJavaRuntime(javaHome);
+        chdir(home);
+        argv.add(0, "java");
+        return VMLauncher.launchJVM(argv.toArray(new String[0]));
+    }
+
     public static List<String> getJavaArgs(Context context) {
         String[] strArr = {"-Dglfwstub.windowWidth=" + CallbackBridge.windowWidth, "-Dglfwstub.windowHeight=" + CallbackBridge.windowHeight, "-Dglfwstub.initEgl=false", "-Dext.net.resolvPath=" + new File(context.getFilesDir().getParent(), "resolv.conf").getAbsolutePath(), "-Dlog4j2.formatMsgNoLookups=true"};
         ArrayList arrayList = new ArrayList();

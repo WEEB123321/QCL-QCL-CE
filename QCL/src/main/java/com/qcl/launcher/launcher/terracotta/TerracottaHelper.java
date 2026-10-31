@@ -81,11 +81,12 @@ public final class TerracottaHelper {
         }
     }
 
-    /** 房主：重置到等待状态，原生层会自动生成房间邀请码（room）。 */
+    /** 房主：扫描本地 Minecraft 端口并创建房间。 */
     public static void host(Activity activity) {
         initialize(activity);
         try {
             TerracottaAndroidAPI.setWaiting();
+            TerracottaAndroidAPI.setScanning(null, null, null);
         } catch (Throwable t) {
             t.printStackTrace();
         }

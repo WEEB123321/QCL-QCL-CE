@@ -40,6 +40,7 @@ import com.tungsten.filepicker.listeners.SearchViewListener;
 import com.tungsten.filepicker.listeners.TabChangeListener;
 import com.tungsten.filepicker.models.FileItem;
 import com.tungsten.filepicker.utils.AssortedUtils;
+import com.tungsten.filepicker.utils.FileProviderHelper;
 import com.tungsten.filepicker.utils.UIUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -198,7 +199,7 @@ public class FileBrowser extends AppCompatActivity implements OnFileChangedListe
                         MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
                         Intent openFileIntent = new Intent(Intent.ACTION_VIEW);
                         String mimeType = mimeMap.getMimeTypeFromExtension(FilenameUtils.getExtension(f.getName()));
-                        Uri uri = FileProvider.getUriForFile(mContext, mContext.getString(R.string.filebrowser_provider), f);
+                        Uri uri = FileProvider.getUriForFile(mContext, FileProviderHelper.getAuthority(mContext), f);
                         openFileIntent.setDataAndType(uri,mimeType);
                         openFileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         openFileIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

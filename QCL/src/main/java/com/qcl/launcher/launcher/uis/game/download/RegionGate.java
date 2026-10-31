@@ -70,6 +70,27 @@ public final class RegionGate {
     /** 其它地区：不限制。 */
     public static final String REGION_OTHER = "other";
 
+    /**
+     * ★★★ v3.0.6：地区限制**总开关**。用户要求「不管选的是中国还是其他地区，全部放行」。
+     *
+     * <h3>为什么做成一个常量，而不是把判断删掉</h3>
+     * 这套闸门不是 bug，是 2.0.12 刻意加的：2026-10-20 PCL 2.99.0.0 公告
+     * 「为遵守相关法律法规，暂不支持提供 MC 下载」，HMCL 也有同样说法 ——
+     * MC 原版文件的获取由此变成一个分地区的问题。
+     * 现在用户明确要求关掉，那就关；但**保留开关本身**，理由有两条：
+     * <ol>
+     *   <li>删掉判断会让「当初为什么有这个东西」这段历史一起消失，
+     *       将来要恢复时只能重写一遍；</li>
+     *   <li>关掉的是**判定**，不是**界面**。地区选择层、设置页入口、
+     *       那套「连点 5 次」的交互全部原样留着 —— 只是不再拦截任何操作。
+     *       想恢复成受限状态，把这里改回 {@code true} 即可，不需要动别处。</li>
+     * </ol>
+     *
+     * <p>★ 关掉之后 {@link #getRegion} 仍然照常读写：用户选过的地区会留着，
+     * 设置页仍能看到当前选择。只是它不再影响下载。
+     */
+    public static final boolean RESTRICTION_ENABLED = false;
+
     private RegionGate() {
     }
 
@@ -95,9 +116,13 @@ public final class RegionGate {
         return getRegion(ctx) != null;
     }
 
-    /** 当前是否处于「原版 MC 下载受限」状态。没选过地区时按**未限制**处理。 */
+    /**
+     * 当前是否处于「原版 MC 下载受限」状态。没选过地区时按**未限制**处理。
+     *
+     * <p>★ v3.0.6：受 {@link #RESTRICTION_ENABLED} 总开关控制，默认恒为 {@code false}。
+     */
     public static boolean isDownloadRestricted(Context ctx) {
-        return REGION_CN.equals(getRegion(ctx));
+        return RESTRICTION_ENABLED && REGION_CN.equals(getRegion(ctx));
     }
 
     public static void setRegion(Context ctx, String region) {
@@ -125,6 +150,17 @@ public final class RegionGate {
     public static void bindOverlay(final Activity activity, final View gate,
                                    final Runnable onCommitted) {
         if (activity == null || gate == null) {
+            return;
+        }
+        // ★★★ v3.0.6：限制关掉时，这层**根本不出现**。
+        //   为什么不是「照常显示但不拦截」：它是一层 match_parent + clickable 的遮罩，
+        //   盖住整页 ⇒ 用户必须先答一遍「你是哪个国家的人」才能点任何东西，
+        //   而答完又什么都不限制 —— 纯摩擦。关掉限制就该连问都不问。
+        if (!RESTRICTION_ENABLED) {
+            gate.setVisibility(View.GONE);
+            if (onCommitted != null) {
+                onCommitted.run();
+            }
             return;
         }
         // 已经选过就不该看到这一层

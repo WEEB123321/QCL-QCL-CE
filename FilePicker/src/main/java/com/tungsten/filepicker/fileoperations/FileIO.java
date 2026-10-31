@@ -18,6 +18,7 @@ import com.tungsten.filepicker.NavigationHelper;
 import com.tungsten.filepicker.R;
 import com.tungsten.filepicker.interfaces.IFuncPtr;
 import com.tungsten.filepicker.models.FileItem;
+import com.tungsten.filepicker.utils.FileProviderHelper;
 import com.tungsten.filepicker.utils.UIUpdateHelper;
 import com.tungsten.filepicker.utils.UIUtils;
 
@@ -221,7 +222,7 @@ public class FileIO {
 
         ArrayList<Uri> uris = new ArrayList<>();
         for(FileItem file: filesToBeShared){
-            uris.add(FileProvider.getUriForFile(mContext,mContext.getString(R.string.filebrowser_provider),file.getFile()));
+            uris.add(FileProvider.getUriForFile(mContext, FileProviderHelper.getAuthority(mContext), file.getFile()));
         }
         final Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
         intent.setType("*/*");

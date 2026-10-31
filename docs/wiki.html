@@ -111,6 +111,8 @@
     <a href="#menu">菜单排版</a>
     <a href="#plugin">插件</a>
     <a href="#layout">界面排版</a>
+    <a href="#control-import">控键布局导入</a>
+    <a href="#server">手机开服</a>
     <a href="#market">插件市场</a>
 
     <h4>排错</h4>
@@ -128,29 +130,43 @@
   <main>
 
     <h1>QCL-CE 使用文档</h1>
-    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 v3.0.5。</p>
+    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 Beta 1.0.0（正式版用法仍适用，Beta 差异见安装说明）。</p>
 
     <h2 id="install">安装</h2>
 
+    <div class="box warn">
+      <h3>Beta 1.0.0 说明</h3>
+      <ul>
+        <li>Beta 使用独立包名 <code>com.qcl.launcher.ce.beta</code>，可以和正式版 / 官方版<b>同时安装</b>，不需要卸载。</li>
+        <li>游戏目录仍共用 <code>/sdcard/QCL</code>，实例、存档、备份通用；Beta 的应用内部设置与正式版隔离。</li>
+        <li>本包是 <b>Android Debug 签名</b>，只用于测试。后续正式签名版本无法直接覆盖安装本次 Beta。</li>
+        <li>Beta 的检查更新只读取预发布版本，不会误推正式版；稳定版仍可下载 v1.9.4。</li>
+      </ul>
+    </div>
+
     <div class="box bad">
-      <h3>装之前一定要做两件事</h3>
+      <h3>装之前</h3>
       <ol>
-        <li><b>卸载官方版 QCL</b>。QCL-CE 和官方包<b>签名不同</b>，不卸载会装不上。</li>
-        <li><b>清除应用数据</b>（如果之前装过 QCL-CE）。旧设置文件会自我延续，可能导致一些难以理解的现象。</li>
+        <li>确认手机是 <b>arm64</b>（绝大多数现代手机都是）；模拟器 x86_64 不能装。</li>
+        <li>如果之前装过<b>别的 Beta 签名</b>，先卸载再装；正式版 / 官方版不用卸载。</li>
+        <li>测试前建议先备份存档。Beta 与正式版共用 <code>/sdcard/QCL</code>。</li>
       </ol>
     </div>
 
     <p><b>直接下载：</b>
-      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.0.5/QCL-CE-v3.0.5-arm64.apk">GitHub 直链</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk">Beta 1.0.0 直链</a>
       ｜
-      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.0.5/QCL-CE-v3.0.5-arm64.apk">国内镜像（gh-proxy）</a>
+      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk">国内镜像（gh-proxy）</a>
+      ｜
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk">稳定版 v1.9.4</a>
     </p>
     <p>gh-proxy 只是把同一条 GitHub 直链转发一遍，下载到的文件完全一样。
       也可以到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">Releases 页面</a>查看全部发布：</p>
 
     <table>
       <tr><th>文件</th><th>用途</th></tr>
-      <tr><td><code>QCL-CE-v3.0.5-arm64.apk</code></td><td>给手机用。绝大多数现代手机都是这个。</td></tr>
+      <tr><td><code>QCL-CE-1.0.0-beta-arm64.apk</code></td><td>Beta 测试包，Debug 签名，可与正式版共存。</td></tr>
+      <tr><td><code>QCL-CE-v1.9.4-arm64.apk</code></td><td>GitHub 上最后一个正式 Release。</td></tr>
     </table>
 
     <h2 id="first">第一次启动</h2>
@@ -267,6 +283,28 @@
     </div>
     <p>想把排版分享给别人：插件页 → 界面 → <b>排版导入 / 导出</b> → 复制到剪贴板 → 发群里。别人复制后点「从剪贴板导入」即可。</p>
 
+    <h3 id="control-import">控键布局导入（Beta 1.0.0 新增）</h3>
+    <p>入口：<b>设置 → 游戏设置 → 控键布局 → 管理</b>，或 <b>版本设置 → 管理控键</b>。
+    在「管理触控布局方案」里点 <b>从本地导入布局</b>，选择文件即可。</p>
+    <table>
+      <tr><th>来源</th><th>文件</th></tr>
+      <tr><td>Fold Craft Launcher（FCL）</td><td><code>.json</code>（<code>controllerVersion 21</code>）</td></tr>
+      <tr><td>Zalith Launcher 2</td><td><code>.json</code>（<code>editorVersion 12</code>）</td></tr>
+      <tr><td>Zalith Launcher（ZL1）</td><td><code>.json</code>（<code>version 8</code>）</td></tr>
+      <tr><td>HMCL-PE</td><td><code>.hmclpe</code>（加密 ZIP，内部密码自动处理）</td></tr>
+    </table>
+    <ul>
+      <li>导入后<b>另存为新布局</b>，不会覆盖你已有的布局；同名会自动加 <code>(2)</code>。</li>
+      <li>FCL 的图层、ZL2 的 layer、ZL1 的抽屉都会转成 QCL 的子布局；抽屉默认隐藏，由把手按钮展开。</li>
+      <li>按键会从各家的键码统一映射到 GLFW；ZL2 的 <code>switch_layer</code> / 启动器事件会转成 QCL 的可见性控制或菜单/输入法开关。</li>
+      <li>ZL1 的像素坐标表达式会在参考屏幕上求值后转成百分比，换设备仍保持相对位置。</li>
+      <li>样式（颜色、圆角、描边、文字大小）尽量还原；ZL2 的文字粗体/斜体等 QCL 没有的属性会忽略。</li>
+    </ul>
+    <div class="box warn">
+      <b>兼容性：</b>FCL 的方向控件如果改过方向键（不是 WASD），QCL 摇杆仍按 WASD 输出；
+      ZL1 的虚拟鼠标开关、ZL2 的穿透/滑动属性没有一一对应项，会退化为普通按钮。
+    </div>
+
     <h3 id="plugin">插件</h3>
     <p>左侧「≡ 菜单」→ <b>插件</b>。顶部有搜索框，可以按名字搜。</p>
     <p>插件分几类：下载、界面、资源、模组、账号、联机、系统、安全与备份等。</p>
@@ -279,6 +317,25 @@
       <li>安装完如果是排版类，<b>退出再进主页</b>生效；控键类到「设置 → 控键布局」里选。</li>
       <li>市场网页：<a href="https://weeb123321.github.io/QCL-Plugins/">weeb123321.github.io/QCL-Plugins</a></li>
     </ul>
+
+    <h3 id="server">手机开服（Beta）</h3>
+    <p>入口：插件页搜索 <b>手机开服管理</b> → 打开服务器列表；也可以用插件里的 <b>一键开服向导</b> 先建目录。</p>
+    <table>
+      <tr><th>能力</th><th>说明</th></tr>
+      <tr><td>服务端类型</td><td>原版、Paper、Purpur、Fabric、Forge（Forge 为实验性，需要跑官方 installer）</td></tr>
+      <tr><td>下载与校验</td><td>官方源 / Paper API / Purpur API / Fabric Meta / Forge Maven；原版与 Paper 校验 SHA-256，Purpur 校验 MD5，可改用本地包</td></tr>
+      <tr><td>运行</td><td>独立 <code>:server</code> 进程 + 前台服务，支持 WakeLock / WifiLock，退出启动器不中断</td></tr>
+      <tr><td>控制台</td><td>启停 / 重启 / 直连启动、实时日志、发送服务端命令</td></tr>
+      <tr><td>玩家与配置</td><td>ops / whitelist / banned 管理，直接编辑 <code>server.properties</code></td></tr>
+      <tr><td>模组 / 插件</td><td>Paper / Purpur 管理 <code>plugins</code>，Fabric / Forge 管理 <code>mods</code>；支持启用/停用、移入回收目录</td></tr>
+      <tr><td>世界备份</td><td>世界 + 核心配置打包 ZIP；恢复前自动再做一份 pre-restore 备份</td></tr>
+      <tr><td>联机共享</td><td>配合 Terracotta 房间，向 Minecraft 局域网广播端口，朋友可直接扫描加入</td></tr>
+    </table>
+    <div class="box warn">
+      <b>注意：</b>同一时间只运行一个服务端；手机性能有限，建议 2 GB 以上内存并保持充电。
+      Forge 安装器需要联网且耗时较长；NeoForge 暂未接入。Beta 的开服链路还没有经过真机验收，
+      遇到问题请附控制台日志和启动诊断。
+    </div>
 
     <h2 id="trouble">排错</h2>
 

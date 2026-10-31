@@ -847,7 +847,7 @@
     <string name="donate_ui_text">QCL（Quanta Craft Launcher，量子方块启动器）是一个免费、自由、开放源代码的 Minecraft 启动器。您的赞助将帮助本项目获得更好的发展。点击此处查阅更多详细信息。</string>
 
     <string name="dialog_manage_controller_title">管理触控布局方案</string>
-    <string name="dialog_manage_controller_import">从本地导入布局方案</string>
+    <string name="dialog_manage_controller_import">从本地导入布局</string>
     <string name="dialog_manage_controller_create">创建新的布局方案</string>
     <string name="dialog_manage_controller_exit">完成</string>
 
@@ -855,7 +855,8 @@
     <string name="dialog_manage_controller_export_dialog">正在导出本地布局方案…</string>
     <string name="dialog_manage_controller_import_dialog">正在导入触控布局方案…</string>
     <string name="dialog_manage_controller_import_exist">您导入的布局方案已存在！</string>
-    <string name="dialog_manage_controller_import_error">导入失败，请检查文件是否为 QCL 布局文件</string>
+    <string name="dialog_manage_controller_import_error">导入失败，请检查文件是否为 FCL / Zalith Launcher / HMCL-PE 布局文件</string>
+    <string name="dialog_manage_controller_import_success">已导入 %1$s 布局：%2$s</string>
     <string name="dialog_manage_controller_import_warn">当前版本启动器不支持您导入的布局方案，如果强行导入，可能会造成崩溃，是否继续？</string>
 
     <string name="dialog_create_control_pattern_title">创建新的布局方案</string>

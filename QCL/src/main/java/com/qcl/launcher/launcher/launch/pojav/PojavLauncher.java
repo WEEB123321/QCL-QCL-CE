@@ -495,10 +495,19 @@ public class PojavLauncher {
             args.add(Integer.toString(height));
             if (StringUtils.isNotBlank(server)) {
                 String[] ser = server.split(":");
-                args.add("--server");
-                args.add(ser[0]);
-                args.add("--port");
-                args.add(ser.length > 1 ? ser[1] : "25565");
+                String host = ser[0];
+                String port = ser.length > 1 ? ser[1] : "25565";
+                String versionId = version.id != null ? version.id
+                        : new File(gameLaunchSetting.currentVersion).getName();
+                if (supportsQuickPlay(versionId)) {
+                    args.add("--quickPlayMultiplayer");
+                    args.add(host + ":" + port);
+                } else {
+                    args.add("--server");
+                    args.add(host);
+                    args.add("--port");
+                    args.add(port);
+                }
             }
             String[] extraMinecraftArgs = gameLaunchSetting.extraMinecraftFlags.split(" ");
             Collections.addAll(args, extraMinecraftArgs);
@@ -514,6 +523,27 @@ public class PojavLauncher {
             }
             return null;
         }
+    }
+
+    private static boolean supportsQuickPlay(String versionId) {
+        if (versionId == null) {
+            return false;
+        }
+        java.util.regex.Matcher release = java.util.regex.Pattern
+                .compile("^(\\d+)\\.(\\d+)").matcher(versionId);
+        if (release.find()) {
+            int major = Integer.parseInt(release.group(1));
+            int minor = Integer.parseInt(release.group(2));
+            return major > 1 || (major == 1 && minor >= 20);
+        }
+        java.util.regex.Matcher snapshot = java.util.regex.Pattern
+                .compile("^(\\d{2})w(\\d{2})").matcher(versionId);
+        if (snapshot.find()) {
+            int year = Integer.parseInt(snapshot.group(1));
+            int week = Integer.parseInt(snapshot.group(2));
+            return year > 23 || (year == 23 && week >= 14);
+        }
+        return false;
     }
 
     private static String buildFclLibraryPath(Context context, String javaPath) {

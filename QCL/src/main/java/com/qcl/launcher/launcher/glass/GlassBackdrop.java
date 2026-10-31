@@ -62,6 +62,72 @@ public final class GlassBackdrop {
     /** 每次换背景 +1。面板靠它判断「要不要重新绑定 BitmapShader」。 */
     private static volatile long sVersion = 0;
 
+    /**
+     * ★★★ v3.0.6：这张背景图**实际被画在多大的区域上**（像素）。
+     *
+     * <h3>为什么不能用屏幕尺寸</h3>
+     * 玻璃取样是按「屏幕坐标 → 归一化 → 位图像素」换算的。这个换算只有在
+     * 「位图铺满的区域 == 换算用的那个尺寸」时才成立。
+     *
+     * <p>而这张位图是 {@code launcher_layout} 的背景，{@code BitmapDrawable} 默认
+     * gravity 是 {@code FILL}（fitXY，铺满 View 的 bounds）。{@code launcher_layout}
+     * 虽然是 {@code match_parent}，但它挂在 Activity 的内容区里 ——
+     * 有状态栏 / 导航栏时高度比 {@code displayMetrics.heightPixels} 小一截。
+     *
+     * <p>以前这里用的是屏幕尺寸 ⇒ 分母比实际大 ⇒ 纵向取到的内容被压缩、
+     * 位置整体偏移，观感就是「背景被拉长 / 对不上」。这是用户报的
+     * 「被拉长」的成因。
+     *
+     * <p>★ 0 表示还没量过，调用方应退回屏幕尺寸。
+     */
+    private static volatile int sHostW = 0, sHostH = 0;
+
+    /**
+     * ★★★ v3.0.6：背景区域左上角的**屏幕坐标**。
+     *
+     * <p>只改分母（尺寸）是不够的 —— 换算分子用的是面板的**屏幕坐标**，
+     * 而位图的 (0,0) 落在 host 的左上角，不是屏幕的左上角。有状态栏时两者
+     * 差一个状态栏高度，整块玻璃取样的内容就会整体下移，叠加尺寸误差后
+     * 表现为「背景被拉长」。
+     *
+     * <p>正解：把面板坐标先减掉 host 原点，再除以 host 尺寸 —— 见
+     * {@code GlassDrawable#sampleSpace}。
+     */
+    private static volatile int sHostX = 0, sHostY = 0;
+    private static volatile boolean sHostValid = false;
+
+    /** 记录背景图实际铺满的区域（由 {@code GlassApplier} 传入 host View 的屏幕矩形）。 */
+    public static void setHostRect(int x, int y, int w, int h) {
+        if (w > 0 && h > 0) {
+            sHostX = x;
+            sHostY = y;
+            sHostW = w;
+            sHostH = h;
+            sHostValid = true;
+        }
+    }
+
+    public static int hostWidth() {
+        return sHostW;
+    }
+
+    public static int hostHeight() {
+        return sHostH;
+    }
+
+    public static int hostX() {
+        return sHostX;
+    }
+
+    public static int hostY() {
+        return sHostY;
+    }
+
+    /** 是否已经量过背景区域。false ⇒ 调用方必须退回屏幕尺寸/原点 (0,0)。 */
+    public static boolean hostValid() {
+        return sHostValid;
+    }
+
     public static long version() {
         return sVersion;
     }

@@ -295,6 +295,8 @@ public final class GlassApplier {
         sHooked = new java.lang.ref.WeakReference<>(activity);
         // ★ v4.3：同时装「布局完成即补扫」—— 没有它，切页时会先画一帧原背景
         attachLayoutHook(activity);
+        // ★★★ v3.0.6：装「绘制前同步面板位置」—— 没有它，滚动时壁纸会被粘在板块上
+        attachPreDrawHook(activity);
         try {
             hookTree(activity, activity.getWindow().getDecorView(), 0);
         } catch (Throwable t) {
@@ -354,6 +356,10 @@ public final class GlassApplier {
 
     /** 已经装过 layout 监听的 Activity（每个 Activity 只装一次）。 */
     private static java.lang.ref.WeakReference<Activity> sLayoutHooked =
+            new java.lang.ref.WeakReference<>(null);
+
+    /** ★ v3.0.6：已经装过「绘制前同步位置」监听的 Activity。 */
+    private static java.lang.ref.WeakReference<Activity> sPreDrawHooked =
             new java.lang.ref.WeakReference<>(null);
 
     /**
@@ -429,6 +435,92 @@ public final class GlassApplier {
         }
     }
 
+    /**
+     * ★★★ v3.0.6：绘制前同步面板位置 —— 修「壁纸被粘在板块上 / 被拉长」。
+     *
+     * <h3>为什么需要（这是本轮最关键的一条）</h3>
+     * 玻璃内部是「按屏幕坐标去背景图上取一块」，基准 uniform 是
+     * {@code uPanelOrigin}，它在 {@code GlassDrawable.drawShader} 里设 ——
+     * <b>只有这块面板被重新绘制时才会更新</b>。
+     *
+     * <p>而 View 只是被**移动**时（滚动、位移动画），Android 复用它的显示列表，
+     * **不会重新绘制背景**。所以滚动过程中面板一路滑过去，{@code uPanelOrigin}
+     * 却停在滚动开始那一刻 ⇒ 面板永远显示同一块壁纸 ⇒ 看起来就是壁纸贴在板块上。
+     *
+     * <h3>为什么用 OnPreDraw 而不是 OnScrollChanged</h3>
+     * {@code ViewTreeObserver.OnScrollChangedListener} 只在 {@code View.scrollTo/scrollBy}
+     * 时触发。而 {@code RecyclerView} 滚动走的是
+     * {@code offsetChildrenVertical → offsetTopAndBottom} —— 改子 View 的 {@code mTop}，
+     * 既不调 scrollTo，也不触发 layout ⇒ 上面两个监听器**一个都不会响**。
+     * {@code OnPreDraw} 是唯一「每次真要画一帧就一定会走」的入口。
+     *
+     * <h3>★ 为什么不会变成每帧重画</h3>
+     * <ol>
+     *   <li>静态界面不产生绘制帧 ⇒ 这个钩子根本不跑；</li>
+     *   <li>即使跑，{@link GlassDrawable#needsRedraw()} 会先比对屏幕坐标，
+     *       没动就不 invalidate ⇒ 滚动一停就自动归零；</li>
+     *   <li>在 OnPreDraw 里 invalidate 不会多画一帧：它在
+     *       {@code performMeasure/Layout} 之后、{@code performDraw} **之前**，
+     *       这一次遍历就会重新录制显示列表。</li>
+     * </ol>
+     */
+    public static void attachPreDrawHook(final Activity activity) {
+        if (activity == null || sPreDrawHooked.get() == activity) {
+            return;
+        }
+        sPreDrawHooked = new java.lang.ref.WeakReference<>(activity);
+        try {
+            final View decor = activity.getWindow().getDecorView();
+            decor.getViewTreeObserver().addOnPreDrawListener(
+                    new android.view.ViewTreeObserver.OnPreDrawListener() {
+                        @Override
+                        public boolean onPreDraw() {
+                            syncAppliedPositions();
+                            return true;
+                        }
+                    });
+        } catch (Throwable t) {
+            Log.w(TAG, "绘制前同步监听安装失败（滚动时玻璃可能不跟随，其余不受影响）", t);
+        }
+    }
+
+    /**
+     * 把所有「位置变了」的面板标脏，让它们在本次遍历里重新录制显示列表。
+     *
+     * <p>★ 必须先把 entry 抓成数组再遍历：{@code sApplied} 是 {@link WeakHashMap}，
+     * 迭代过程中 GC 清理条目会让内部结构变化，直接 foreach 有
+     * {@code ConcurrentModificationException} 的风险。
+     */
+    private static void syncAppliedPositions() {
+        if (sMode == MODE_OFF) {
+            return;
+        }
+        // ★★★ v3.0.6：先补量背景区域。它变了（横竖屏、状态栏显隐、分屏）
+        //   意味着**所有**面板的取样换算都失效了，不能只靠 needsRedraw 判位置。
+        boolean hostChanged = syncHostRect();
+        final Object[] entries;
+        synchronized (sApplied) {
+            if (sApplied.isEmpty()) {
+                return;
+            }
+            entries = sApplied.entrySet().toArray();
+        }
+        for (Object o : entries) {
+            try {
+                java.util.Map.Entry<?, ?> e = (java.util.Map.Entry<?, ?>) o;
+                View v = (View) e.getKey();
+                GlassDrawable g = (GlassDrawable) e.getValue();
+                if (v == null || g == null || !v.isShown()) {
+                    continue;
+                }
+                if (hostChanged || g.needsRedraw()) {
+                    v.invalidate();
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
     private static void scheduleScan(final Activity activity) {
         // ★ v4.3：新加进来的子 View 同样要等 layout 完成才能扫（否则尺寸是 0）
         sPendingScan = true;
@@ -477,8 +569,78 @@ public final class GlassApplier {
         if (bmp == null || bmp.isRecycled()) {
             return;
         }
+        // ★★★ v3.0.6：先告诉玻璃「这张图实际铺在屏幕的哪一块」。
+        //   必须用 host View 的**实际屏幕矩形**，不能用 displayMetrics —— 见 GlassBackdrop#sHostW。
+        //   ★ 放在 set() 之前：set() 会让版本号 +1，某些路径会立刻重绘。
+        rememberHost(backgroundHost);
         GlassBackdrop.set(bmp);
         apply(activity);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  背景区域（host 屏幕矩形）
+    // ═══════════════════════════════════════════════════════════
+
+    /** 背景 host 的弱引用 —— 用来在布局变化后重新量它的屏幕矩形（见 {@link #syncHostRect()}）。 */
+    private static java.lang.ref.WeakReference<View> sHostRef =
+            new java.lang.ref.WeakReference<>(null);
+    private static final int[] sHostLoc = new int[2];
+
+    /**
+     * ★★★ v3.0.6：量一次「背景图到底铺在屏幕的哪一块」，交给 {@link GlassBackdrop}。
+     *
+     * <h3>为什么需要（「被拉长」的根因）</h3>
+     * 玻璃取样是「面板屏幕坐标 → 归一化 → 位图像素」。这个换算成立的前提是：
+     * <b>位图铺满的区域 == 归一化用的那个矩形</b>。而这张位图是
+     * {@code launcher_layout} 的背景，{@code BitmapDrawable} 默认 {@code FILL}（fitXY）
+     * ⇒ 铺满的是 **host 的 bounds**，不是屏幕。
+     *
+     * <p>以前拿 {@code displayMetrics} 当分母、原点当 (0,0)：
+     * <ul>
+     *   <li>分母偏大 ⇒ 纵向取到的内容被压缩 ⇒ 「被拉长」；</li>
+     *   <li>原点没减状态栏高度 ⇒ 整块内容整体偏移 ⇒ 越往下越对不上。</li>
+     * </ul>
+     * 两者叠加，就是用户说的「滑动多板块界面，背景不是在那里的也被粘上去、还被拉长」。
+     *
+     * <p>★ 尺寸为 0 时不记（说明还没 layout 完）；由 {@link #syncHostRect()} 在
+     * 之后的绘制前钩子里补量。
+     */
+    private static void rememberHost(View host) {
+        if (host == null) {
+            return;
+        }
+        sHostRef = new java.lang.ref.WeakReference<>(host);
+        syncHostRect();
+    }
+
+    /**
+     * 重新量 host 的屏幕矩形（只在变化时才写，避免每帧无意义地写 volatile）。
+     *
+     * <p>挂在绘制前钩子里调用：那时 layout 一定已经完成，{@code getWidth/Height}
+     * 与 {@code getLocationOnScreen} 都是有效值。横竖屏切换、分屏、刘海/手势条
+     * 显隐导致 host 尺寸或位置变化，都会在下一帧被这里捕捉到。
+     *
+     * @return true = 背景区域变了（调用方应把所有面板标脏）
+     */
+    private static boolean syncHostRect() {
+        View host = sHostRef.get();
+        if (host == null || host.getWidth() <= 0 || host.getHeight() <= 0) {
+            return false;
+        }
+        try {
+            host.getLocationOnScreen(sHostLoc);
+        } catch (Throwable t) {
+            return false;
+        }
+        int x = sHostLoc[0], y = sHostLoc[1];
+        int w = host.getWidth(), h = host.getHeight();
+        if (GlassBackdrop.hostValid()
+                && x == GlassBackdrop.hostX() && y == GlassBackdrop.hostY()
+                && w == GlassBackdrop.hostWidth() && h == GlassBackdrop.hostHeight()) {
+            return false;
+        }
+        GlassBackdrop.setHostRect(x, y, w, h);
+        return true;
     }
 
     /** 从各种 Drawable 里挖出底层位图。挖不到返回 null。 */

@@ -1,13 +1,21 @@
 {
-  "_note": "★ 注意：这个文件是 App 更新检查的真源。App 读取的是 main 分支上的同名文件（raw.githubusercontent.com/WEEB123321/QCL-QCL-CE/main/launcher_version.json）。这里保留一份当前值只是为了让克隆下来的人能看清格式，改版本时请一并同步，避免两份漂移。",
+  "_note": "★ 更新检查真源：正式版 App 读取 latestRelease；Beta 独立包（com.qcl.launcher.ce.beta）只读取 latestPrerelease。App 读取 main 分支上的同名文件。v1.9.4 是 GitHub 上最后一个正式 Release；2.0.x–3.1.6 的源码改动没有单独发版，已并入 Beta 1.0.0。",
   "latestRelease": {
-    "versionCode": 30005,
-    "versionName": "3.0.5",
-    "date": "2026-10-25",
+    "versionCode": 1742,
+    "versionName": "1.9.4",
+    "date": "2026-10-13",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.0.5/QCL-CE-v3.0.5-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 3.0.5 —— 补 90 个缺失版本 + 愚人节分类 + 修玻璃切页那个方框</b><br/>· <b>补上 90 个缺失版本</b>——归档从 181 条扩到 271 条：<b>11w47a 到 13w12~ 的全部 74 个周快照</b>、13 个 1.x 预发布（1.2-pre / 1.3-pre-1249 等）、以及 <b>2.0 的三个颜色版本</b>。这些版本官方清单里根本没有（官方快照从 13w16a 才开始），只能从存档站取；每个都下载解开确认过里面有 net/minecraft/client/Minecraft.class，装得上也启动得了才列出来<br/>· <b>新增「愚人节」分类</b>——2.0-red/blue/purple、15w14a、1.RV-Pre1、3D Shareware v1.34、20w14infinite、22w13oneblockatatime、23w13a_or_b、24w14potato、25w14craftmine、26w14a，共 12 个。以前它们混在快照里，勾「快照」才能看到，还容易和正经快照搞混。四个勾选框放不下一屏时会横向滚动，不会被挤出去<br/>· <b>修「正式版里有版本不显示」</b>——1.3、1.4、1.4.1、1.4.3、1.5 这五个正式版，Mojang 官方清单里把它们标成了 snapshot，所以勾「正式版」时它们根本不出现。现在不再信清单的 type 字段，改用版本号本身判断，这五个回来了<br/>· <b>修切页动画里那个「没有圆角的框」</b>——这是本轮最主要的一条。根因不在动画，而在每个页面的根布局：它的背景色是全透明的（意思是「让壁纸透出来」），但玻璃的判定只看「是不是图片背景」，于是把整页当成一块面板套上了玻璃 ⇒ 整页变成一张铺满内容区的不透明模糊壁纸。它左右两边贴着导航栏边界和屏幕边缘，圆角全被裁在屏幕外，看起来就是一个没有圆角的框；而且这张底图是按布局位置取样的，切页动画期间不会跟着更新，所以页面里的控件在滑、这张底图却像钉住不动。现在整页容器不再套玻璃，卡片、按钮、列表项、底部导航、对话框的玻璃全部照旧<br/>· 顺手修了两个会造成同类「方角」的隐患：玻璃着色器的绘制矩形以前完全靠着色器自己裁形状，一旦参数没跟上就会画出一整块直角矩形，现在额外按圆角路径硬裁一道；以及着色器是从全局池里复用的，归还时没清掉「尺寸已设置」的缓存，重新取到时会沿用别的面板的尺寸和圆角<br/>· 切页动画期间玻璃取样点现在会跟着动画位移走（以前取的是终点位置）；降级路径的放大环缓存也补上了位置，面板一移动不会再按老位置取样<br/>· 版本号 3.0.4 → 3.0.5"
+    "updateLog": "<b>QCL-CE 1.9.4</b><br/>· 内置插件 90 个（可搜索、可逐个开关）<br/>· 深色模式：13 个语义色 + 完整夜间配色，内置「跟随系统 / 浅色 / 深色」开关<br/>· 主页改版：8 个入口收进左侧「≡ 菜单」，菜单支持自定义排版<br/>· 界面排版自定义：长按进入编辑模式，控件可拖动 / 隐藏 / 缩放，支持导入导出布局<br/>· 新增「一键开服」<br/>· 装模组自动补全整条前置依赖链（已装的自动跳过）<br/>· 白天 / 黑夜背景（跟随系统深色模式自动切换）<br/>· 新增「输入链路自检」：检查输入桥加载、isInputReady、控制布局，结果写进启动诊断报告<br/>· 修一批闪退 / 卡死，修整合包下载<br/>· 安装包 328MB → 229MB<br/>· 新增官网落地页与 Wiki（docs/）"
   },
-  "latestPrerelease": null
+  "latestPrerelease": {
+    "versionCode": 10000,
+    "versionName": "1.0.0-beta",
+    "date": "2026-10-31",
+    "url": [
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk"
+    ],
+    "updateLog": "<b>QCL-CE Beta 1.0.0 —— 独立 Beta 包 + 四种控键布局导入</b><br/>· <b>独立包名</b> <code>com.qcl.launcher.ce.beta</code>，可与正式版 / 官方版同时安装；游戏目录仍共用 <code>/sdcard/QCL</code><br/>· <b>控键布局导入</b>：FCL（controllerVersion 21）、Zalith Launcher 2（editorVersion 12）、Zalith Launcher（version 8）、HMCL-PE（.hmclpe）；导入后另存为新布局，不覆盖现有布局<br/>· FCL 的图层、ZL2 的 layer、ZL1 的抽屉转为 QCL 子布局；FCL 键码（LWJGL2）与 ZL1/ZL2 键码（GLFW）统一映射<br/>· <b>Beta 更新通道</b>：只跟随 latestPrerelease，不会误推正式版；FileProvider authority 跟随包名，正式版与 Beta 可共存<br/>· <b>包含 3.1.6 稳定线的全部功能</b>：原版 / Paper / Purpur / Fabric / Forge 手机开服、控制台、玩家与配置、模组/插件、世界备份、Terracotta 联机共享<br/>· 对比 GitHub 上最后一个正式 Release v1.9.4：额外包含 2.0.x–3.1.6 的全部累积更新（服务端、联机、液态玻璃、整合包与插件市场修复等）<br/>· <b>注意</b>：本包为 Android Debug 签名，仅用于测试；后续正式签名版本无法直接覆盖安装本次 Beta。安装包约 228 MiB，仅 arm64"
+  }
 }
