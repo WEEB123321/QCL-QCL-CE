@@ -1,13 +1,13 @@
 {
-  "_note": "★ 更新检查真源：正式版 App 读取 latestRelease；Beta 独立包（com.qcl.launcher.ce.beta）只读取 latestPrerelease。App 读取 main 分支上的同名文件。v1.9.4 是 GitHub 上最后一个正式 Release；2.0.x–3.1.6 的源码改动没有单独发版，已并入 Beta 1.0.0。",
+  "_note": "★ 更新检查真源：正式版 App 读取 latestRelease；Beta 独立包（com.qcl.launcher.ce.beta）只读取 latestPrerelease。当前 latestRelease 为 QCL-CE 最新正式版 v3.1.6；Beta 1.0.0 是独立包名的测试通道，两者可共存。",
   "latestRelease": {
-    "versionCode": 1742,
-    "versionName": "1.9.4",
-    "date": "2026-10-13",
+    "versionCode": 30106,
+    "versionName": "3.1.6",
+    "date": "2026-10-31",
     "url": [
-      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk"
+      "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.1.6/QCL-CE-v3.1.6-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE 1.9.4</b><br/>· 内置插件 90 个（可搜索、可逐个开关）<br/>· 深色模式：13 个语义色 + 完整夜间配色，内置「跟随系统 / 浅色 / 深色」开关<br/>· 主页改版：8 个入口收进左侧「≡ 菜单」，菜单支持自定义排版<br/>· 界面排版自定义：长按进入编辑模式，控件可拖动 / 隐藏 / 缩放，支持导入导出布局<br/>· 新增「一键开服」<br/>· 装模组自动补全整条前置依赖链（已装的自动跳过）<br/>· 白天 / 黑夜背景（跟随系统深色模式自动切换）<br/>· 新增「输入链路自检」：检查输入桥加载、isInputReady、控制布局，结果写进启动诊断报告<br/>· 修一批闪退 / 卡死，修整合包下载<br/>· 安装包 328MB → 229MB<br/>· 新增官网落地页与 Wiki（docs/）"
+    "updateLog": "<b>QCL-CE 3.1.6 —— 最新正式版</b><br/>· <b>Purpur</b>——通过官方 API 获取最新构建，下载后校验 MD5<br/>· 创建服务器时可选择 Purpur，插件统一管理在 plugins 目录<br/>· 已安装 Purpur 服务端同样支持离线启动、控制台、玩家管理、世界备份和联机共享<br/>· 包含 2.x–3.1.6 的全部累积更新：原版 / Paper / Purpur / Fabric / Forge 手机开服、控制台、玩家与配置、模组/插件、世界备份、Terracotta 联机共享、液态玻璃等<br/>· <b>注意</b>：当前构建为 Android Debug 签名，仅用于测试；正式签名需要提供 keystore 后重新构建。安装包约 225 MiB，仅 arm64"
   },
   "latestPrerelease": {
     "versionCode": 10000,
@@ -16,6 +16,6 @@
     "url": [
       "https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk"
     ],
-    "updateLog": "<b>QCL-CE Beta 1.0.0 —— 独立 Beta 包 + 四种控键布局导入</b><br/>· <b>独立包名</b> <code>com.qcl.launcher.ce.beta</code>，可与正式版 / 官方版同时安装；游戏目录仍共用 <code>/sdcard/QCL</code><br/>· <b>控键布局导入</b>：FCL（controllerVersion 21）、Zalith Launcher 2（editorVersion 12）、Zalith Launcher（version 8）、HMCL-PE（.hmclpe）；导入后另存为新布局，不覆盖现有布局<br/>· FCL 的图层、ZL2 的 layer、ZL1 的抽屉转为 QCL 子布局；FCL 键码（LWJGL2）与 ZL1/ZL2 键码（GLFW）统一映射<br/>· <b>Beta 更新通道</b>：只跟随 latestPrerelease，不会误推正式版；FileProvider authority 跟随包名，正式版与 Beta 可共存<br/>· <b>包含 3.1.6 稳定线的全部功能</b>：原版 / Paper / Purpur / Fabric / Forge 手机开服、控制台、玩家与配置、模组/插件、世界备份、Terracotta 联机共享<br/>· 对比 GitHub 上最后一个正式 Release v1.9.4：额外包含 2.0.x–3.1.6 的全部累积更新（服务端、联机、液态玻璃、整合包与插件市场修复等）<br/>· <b>注意</b>：本包为 Android Debug 签名，仅用于测试；后续正式签名版本无法直接覆盖安装本次 Beta。安装包约 228 MiB，仅 arm64"
+    "updateLog": "<b>QCL-CE Beta 1.0.0 —— 独立 Beta 包 + 四种控键布局导入</b><br/>· <b>独立包名</b> <code>com.qcl.launcher.ce.beta</code>，可与正式版 / 官方版同时安装；游戏目录仍共用 <code>/sdcard/QCL</code><br/>· <b>控键布局导入</b>：FCL（controllerVersion 21）、Zalith Launcher 2（editorVersion 12）、Zalith Launcher（version 8）、HMCL-PE（.hmclpe）；导入后另存为新布局，不覆盖现有布局<br/>· FCL 的图层、ZL2 的 layer、ZL1 的抽屉转为 QCL 子布局；FCL 键码（LWJGL2）与 ZL1/ZL2 键码（GLFW）统一映射<br/>· <b>Beta 更新通道</b>：只跟随 latestPrerelease，不会误推正式版；FileProvider authority 跟随包名，正式版与 Beta 可共存<br/>· <b>包含 3.1.6 稳定线的全部功能</b>：原版 / Paper / Purpur / Fabric / Forge 手机开服、控制台、玩家与配置、模组/插件、世界备份、Terracotta 联机共享<br/>· <b>注意</b>：本包为 Android Debug 签名，仅用于测试。安装包约 228 MiB，仅 arm64"
   }
 }

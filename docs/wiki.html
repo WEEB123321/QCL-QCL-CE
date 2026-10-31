@@ -130,19 +130,20 @@
 
   <main>
 
-    <div class="hero-kicker">DOCUMENTATION · BETA 1.0.0</div>
+    <div class="hero-kicker">DOCUMENTATION · v3.1.6 / BETA</div>
     <h1>QCL-CE 使用文档</h1>
-    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前对应版本 Beta 1.0.0（正式版用法仍适用，Beta 差异见安装说明）。</p>
+    <p class="lead">安装、启动器用法、以及遇到问题时的排查方法。当前最新版 v3.1.6；Beta 1.0.0 是独立测试通道，差异见安装说明。</p>
 
     <h2 id="install">安装</h2>
 
     <div class="box warn">
-      <h3>Beta 1.0.0 说明</h3>
+      <h3>v3.1.6 与 Beta 1.0.0</h3>
       <ul>
-        <li>Beta 使用独立包名 <code>com.qcl.launcher.ce.beta</code>，可以和正式版 / 官方版<b>同时安装</b>，不需要卸载。</li>
+        <li><b>v3.1.6 是当前最新正式版</b>，包名 <code>com.qcl.launcher.ce</code>，可直接覆盖同包名的旧 CE 版本。</li>
+        <li>Beta 使用独立包名 <code>com.qcl.launcher.ce.beta</code>，可以和 v3.1.6 / 官方版<b>同时安装</b>，不需要卸载。</li>
         <li>游戏目录仍共用 <code>/sdcard/QCL</code>，实例、存档、备份通用；Beta 的应用内部设置与正式版隔离。</li>
-        <li>本包是 <b>Android Debug 签名</b>，只用于测试。后续正式签名版本无法直接覆盖安装本次 Beta。</li>
-        <li>Beta 的检查更新只读取预发布版本，不会误推正式版；稳定版仍可下载 v1.9.4。</li>
+        <li>v3.1.6 与 Beta 都是 <b>Android Debug 签名</b>，只用于测试。正式签名版本需要提供 keystore 后再构建。</li>
+        <li>Beta 的检查更新只读取预发布版本，不会误推正式版；最新版可下载 v3.1.6。</li>
       </ul>
     </div>
 
@@ -150,25 +151,25 @@
       <h3>装之前</h3>
       <ol>
         <li>确认手机是 <b>arm64</b>（绝大多数现代手机都是）；模拟器 x86_64 不能装。</li>
-        <li>如果之前装过<b>别的 Beta 签名</b>，先卸载再装；正式版 / 官方版不用卸载。</li>
-        <li>测试前建议先备份存档。Beta 与正式版共用 <code>/sdcard/QCL</code>。</li>
+        <li>如果之前装过<b>别的 Beta 签名</b>，先卸载再装；v3.1.6 / 官方版不用卸载。</li>
+        <li>测试前建议先备份存档。v3.1.6 与 Beta 共用 <code>/sdcard/QCL</code>。</li>
       </ol>
     </div>
 
     <p><b>直接下载：</b>
-      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk">Beta 1.0.0 直链</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.1.6/QCL-CE-v3.1.6-arm64.apk">最新版 v3.1.6 直链</a>
       ｜
-      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk">国内镜像（gh-proxy）</a>
+      <a href="https://gh-proxy.com/https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v3.1.6/QCL-CE-v3.1.6-arm64.apk">国内镜像（gh-proxy）</a>
       ｜
-      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.9.4/QCL-CE-v1.9.4-arm64.apk">稳定版 v1.9.4</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.0-beta/QCL-CE-1.0.0-beta-arm64.apk">Beta 1.0.0</a>
     </p>
     <p>gh-proxy 只是把同一条 GitHub 直链转发一遍，下载到的文件完全一样。
       也可以到 <a href="https://github.com/WEEB123321/QCL-QCL-CE/releases">Releases 页面</a>查看全部发布：</p>
 
     <table>
       <tr><th>文件</th><th>用途</th></tr>
-      <tr><td><code>QCL-CE-1.0.0-beta-arm64.apk</code></td><td>Beta 测试包，Debug 签名，可与正式版共存。</td></tr>
-      <tr><td><code>QCL-CE-v1.9.4-arm64.apk</code></td><td>GitHub 上最后一个正式 Release。</td></tr>
+      <tr><td><code>QCL-CE-v3.1.6-arm64.apk</code></td><td>最新正式版，Debug 签名。</td></tr>
+      <tr><td><code>QCL-CE-1.0.0-beta-arm64.apk</code></td><td>Beta 测试包，独立包名，可与正式版共存。</td></tr>
     </table>
 
     <h2 id="first">第一次启动</h2>

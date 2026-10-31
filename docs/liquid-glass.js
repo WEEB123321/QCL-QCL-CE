@@ -411,37 +411,71 @@
     }
   }
 
-  function installHover() {
-    if (!canHover) return;
-    var nodes = document.querySelectorAll(HOVER);
-    if (!nodes.length) return;
+  var precacheIo = null;
 
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
+  function observePrecache(el) {
+    if (!('IntersectionObserver' in window)) return;
+    if (!precacheIo) {
+      precacheIo = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             idle(function () { precache(entry.target); });
-            io.unobserve(entry.target);
+            precacheIo.unobserve(entry.target);
           }
         });
       }, { rootMargin: '220px 0px', threshold: 0.01 });
-      for (var i = 0; i < nodes.length; i++) io.observe(nodes[i]);
+    }
+    precacheIo.observe(el);
+  }
+
+  function bindHover(el) {
+    if (el.__qclLgHoverBound) return;
+    el.__qclLgHoverBound = true;
+    var leaveTimer = 0;
+    el.addEventListener('pointerenter', function () {
+      clearTimeout(leaveTimer);
+      if (build(el)) el.classList.add('qcl-liquid');
+    });
+    el.addEventListener('pointerleave', function () {
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(function () {
+        el.classList.remove('qcl-liquid');
+      }, 90);
+    });
+  }
+
+  function installHover() {
+    if (!canHover) return;
+    var nodes = document.querySelectorAll(HOVER);
+
+    for (var i = 0; i < nodes.length; i++) {
+      bindHover(nodes[i]);
+      observePrecache(nodes[i]);
     }
 
-    for (var j = 0; j < nodes.length; j++) {
-      (function (el) {
-        var leaveTimer = 0;
-        el.addEventListener('pointerenter', function () {
-          clearTimeout(leaveTimer);
-          if (build(el)) el.classList.add('qcl-liquid');
-        });
-        el.addEventListener('pointerleave', function () {
-          clearTimeout(leaveTimer);
-          leaveTimer = setTimeout(function () {
-            el.classList.remove('qcl-liquid');
-          }, 90);
-        });
-      })(nodes[j]);
+    // 插件市场的卡片是 fetch 后动态插入的，需要持续绑定新节点。
+    if ('MutationObserver' in window) {
+      var mo = new MutationObserver(function (mutations) {
+        for (var m = 0; m < mutations.length; m++) {
+          var added = mutations[m].addedNodes;
+          for (var n = 0; n < added.length; n++) {
+            var node = added[n];
+            if (!node || node.nodeType !== 1) continue;
+            if (node.matches && node.matches(HOVER)) {
+              bindHover(node);
+              observePrecache(node);
+            }
+            if (node.querySelectorAll) {
+              var nested = node.querySelectorAll(HOVER);
+              for (var k = 0; k < nested.length; k++) {
+                bindHover(nested[k]);
+                observePrecache(nested[k]);
+              }
+            }
+          }
+        }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
     }
   }
 
