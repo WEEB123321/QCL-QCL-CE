@@ -62,6 +62,7 @@ import com.qcl.launcher.launcher.download.modloader.ModLoaderDetector;
 import com.qcl.launcher.launcher.mod.ModClassInjector;
 import androidx.appcompat.widget.SwitchCompat;
 import com.qcl.launcher.launcher.MainActivity;
+import com.qcl.launcher.launcher.instance.ControlKeySyncHelper;
 import com.qcl.launcher.launcher.dialogs.control.ControllerManagerDialog;
 import com.qcl.launcher.launcher.launch.RendererCompat;
 import com.qcl.launcher.launcher.list.local.game.GameListBean;
@@ -402,6 +403,9 @@ SeekBar.OnSeekBarChangeListener {
             this.currentControlPattern.setText((CharSequence)pattern);
             this.privateGameSetting.controlLayout = pattern;
             GsonUtils.savePrivateGameSetting(this.privateGameSetting, this.activity.launcherSetting.gameFileDirectory + "/versions/" + this.versionName + "/qcl.cfg");
+            ControlKeySyncHelper.markChanged(this.context, new java.io.File(
+                    this.activity.launcherSetting.gameFileDirectory + "/versions/"
+                            + this.versionName + "/qcl.cfg"), pattern);
             this.controllerManagerDialog.currentPattern = pattern;
             this.controllerManagerDialog.loadList();
         }
@@ -841,6 +845,10 @@ SeekBar.OnSeekBarChangeListener {
                     VersionSettingUI.this.currentControlPattern.setText((CharSequence)pattern);
                     ((VersionSettingUI)VersionSettingUI.this).privateGameSetting.controlLayout = pattern;
                     GsonUtils.savePrivateGameSetting(VersionSettingUI.this.privateGameSetting, VersionSettingUI.this.activity.launcherSetting.gameFileDirectory + "/versions/" + VersionSettingUI.this.versionName + "/qcl.cfg");
+                    ControlKeySyncHelper.markChanged(VersionSettingUI.this.context, new java.io.File(
+                            VersionSettingUI.this.activity.launcherSetting.gameFileDirectory
+                                    + "/versions/" + VersionSettingUI.this.versionName + "/qcl.cfg"),
+                            pattern);
                 }
             }, true);
             this.controllerManagerDialog.show();

@@ -45,6 +45,8 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
     private final RemoteModRepository.Type type;
     public static final CurseAddon.Category CATEGORY_ALL = new CurseAddon.Category();
     public static final CurseForgeRemoteModRepository MODS = new CurseForgeRemoteModRepository(RemoteModRepository.Type.MOD, 6);
+    public static final CurseForgeRemoteModRepository BUKKIT_PLUGINS =
+            new CurseForgeRemoteModRepository(RemoteModRepository.Type.MOD, SECTION_BUKKIT_PLUGIN);
     public static final CurseForgeRemoteModRepository MODPACKS = new CurseForgeRemoteModRepository(RemoteModRepository.Type.MODPACK, 4471);
     public static final CurseForgeRemoteModRepository RESOURCE_PACKS = new CurseForgeRemoteModRepository(RemoteModRepository.Type.RESOURCE_PACK, 12);
     public static final CurseForgeRemoteModRepository WORLDS = new CurseForgeRemoteModRepository(RemoteModRepository.Type.WORLD, 17);

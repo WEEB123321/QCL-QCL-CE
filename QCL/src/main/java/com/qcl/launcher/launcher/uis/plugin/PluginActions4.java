@@ -685,9 +685,9 @@ public final class PluginActions4 {
                         : (content.trim().isEmpty() ? "空" : content.length() + " 字符")));
             }
             col.addView(PluginUiKit.sub(a, " "));
-            col.addView(PluginUiKit.sub(a, "★ 这四个文件是**服务器**用的。"
-                    + "先跑一次「一键开服向导」建目录，再用服务器生成它们，"
-                    + "然后可以在这里查看内容。"));
+            col.addView(PluginUiKit.sub(a, "★ 这些文件是**服务器**用的。"
+                    + "先用「手机开服」建一个服务器并启动一次，"
+                    + "服务端生成它们后可以在这里查看内容。"));
             col.addView(PluginUiKit.sub(a, "★ 「图形化增删 + 一键同步到服务端」需要服务端配合"
                     + "（要连上去执行命令），本项目不做假按钮。"));
             PluginUiKit.sheet(a, "服务器白名单管理", PluginUiKit.scroller(a, col), "知道了", null);

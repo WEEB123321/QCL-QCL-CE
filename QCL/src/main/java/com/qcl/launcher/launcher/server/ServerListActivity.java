@@ -1,10 +1,18 @@
 package com.qcl.launcher.launcher.server;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +20,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.qcl.launcher.manifest.AppManifest;
@@ -26,6 +36,66 @@ import java.util.List;
 public class ServerListActivity extends AppCompatActivity {
 
     private LinearLayout listContainer;
+    private boolean bound;
+    private Messenger serviceMessenger;
+    private String activeProfile = "";
+    private String activeState = MinecraftServerService.STATE_IDLE;
+    private String activeDetail = "";
+
+    private final Messenger clientMessenger = new Messenger(new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (msg.what != MinecraftServerService.MSG_STATE) {
+                return;
+            }
+            String state = msg.getData().getString("state",
+                    MinecraftServerService.STATE_IDLE);
+            String detail = msg.getData().getString("detail", "");
+            String profile = msg.getData().getString("profile", "");
+            String nextProfile = profile == null ? "" : profile;
+            String nextState = state == null ? MinecraftServerService.STATE_IDLE : state;
+            boolean changed = !nextProfile.equals(activeProfile)
+                    || !nextState.equals(activeState);
+            activeProfile = nextProfile;
+            activeState = nextState;
+            activeDetail = detail == null ? "" : detail;
+            if (changed) {
+                refreshServers();
+            }
+        }
+    });
+
+    private final ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            serviceMessenger = new Messenger(service);
+            bound = true;
+            try {
+                Message message = Message.obtain(null, MinecraftServerService.MSG_REGISTER);
+                message.replyTo = clientMessenger;
+                serviceMessenger.send(message);
+            } catch (RemoteException ignored) {
+                serviceMessenger = null;
+                bound = false;
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            if (bound) {
+                try {
+                    unbindService(connection);
+                } catch (Throwable ignored) {
+                }
+            }
+            serviceMessenger = null;
+            bound = false;
+            activeProfile = "";
+            activeState = MinecraftServerService.STATE_IDLE;
+            activeDetail = "";
+            refreshServers();
+        }
+    };
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -37,12 +107,33 @@ public class ServerListActivity extends AppCompatActivity {
         AppManifest.initializeManifest(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(buildContent());
+        bindServerService();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         refreshServers();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (bound) {
+            try {
+                unbindService(connection);
+            } catch (Throwable ignored) {
+            }
+            bound = false;
+        }
+        super.onDestroy();
+    }
+
+    private void bindServerService() {
+        try {
+            bindService(new Intent(this, MinecraftServerService.class),
+                    connection, Context.BIND_AUTO_CREATE);
+        } catch (Throwable ignored) {
+        }
     }
 
     private View buildContent() {
@@ -65,7 +156,7 @@ public class ServerListActivity extends AppCompatActivity {
         title.setTextSize(22f);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
         TextView subtitle = new TextView(this);
-        subtitle.setText("管理服务器实例，进入独立控制台");
+        subtitle.setText("点服务器进控制台，也可以直接从列表启动");
         subtitle.setTextColor(0xFFBDBDBD);
         subtitle.setTextSize(12f);
         titles.addView(title);
@@ -76,7 +167,8 @@ public class ServerListActivity extends AppCompatActivity {
         Button create = new Button(this);
         create.setText("新建服务器");
         create.setOnClickListener(v -> ServerSetupDialog.show(this,
-                ServerProfile.serversRoot(), "server", (file, profile) -> openConsole(file)));
+                ServerProfile.serversRoot(), "server",
+                (file, profile) -> openConsole(file, false)));
         header.addView(create);
         root.addView(header);
 
@@ -147,6 +239,11 @@ public class ServerListActivity extends AppCompatActivity {
     }
 
     private void addServerRow(ServerProfile profile, File profileFile) {
+        boolean isActive = profileFile.getAbsolutePath().equals(activeProfile);
+        boolean serverActive = isActive && isActiveState(activeState);
+        boolean otherActive = !isActive && !activeProfile.isEmpty()
+                && isActiveState(activeState);
+
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable bg = new GradientDrawable();
@@ -176,17 +273,127 @@ public class ServerListActivity extends AppCompatActivity {
         detail.setPadding(0, dp(4), 0, 0);
         row.addView(detail);
 
-        row.setOnClickListener(v -> openConsole(profileFile));
+        if (isActive) {
+            TextView status = new TextView(this);
+            status.setText(stateLabel(activeState)
+                    + (activeDetail.isEmpty() ? "" : " · " + activeDetail));
+            status.setTextColor(stateColor(activeState));
+            status.setTextSize(12f);
+            status.setPadding(0, dp(4), 0, 0);
+            row.addView(status);
+        } else if (otherActive) {
+            TextView status = new TextView(this);
+            status.setText("另一个服务器正在运行：" + stateLabel(activeState));
+            status.setTextColor(0xFFFFB74D);
+            status.setTextSize(12f);
+            status.setPadding(0, dp(4), 0, 0);
+            row.addView(status);
+        }
+
+        LinearLayout actions = new LinearLayout(this);
+        actions.setOrientation(LinearLayout.HORIZONTAL);
+        actions.setGravity(Gravity.END);
+        actions.setPadding(0, dp(8), 0, 0);
+
+        if (supportsContent(profile)) {
+            Button content = new Button(this);
+            content.setText(isPluginServer(profile) ? "下载插件" : "下载模组");
+            content.setOnClickListener(v -> openContentDownload(profileFile));
+            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            contentParams.rightMargin = dp(6);
+            actions.addView(content, contentParams);
+        }
+
+        Button start = new Button(this);
+        start.setText(serverActive ? "查看控制台" : "启动");
+        start.setOnClickListener(v -> {
+            if (otherActive) {
+                toast("另一个服务器正在运行，请先停止它");
+                return;
+            }
+            openConsole(profileFile, !serverActive);
+        });
+        actions.addView(start);
+        row.addView(actions);
+
+        row.setOnClickListener(v -> openConsole(profileFile, false));
         listContainer.addView(row);
     }
 
-    private void openConsole(File profileFile) {
+    private void openConsole(File profileFile, boolean autoStart) {
         Intent intent = new Intent(this, ServerConsoleActivity.class)
-                .putExtra(ServerConsoleActivity.EXTRA_PROFILE, profileFile.getAbsolutePath());
+                .putExtra(ServerConsoleActivity.EXTRA_PROFILE, profileFile.getAbsolutePath())
+                .putExtra(ServerConsoleActivity.EXTRA_AUTO_START, autoStart);
         startActivity(intent);
+    }
+
+    private void openContentDownload(File profileFile) {
+        try {
+            startActivity(new Intent(this, ServerContentDownloadActivity.class)
+                    .putExtra(ServerContentDownloadActivity.EXTRA_PROFILE,
+                            profileFile.getAbsolutePath()));
+        } catch (Throwable t) {
+            toast("打开下载页失败：" + t.getMessage());
+        }
+    }
+
+    private static boolean supportsContent(ServerProfile profile) {
+        return isPluginServer(profile) || "fabric".equals(profile.type)
+                || "forge".equals(profile.type);
+    }
+
+    private static boolean isPluginServer(ServerProfile profile) {
+        return "paper".equals(profile.type) || "purpur".equals(profile.type);
+    }
+
+    private static boolean isActiveState(String state) {
+        return MinecraftServerService.STATE_PREPARING.equals(state)
+                || MinecraftServerService.STATE_DOWNLOADING.equals(state)
+                || MinecraftServerService.STATE_STARTING.equals(state)
+                || MinecraftServerService.STATE_READY.equals(state)
+                || MinecraftServerService.STATE_STOPPING.equals(state);
+    }
+
+    private static String stateLabel(String state) {
+        switch (state) {
+            case MinecraftServerService.STATE_PREPARING:
+                return "准备中";
+            case MinecraftServerService.STATE_DOWNLOADING:
+                return "下载中";
+            case MinecraftServerService.STATE_STARTING:
+                return "启动中";
+            case MinecraftServerService.STATE_READY:
+                return "运行中";
+            case MinecraftServerService.STATE_STOPPING:
+                return "停止中";
+            case MinecraftServerService.STATE_STOPPED:
+                return "已停止";
+            case MinecraftServerService.STATE_FAILED:
+                return "启动失败";
+            default:
+                return "未启动";
+        }
+    }
+
+    private static int stateColor(String state) {
+        if (MinecraftServerService.STATE_READY.equals(state)) {
+            return 0xFF81C784;
+        }
+        if (MinecraftServerService.STATE_FAILED.equals(state)) {
+            return 0xFFE57373;
+        }
+        if (MinecraftServerService.STATE_STOPPED.equals(state)) {
+            return 0xFFBDBDBD;
+        }
+        return 0xFFFFD54F;
     }
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

@@ -39,6 +39,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     private static final String PREFIX = ModApiMirror.apply("https://api.modrinth.com");
     private final String projectType;
     public static final ModrinthRemoteModRepository MODS = new ModrinthRemoteModRepository("mod");
+    public static final ModrinthRemoteModRepository PLUGINS = new ModrinthRemoteModRepository("plugin");
     public static final ModrinthRemoteModRepository MODPACKS = new ModrinthRemoteModRepository("modpack");
     public static final ModrinthRemoteModRepository RESOURCE_PACKS = new ModrinthRemoteModRepository("resourcepack");
     public static final ModrinthRemoteModRepository SHADERS = new ModrinthRemoteModRepository("shader");

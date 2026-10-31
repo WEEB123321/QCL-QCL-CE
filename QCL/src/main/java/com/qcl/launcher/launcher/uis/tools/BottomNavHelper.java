@@ -277,7 +277,15 @@ public class BottomNavHelper implements View.OnClickListener {
                 break;
             }
         }
-        if (tab == TAB_NONE || activity.uiManager == null) {
+        if (tab == TAB_NONE) {
+            return;
+        }
+        // 「游戏」入口先让用户选游戏实例或服务器列表，不直接切换页面。
+        if (tab == TAB_INSTANCE) {
+            com.qcl.launcher.launcher.uis.main.GameEntryDialog.show(activity);
+            return;
+        }
+        if (activity.uiManager == null) {
             return;
         }
         // 重复点同一个 Tab：不重复切换，避免把返回栈洗掉（用户预期是"回到这个 Tab 的首页"）

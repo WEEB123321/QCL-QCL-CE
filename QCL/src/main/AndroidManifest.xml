@@ -234,6 +234,13 @@
             android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition" />
 
         <activity
+            android:name=".launcher.server.ServerContentDownloadActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.HelloMinecraftLauncherPocketEdition"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".launcher.server.ServerBackupsActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"

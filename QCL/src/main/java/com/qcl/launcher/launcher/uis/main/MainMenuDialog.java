@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.qcl.launcher.launcher.MainActivity;
 import com.qcl.launcher.launcher.uis.plugin.UiPalette;
 import com.qcl.launcher.manifest.AppManifest;
-import com.qcl.launcher.launcher.uis.plugin.PluginServer;
 import com.qcl.launcher.launcher.uis.plugin.PluginUiKit;
 
 import java.io.File;
@@ -336,8 +335,15 @@ public final class MainMenuDialog {
                 }
             }));
         }
-        // 一键开服（不走 performClick，直接调插件入口）
-        list.add(new Item("server", "一键开服", () -> PluginServer.open(act)));
+        // 手机开服：直接进入服务器列表，旧版「只生成脚本」的入口已移除
+        list.add(new Item("server", "手机开服", () -> {
+            try {
+                act.startActivity(new android.content.Intent(act,
+                        com.qcl.launcher.launcher.server.ServerListActivity.class));
+            } catch (Throwable t) {
+                Toast.makeText(act, "打开开服管理失败：" + t, Toast.LENGTH_SHORT).show();
+            }
+        }));
         return list;
     }
 

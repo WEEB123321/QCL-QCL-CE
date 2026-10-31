@@ -46,6 +46,7 @@ import java.nio.charset.StandardCharsets;
 public class ServerConsoleActivity extends AppCompatActivity {
 
     public static final String EXTRA_PROFILE = "profile";
+    public static final String EXTRA_AUTO_START = "auto_start";
 
     private static final int LOG_TAIL_BYTES = 256 * 1024;
 
@@ -244,6 +245,10 @@ public class ServerConsoleActivity extends AppCompatActivity {
             showSetupDialog();
         } else {
             applyState(state, "等待服务端状态");
+            if (getIntent() != null
+                    && getIntent().getBooleanExtra(EXTRA_AUTO_START, false)) {
+                handler.postDelayed(this::startServer, 250L);
+            }
         }
     }
 
