@@ -127,11 +127,12 @@ android.widget.SeekBar.OnSeekBarChangeListener {
     private TextView themeExport;
     private TextView themeImport;
 
-    /** ★ v3.1：排版风格四选一（经典 / FCL / HMCL 电脑端 / ZL2）。 */
+    /** ★ v3.1：排版风格五选一（经典 / FCL / HMCL 电脑端 / ZL2 / MIUIX）。 */
     private TextView layoutStyleQcl;
     private TextView layoutStyleFcl;
     private TextView layoutStyleHmcl;
     private TextView layoutStyleZl2;
+    private TextView layoutStyleMiuix;
 
     /** ★ 社区版新增：安全区避让（刘海 / 挖孔 / 大圆角） */
     private LinearLayout safeAreaLayout;
@@ -202,13 +203,14 @@ android.widget.SeekBar.OnSeekBarChangeListener {
                 tv.setOnClickListener((View.OnClickListener)this);
             }
         }
-        // ★ v3.1：排版风格四选一
+        // ★ v3.1：排版风格五选一
         this.layoutStyleQcl = (TextView)this.activity.findViewById(R.id.layout_style_qcl);
         this.layoutStyleFcl = (TextView)this.activity.findViewById(R.id.layout_style_fcl);
         this.layoutStyleHmcl = (TextView)this.activity.findViewById(R.id.layout_style_hmcl);
         this.layoutStyleZl2 = (TextView)this.activity.findViewById(R.id.layout_style_zl2);
+        this.layoutStyleMiuix = (TextView)this.activity.findViewById(R.id.layout_style_miuix);
         for (TextView tv : new TextView[]{this.layoutStyleQcl, this.layoutStyleFcl,
-                this.layoutStyleHmcl, this.layoutStyleZl2}) {
+                this.layoutStyleHmcl, this.layoutStyleZl2, this.layoutStyleMiuix}) {
             if (tv != null) {
                 tv.setOnClickListener((View.OnClickListener)this);
             }
@@ -468,12 +470,13 @@ android.widget.SeekBar.OnSeekBarChangeListener {
         try {
             int cur = this.activity.launcherSetting == null ? 0 : this.activity.launcherSetting.layoutStyle;
             TextView[] all = {this.layoutStyleQcl, this.layoutStyleFcl,
-                    this.layoutStyleHmcl, this.layoutStyleZl2};
+                    this.layoutStyleHmcl, this.layoutStyleZl2, this.layoutStyleMiuix};
             int[] values = {
                     com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_QCL,
                     com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_FCL,
                     com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_HMCL,
-                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2};
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2,
+                    com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_MIUIX};
             for (int i = 0; i < all.length; i++) {
                 if (all[i] == null) {
                     continue;
@@ -987,16 +990,22 @@ android.widget.SeekBar.OnSeekBarChangeListener {
             refreshLiquidGlassScope();
             return;
         }
-        // ★ v3.1：排版风格（经典 / FCL / HMCL 电脑端 / ZL2）
+        // ★ v3.1：排版风格（经典 / FCL / HMCL 电脑端 / ZL2 / MIUIX）
         if (v == this.layoutStyleQcl || v == this.layoutStyleFcl
-                || v == this.layoutStyleHmcl || v == this.layoutStyleZl2) {
-            int style = v == this.layoutStyleFcl
-                    ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_FCL
-                    : (v == this.layoutStyleHmcl
-                        ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_HMCL
-                        : (v == this.layoutStyleZl2
-                            ? com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2
-                            : com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_QCL));
+                || v == this.layoutStyleHmcl || v == this.layoutStyleZl2
+                || v == this.layoutStyleMiuix) {
+            int style;
+            if (v == this.layoutStyleFcl) {
+                style = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_FCL;
+            } else if (v == this.layoutStyleHmcl) {
+                style = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_HMCL;
+            } else if (v == this.layoutStyleZl2) {
+                style = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_ZL2;
+            } else if (v == this.layoutStyleMiuix) {
+                style = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_MIUIX;
+            } else {
+                style = com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_QCL;
+            }
             this.activity.launcherSetting.layoutStyle = style;
             GsonUtils.saveLauncherSetting(this.activity.launcherSetting, AppManifest.SETTING_DIR + "/launcher_setting.json");
             this.activity.applyLayoutStyle();

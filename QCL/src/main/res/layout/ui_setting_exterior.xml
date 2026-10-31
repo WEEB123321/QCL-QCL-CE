@@ -613,6 +613,21 @@
                             android:textSize="@dimen/text_size_small"
                             android:text="@string/exterior_layout_style_zl2"/>
 
+                        <TextView
+                            android:id="@+id/layout_style_miuix"
+                            android:layout_marginStart="6dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/launcher_button_gray"
+                            android:textColor="@color/colorPureBlack"
+                            android:textSize="@dimen/text_size_small"
+                            android:text="@string/exterior_layout_style_miuix"/>
+
                     </LinearLayout>
 
                 </LinearLayout>

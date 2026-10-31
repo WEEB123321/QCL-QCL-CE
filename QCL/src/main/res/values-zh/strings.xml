@@ -1238,6 +1238,7 @@
     <string name="exterior_layout_style_fcl">FCL</string>
     <string name="exterior_layout_style_hmcl">HMCL</string>
     <string name="exterior_layout_style_zl2">ZL2</string>
+    <string name="exterior_layout_style_miuix">MIUIX</string>
     <string name="ui_about_hmclpe_main">HMCL-PE 仓库（已归档）</string>
     <string name="ui_about_hmclpe_sub">HMCL-PE 已停止维护并归档。QCL 1.0.x 及以前基于 HMCL-PE 构建，之后为自建启动管线。</string>
 

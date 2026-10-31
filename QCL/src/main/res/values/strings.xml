@@ -807,6 +807,7 @@
     <string name="exterior_layout_style_fcl">FCL</string>
     <string name="exterior_layout_style_hmcl">HMCL</string>
     <string name="exterior_layout_style_zl2">ZL2</string>
+    <string name="exterior_layout_style_miuix">MIUIX</string>
     <string name="exterior_setting_ui_bar_trans">Transparent titlebar</string>
     <string name="exterior_setting_ui_style">Grass Block UI</string>
     <string name="exterior_setting_ui_full_screen">Ignore notch</string>

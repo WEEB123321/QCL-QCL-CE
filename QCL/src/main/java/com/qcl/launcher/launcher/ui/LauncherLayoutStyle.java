@@ -2,6 +2,7 @@ package com.qcl.launcher.launcher.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.Gravity;
@@ -16,7 +17,7 @@ import com.qcl.launcher.R;
 import com.qcl.launcher.launcher.MainActivity;
 
 /**
- * ★★★ 排版风格（Layout Style）—— 四套预设，运行时切换，不用改布局文件。
+ * ★★★ 排版风格（Layout Style）—— 五套预设，运行时切换，不用改布局文件。
  *
  * <h3>★ v3.7：这一版是**照着三家真实源码重做的**，不是「把导航换个位置」</h3>
  * 上一版（v3.1~v3.6）只改了导航栏的位置 / 宽高 / 圆角，四套风格本质上是同一个界面
@@ -49,6 +50,9 @@ import com.qcl.launcher.launcher.MainActivity;
  *           {@code cardHeight = maxHeight - 24dp}，{@code shape = shapes.extraLarge}
  *           （Material3 默认 <b>28dp</b> 四角），可停靠左右、离屏 12dp。
  *           <b>没有任何导航栏</b>，左侧 70% 是卡片网格</td></tr>
+ *   <tr><td><b>MIUIX</b></td>
+ *       <td>底部悬浮 Dock：满宽、左右与底部留 12dp、24dp 圆角；图标 + 单行文字，
+ *           选中项是蓝色胶囊；液态玻璃调试 Tab 出现时自动六等分</td></tr>
  * </table>
  *
  * <h3>为什么仍然是「运行时改 LayoutParams」而不是做四套布局</h3>
@@ -56,7 +60,7 @@ import com.qcl.launcher.launcher.MainActivity;
  * 任何一处改动都要同步四次 —— 这个项目已经因为「要记得改多处」翻车过三次
  * （签名、版本号、docs）。
  * 但「只改参数」不等于「只改位置」：这一版把**结构差异**也补上了 ——
- * 右侧 25%/30% 操作面板（{@code view_side_panel}）、HMCL 顶部彩条、Tab 的三种形态
+ * 右侧 25%/30% 操作面板（{@code view_side_panel}）、HMCL 顶部彩条、Tab 的四种形态
  * （文字 / 纯图标 / 图标+文字横排），都是靠运行时挂载和 LayoutParams 表达的。
  *
  * <h3>⚠️ 与安全区的冲突（必须处理）</h3>
@@ -77,6 +81,8 @@ public final class LauncherLayoutStyle {
     public static final int STYLE_HMCL = 2;
     /** ZL2 风格：无导航栏 + 右侧 30% 浮动操作卡片。 */
     public static final int STYLE_ZL2 = 3;
+    /** MIUIX 风格：底部悬浮 Dock + 图标文字 Tab + 蓝色选中胶囊。 */
+    public static final int STYLE_MIUIX = 4;
 
     // ── FCL 的真实配色 / 尺寸（bg_game_menu.xml / bg_right_menu.xml / colors.xml）──
     /** FCL {@code @color/ui_bg_color} = {@code #40F4F4F4}。 */
@@ -105,13 +111,15 @@ public final class LauncherLayoutStyle {
     /** HMCL 顶部彩条在这个 ViewGroup 里的标记（用来找回来 / 移除）。 */
     private static final String TAG_HMCL_BAR = "qcl_hmcl_bar";
 
-    // ── Tab 的三种形态 ──
+    // ── Tab 的四种形态 ──
     /** QCL：罗马数字 + 中文（无图标）。 */
     private static final int TABS_TEXT = 0;
     /** FCL：只有图标。 */
     private static final int TABS_ICON = 1;
     /** HMCL：图标 + 中文横排。 */
     private static final int TABS_ROW = 2;
+    /** MIUIX：底部 Dock，图标在上、中文在下，选中态是蓝色胶囊。 */
+    private static final int TABS_MIUIX = 3;
 
     private static final int[] TAB_IDS = {
             R.id.nav_tab_home, R.id.nav_tab_instance, R.id.nav_tab_download,
@@ -149,6 +157,7 @@ public final class LauncherLayoutStyle {
             case STYLE_FCL:  return "FCL";
             case STYLE_HMCL: return "HMCL";
             case STYLE_ZL2:  return "ZL2";
+            case STYLE_MIUIX: return "MIUIX";
             default:         return "QCL";
         }
     }
@@ -183,6 +192,9 @@ public final class LauncherLayoutStyle {
                 case STYLE_ZL2:
                     applyZl2(activity, nav, content, fab, sidePanel);
                     break;
+                case STYLE_MIUIX:
+                    applyMiuix(activity, nav, content, fab, sidePanel);
+                    break;
                 default:
                     applyQcl(activity, nav, content, fab, sidePanel);
                     break;
@@ -201,7 +213,7 @@ public final class LauncherLayoutStyle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  四套风格
+    //  五套风格
     // ═══════════════════════════════════════════════════════════
 
     /** QCL 原版：左侧 76dp 竖栏，罗马数字 + 中文，18dp 上方两角。 */
@@ -335,6 +347,68 @@ public final class LauncherLayoutStyle {
      * <p>★ 卡片是「浮动」的：上下各留 12dp，所以高度 = 屏高 − 24dp。
      * 用 {@code MATCH_PARENT} + 上下 12dp 外边距表达，效果等价。
      */
+    private static void applyMiuix(Activity a, View nav, View content, View fab, View sidePanel) {
+        boolean compact = screenH(a) < dp(a, 420);
+        int navH = dp(a, compact ? 62f : 74f);
+        int margin = dp(a, 12f);
+
+        navBottomLayout(a, nav, navH, margin);
+        navOrientation(nav, false, dp(a, 6f), dp(a, 6f));
+        navMiuixBackground(a, nav);
+        tabs(nav, TABS_MIUIX);
+        setBrandVisible(nav, false);
+        setNavFooterVisible(nav, false);
+        hideHmclBar(content);
+
+        content.setPadding(0, 0, 0, navH + margin * 2);
+        fabMargin(fab, navH + margin * 2 + dp(a, 6f), margin + dp(a, 4f));
+        showSidePanel(sidePanel, false, 0, null, 0, 0, 0, 0);
+        backBar(a, false, 0, dp(a, 6f));
+        Log.i(TAG, "MIUIX：底部悬浮 Dock");
+    }
+
+    /**
+     * MIUIX 的底部悬浮 Dock：满宽、左右与底部各留 12dp，圆角 24dp。
+     *
+     * <p>与 {@link #navLayout} 分开，是因为后者固定贴顶 + 贴左；Dock 必须贴底，
+     * 而且需要保留左右外边距形成「悬浮」效果。
+     */
+    private static void navBottomLayout(Activity a, View nav, int heightPx, int marginPx) {
+        ViewGroup.LayoutParams raw = nav.getLayoutParams();
+        if (!(raw instanceof RelativeLayout.LayoutParams)) {
+            return;
+        }
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) raw;
+        lp.removeRule(RelativeLayout.ALIGN_PARENT_START);
+        lp.removeRule(RelativeLayout.ALIGN_PARENT_END);
+        lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lp.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lp.removeRule(RelativeLayout.CENTER_VERTICAL);
+
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        lp.height = heightPx;
+        lp.leftMargin = marginPx;
+        lp.rightMargin = marginPx;
+        lp.topMargin = 0;
+        lp.bottomMargin = marginPx;
+        lp.addRule(RelativeLayout.ALIGN_PARENT_START);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        nav.setLayoutParams(lp);
+        nav.setVisibility(View.VISIBLE);
+        nav.setElevation(dp(a, 10f));
+    }
+
+    private static void navMiuixBackground(Activity a, View nav) {
+        try {
+            GradientDrawable g = new GradientDrawable();
+            g.setColor(isNight(a) ? 0xF21C1C1E : 0xF7FFFFFF);
+            g.setCornerRadius(dp(a, 24f));
+            g.setStroke(dp(a, 1f), isNight(a) ? 0x22FFFFFF : 0x0D000000);
+            nav.setBackground(g);
+        } catch (Throwable ignored) {
+        }
+    }
+
     private static void applyZl2(Activity a, View nav, View content, View fab, View sidePanel) {
         int outer = dp(a, ZL2_OUTER_DP);
         int panelW = Math.round(screenW(a) * ZL2_PANEL_RATIO) - outer;
@@ -393,6 +467,7 @@ public final class LauncherLayoutStyle {
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         nav.setLayoutParams(lp);
         nav.setVisibility(View.VISIBLE);
+        nav.setElevation(0);
     }
 
     /** 导航栏自身的方向 + 内边距。 */
@@ -409,7 +484,7 @@ public final class LauncherLayoutStyle {
     /**
      * 导航栏 / 面板背景：动态生成圆角矩形。
      *
-     * <p>★ 为什么不用 XML drawable：四套风格要四种圆角 / 颜色，而 {@code GradientDrawable}
+     * <p>★ 为什么不用 XML drawable：五套风格要五种圆角 / 颜色，而 {@code GradientDrawable}
      * 的 corner 半径在 XML 里是常量，运行时改不了。
      *
      * @param radii 8 个值，顺序 = 左上X,左上Y, 右上X,右上Y, 右下X,右下Y, 左下X,左下Y
@@ -429,7 +504,7 @@ public final class LauncherLayoutStyle {
     }
 
     /**
-     * Tab 的三种形态。
+     * Tab 的四种形态。
      *
      * <p>★ 为什么用「显隐 + 尺寸」而不是建两套 Tab：
      * {@code view_bottom_nav.xml} 里每个 Tab 同时带了**图标、罗马数字、中文**三个子 View，
@@ -440,6 +515,8 @@ public final class LauncherLayoutStyle {
      * 以后在 Tab 里插别的控件也不会错位。
      */
     private static void tabs(View nav, int mode) {
+        Context c = nav.getContext();
+        boolean miuix = mode == TABS_MIUIX;
         for (int i = 0; i < TAB_IDS.length; i++) {
             View tab = nav.findViewById(TAB_IDS[i]);
             if (tab == null) {
@@ -449,20 +526,70 @@ public final class LauncherLayoutStyle {
             TextView label = nav.findViewById(TAB_TEXT_IDS[i]);
             TextView numeral = numeralOf(tab);
 
-            // ① 子 View 显隐
+            // ① 子 View 显隐、图标尺寸与着色
             if (icon != null) {
                 icon.setVisibility(mode == TABS_TEXT ? View.GONE : View.VISIBLE);
+                ViewGroup.LayoutParams rawIcon = icon.getLayoutParams();
+                if (rawIcon != null) {
+                    int size = dp(c, miuix ? 22f : 24f);
+                    rawIcon.width = size;
+                    rawIcon.height = size;
+                    icon.setLayoutParams(rawIcon);
+                }
+                if (miuix) {
+                    icon.setDuplicateParentStateEnabled(true);
+                    icon.setImageTintList(miuixTabColors(c));
+                } else {
+                    icon.setDuplicateParentStateEnabled(false);
+                    icon.setImageTintList(null);
+                    icon.clearColorFilter();
+                }
             }
             if (numeral != null) {
                 numeral.setVisibility(mode == TABS_TEXT ? View.VISIBLE : View.GONE);
             }
             if (label != null) {
                 label.setVisibility(View.VISIBLE);
-                // ② 字号跟着形态走（QCL 原版 11sp / HMCL 条目 15sp）
-                label.setTextSize(mode == TABS_ROW ? 15f : 11f);
+                label.setDuplicateParentStateEnabled(miuix);
+                CharSequence orig = (CharSequence) label.getTag(TAG_NAV_TEXT);
+                if (orig == null) {
+                    orig = label.getText();
+                    if (orig != null) {
+                        label.setTag(TAG_NAV_TEXT, orig);
+                    }
+                }
+                if (miuix) {
+                    if (orig != null) {
+                        String text = orig.toString().replace("\n", "");
+                        if (i == 3) {
+                            text = "插件";
+                        }
+                        label.setText(text);
+                    }
+                    label.setSingleLine(true);
+                } else if (mode == TABS_TEXT) {
+                    if (orig != null) {
+                        label.setText(orig);
+                    }
+                    label.setSingleLine(false);
+                }
+                label.setTextSize(miuix ? 9.5f : (mode == TABS_ROW ? 15f : 11f));
+                if (miuix) {
+                    label.setTextColor(miuixTabColors(c));
+                } else {
+                    label.setTextColor(c.getColor(R.color.colorPureBlack));
+                }
+                ViewGroup.LayoutParams rawLabel = label.getLayoutParams();
+                if (rawLabel instanceof LinearLayout.LayoutParams) {
+                    LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) rawLabel;
+                    llp.leftMargin = 0;
+                    llp.rightMargin = 0;
+                    llp.topMargin = miuix ? dp(c, 2f) : 0;
+                    label.setLayoutParams(llp);
+                }
             }
 
-            // ③ 尺寸
+            // ② 尺寸与形态
             ViewGroup.LayoutParams raw = tab.getLayoutParams();
             if (!(raw instanceof LinearLayout.LayoutParams)) {
                 continue;
@@ -470,35 +597,149 @@ public final class LauncherLayoutStyle {
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) raw;
             lp.leftMargin = 0;
             lp.rightMargin = 0;
-            Context c = tab.getContext();
-            if (mode == TABS_TEXT) {
-                // QCL：竖排均分高度
-                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                lp.height = 0;
+            if (miuix) {
+                lp.width = 0;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 lp.weight = 1f;
                 lp.topMargin = 0;
                 lp.bottomMargin = 0;
-                tab.setPadding(0, 0, 0, 0);
+                lp.leftMargin = dp(c, 2f);
+                lp.rightMargin = dp(c, 2f);
+                tab.setPadding(0, dp(c, 4f), 0, dp(c, 4f));
                 if (tab instanceof LinearLayout) {
+                    ((LinearLayout) tab).setOrientation(LinearLayout.VERTICAL);
                     ((LinearLayout) tab).setGravity(Gravity.CENTER);
                 }
+                tab.setBackgroundResource(R.drawable.qcl_nav_tab_bg_miuix);
             } else {
-                // FCL / HMCL：固定高度的条目，间距 10dp（FCL 的 layout_marginTop="10dp"）
-                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                lp.height = dp(c, mode == TABS_ROW ? 56f : 48f);
-                lp.weight = 0f;
-                lp.topMargin = i == 0 ? 0 : dp(c, 10f);
-                lp.bottomMargin = 0;
-                int padStart = mode == TABS_ROW ? dp(c, 12f) : 0;
-                tab.setPadding(padStart, 0, padStart, 0);
+                tab.setBackgroundResource(R.drawable.qcl_nav_tab_bg);
                 if (tab instanceof LinearLayout) {
-                    ((LinearLayout) tab).setGravity(mode == TABS_ROW
-                            ? (Gravity.CENTER_VERTICAL | Gravity.START)
-                            : Gravity.CENTER);
+                    ((LinearLayout) tab).setOrientation(LinearLayout.HORIZONTAL);
+                }
+                if (mode == TABS_TEXT) {
+                    // QCL：竖排均分高度
+                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    lp.height = 0;
+                    lp.weight = 1f;
+                    lp.topMargin = 0;
+                    lp.bottomMargin = 0;
+                    tab.setPadding(0, 0, 0, 0);
+                    if (tab instanceof LinearLayout) {
+                        ((LinearLayout) tab).setGravity(Gravity.CENTER);
+                    }
+                } else {
+                    // FCL / HMCL：固定高度的条目，间距 10dp（FCL 的 layout_marginTop="10dp"）
+                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    lp.height = dp(c, mode == TABS_ROW ? 56f : 48f);
+                    lp.weight = 0f;
+                    lp.topMargin = i == 0 ? 0 : dp(c, 10f);
+                    lp.bottomMargin = 0;
+                    int padStart = mode == TABS_ROW ? dp(c, 12f) : 0;
+                    tab.setPadding(padStart, 0, padStart, 0);
+                    if (tab instanceof LinearLayout) {
+                        ((LinearLayout) tab).setGravity(mode == TABS_ROW
+                                ? (Gravity.CENTER_VERTICAL | Gravity.START)
+                                : Gravity.CENTER);
+                    }
                 }
             }
             tab.setLayoutParams(lp);
         }
+        styleGlassTab(nav, mode);
+    }
+
+    /** 第 6 个「液态玻璃调试」Tab 只在开玻璃时出现，但横排 Dock 下也要按同样形态收窄。 */
+    private static void styleGlassTab(View nav, int mode) {
+        View tab = nav.findViewById(R.id.nav_tab_glass);
+        if (tab == null) {
+            return;
+        }
+        Context c = tab.getContext();
+        boolean miuix = mode == TABS_MIUIX;
+        TextView label = tab.findViewById(R.id.nav_text_glass);
+        TextView numeral = numeralOf(tab);
+        if (label != null) {
+            label.setDuplicateParentStateEnabled(miuix);
+            CharSequence orig = (CharSequence) label.getTag(TAG_NAV_TEXT);
+            if (orig == null) {
+                orig = label.getText();
+                if (orig != null) {
+                    label.setTag(TAG_NAV_TEXT, orig);
+                }
+            }
+            if (miuix) {
+                if (orig != null) {
+                    label.setText("玻璃");
+                }
+                label.setSingleLine(true);
+            } else if (mode == TABS_TEXT) {
+                if (orig != null) {
+                    label.setText(orig);
+                }
+                label.setSingleLine(false);
+            }
+            label.setTextSize(miuix ? 9.5f : 11f);
+            if (miuix) {
+                label.setTextColor(miuixTabColors(c));
+            } else {
+                label.setTextColor(c.getColor(R.color.colorPureBlack));
+            }
+            ViewGroup.LayoutParams rawLabel = label.getLayoutParams();
+            if (rawLabel instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams llp = (LinearLayout.LayoutParams) rawLabel;
+                llp.leftMargin = 0;
+                llp.rightMargin = 0;
+                llp.topMargin = miuix ? dp(c, 2f) : 0;
+                label.setLayoutParams(llp);
+            }
+        }
+        if (numeral != null) {
+            numeral.setVisibility(mode == TABS_TEXT ? View.VISIBLE : View.GONE);
+        }
+        ViewGroup.LayoutParams raw = tab.getLayoutParams();
+        if (!(raw instanceof LinearLayout.LayoutParams)) {
+            return;
+        }
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) raw;
+        if (miuix) {
+            lp.width = 0;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.weight = 1f;
+            lp.topMargin = 0;
+            lp.bottomMargin = 0;
+            lp.leftMargin = dp(c, 2f);
+            lp.rightMargin = dp(c, 2f);
+            tab.setPadding(0, dp(c, 4f), 0, dp(c, 4f));
+            if (tab instanceof LinearLayout) {
+                ((LinearLayout) tab).setOrientation(LinearLayout.VERTICAL);
+                ((LinearLayout) tab).setGravity(Gravity.CENTER);
+            }
+            tab.setBackgroundResource(R.drawable.qcl_nav_tab_bg_miuix);
+        } else {
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = 0;
+            lp.weight = 1f;
+            lp.topMargin = 0;
+            lp.bottomMargin = 0;
+            lp.leftMargin = 0;
+            lp.rightMargin = 0;
+            tab.setPadding(0, 0, 0, 0);
+            if (tab instanceof LinearLayout) {
+                ((LinearLayout) tab).setOrientation(LinearLayout.HORIZONTAL);
+                ((LinearLayout) tab).setGravity(Gravity.CENTER);
+            }
+            tab.setBackgroundResource(R.drawable.qcl_nav_tab_bg);
+        }
+        tab.setLayoutParams(lp);
+    }
+
+    private static ColorStateList miuixTabColors(Context c) {
+        boolean night = isNight(c);
+        int accent = night ? 0xFF8AB4FF : 0xFF3482FF;
+        int normal = night ? 0xFFEDE7DE : 0xFF1A1A1A;
+        return new ColorStateList(
+                new int[][]{ {android.R.attr.state_selected}, {} },
+                new int[]{accent, normal});
     }
 
     /** 找 Tab 里那个「罗马数字」TextView —— 它是唯一没有 id 的 TextView。 */
@@ -530,7 +771,7 @@ public final class LauncherLayoutStyle {
         return isNight(a) ? 0xD91A1A1A : 0xD9FFFFFF;
     }
 
-    private static boolean isNight(Activity a) {
+    private static boolean isNight(Context a) {
         try {
             int mode = a.getResources().getConfiguration().uiMode
                     & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
