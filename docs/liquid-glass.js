@@ -6,6 +6,11 @@
  *
  * Chromium-only SVG backdrop-filter path. Other browsers keep the CSS
  * blur/saturate glass fallback from premium.css.
+ *
+ * Performance notes:
+ *  - Only the nav / phone / QR card / desktop sidebar keep a live filter.
+ *  - Cards, boxes and ghost buttons get the filter on hover only.
+ *  - Refraction maps are generated at reduced resolution.
  */
 (function () {
   'use strict';
@@ -20,7 +25,10 @@
   var defs = null;
   var mapCache = Object.create(null);
   var records = new WeakMap();
-  var SELECTOR = '.phone, .card, .box, .qr-card, .btn-ghost, aside';
+  var isSmall = window.matchMedia && window.matchMedia('(max-width: 720px)').matches;
+  var canHover = !isSmall && window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  var ALWAYS = isSmall ? 'nav, .phone, .qr-card' : 'nav, .phone, .qr-card, aside';
+  var HOVER = '.card, .box, .btn-ghost';
 
   var SURFACE_FNS = {
     convex_squircle: function (x) {
@@ -168,29 +176,48 @@
   }
 
   function radiusOf(el, w, h) {
-    var raw = getComputedStyle(el).borderTopLeftRadius || '0';
-    var value = parseFloat(raw) || 0;
-    if (raw.indexOf('%') >= 0) return Math.min(w, h) * value / 100;
-    return Math.min(value, w / 2, h / 2);
+    var cs = getComputedStyle(el);
+    var names = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius'];
+    var max = 0;
+    var percent = false;
+    for (var i = 0; i < names.length; i++) {
+      var raw = cs[names[i]] || '0';
+      var value = parseFloat(raw) || 0;
+      if (raw.indexOf('%') >= 0) percent = true;
+      if (value > max) max = value;
+    }
+    if (percent) return Math.min(w, h) * max / 100;
+    return Math.min(max, w / 2, h / 2);
   }
 
   function optionsFor(el) {
+    if (el.tagName === 'NAV') {
+      return { thickness: 20, ior: 1.45, blur: 0.28, spec: 0.26, scale: 0.7 };
+    }
     if (el.classList.contains('phone')) {
-      return { thickness: 54, ior: 2.0, blur: 0.55, spec: 0.5, scale: 1 };
-    }
-    if (el.tagName === 'ASIDE') {
-      return { thickness: 30, ior: 1.6, blur: 0.45, spec: 0.36, scale: 1 };
-    }
-    if (el.classList.contains('box')) {
-      return { thickness: 36, ior: 1.65, blur: 0.4, spec: 0.38, scale: 1 };
+      return { thickness: 50, ior: 1.9, blur: 0.35, spec: 0.45, scale: 0.9 };
     }
     if (el.classList.contains('qr-card')) {
-      return { thickness: 46, ior: 1.8, blur: 0.45, spec: 0.4, scale: 1 };
+      return { thickness: 42, ior: 1.75, blur: 0.3, spec: 0.38, scale: 1 };
+    }
+    if (el.tagName === 'ASIDE') {
+      return { thickness: 28, ior: 1.55, blur: 0.3, spec: 0.32, scale: 1 };
+    }
+    if (el.classList.contains('box')) {
+      return { thickness: 32, ior: 1.6, blur: 0.28, spec: 0.32, scale: 1 };
     }
     if (el.classList.contains('btn-ghost')) {
-      return { thickness: 16, ior: 1.45, blur: 0.2, spec: 0.28, scale: 1 };
+      return { thickness: 14, ior: 1.4, blur: 0.15, spec: 0.25, scale: 1 };
     }
-    return { thickness: 46, ior: 1.8, blur: 0.38, spec: 0.45, scale: 1 };
+    return { thickness: 40, ior: 1.7, blur: 0.28, spec: 0.38, scale: 1 };
+  }
+
+  function mapScaleFor(w, h) {
+    var m = Math.max(w, h);
+    if (m > 1100) return 0.4;
+    if (m > 720) return 0.5;
+    if (m > 420) return 0.6;
+    return 0.72;
   }
 
   function getMaps(w, h, radius, opts) {
@@ -204,11 +231,16 @@
       maxDisp = Math.max(maxDisp, Math.abs(profile[i]));
     }
     maxDisp = maxDisp || 1;
-    var dispUrl = generateDisplacementMap(w, h, radius, bezel, profile, maxDisp);
-    var specUrl = generateSpecularMap(w, h, radius, bezel * 2.5, Math.PI / 4);
+
+    var s = mapScaleFor(w, h);
+    var mw = Math.max(24, Math.round(w * s));
+    var mh = Math.max(16, Math.round(h * s));
+    var mr = Math.max(1, radius * s);
+    var mb = Math.max(1, bezel * s);
+
     var maps = {
-      dispUrl: dispUrl,
-      specUrl: specUrl,
+      dispUrl: generateDisplacementMap(mw, mh, mr, mb, profile, maxDisp),
+      specUrl: generateSpecularMap(mw, mh, mr, mb * 2.5, Math.PI / 4),
       scale: maxDisp * opts.scale
     };
     mapCache[key] = maps;
@@ -299,17 +331,20 @@
   }
 
   function build(el) {
-    if (!el.isConnected) return;
+    if (!el.isConnected) return false;
     var w = el.offsetWidth;
     var h = el.offsetHeight;
-    if (w < 60 || h < 36) return;
+    if (w < 60 || h < 36) return false;
     var radius = radiusOf(el, w, h);
-    if (radius < 6) return;
+    if (radius < 6) return false;
 
     var opts = optionsFor(el);
     var rec = records.get(el);
     var key = [w, h, Math.round(radius), opts.thickness, opts.ior].join('|');
-    if (rec && rec.key === key) return;
+    if (rec && rec.key === key) {
+      el.classList.add('qcl-liquid');
+      return true;
+    }
 
     var maps = getMaps(w, h, Math.round(radius), opts);
     var id = 'qcl-lg-' + (++uid);
@@ -324,40 +359,41 @@
     el.style.setProperty('--qcl-liquid-filter', 'url(#' + id + ')');
     el.classList.add('qcl-liquid');
     records.set(el, { id: id, key: key });
+    return true;
+  }
+
+  function precache(el) {
+    var w = el.offsetWidth;
+    var h = el.offsetHeight;
+    if (w < 60 || h < 36) return;
+    var radius = radiusOf(el, w, h);
+    if (radius < 6) return;
+    getMaps(w, h, Math.round(radius), optionsFor(el));
+  }
+
+  function idle(fn) {
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(fn, { timeout: 400 });
+    } else {
+      setTimeout(fn, 40);
+    }
   }
 
   function scheduleBuild(el) {
     if (el.__qclLgScheduled) return;
     el.__qclLgScheduled = true;
-    var done = false;
-    function run() {
-      if (done) return;
-      done = true;
+    idle(function () {
       build(el);
-    }
-    if (window.requestIdleCallback) {
-      var handle = window.requestIdleCallback(run, { timeout: 300 });
-      setTimeout(function () {
-        if (!done) {
-          try { window.cancelIdleCallback(handle); } catch (e) {}
-          run();
-        }
-      }, 320);
-    } else {
-      setTimeout(run, 40);
-    }
+    });
   }
 
-  function install() {
-    ensureDefs();
-    var nodes = document.querySelectorAll(SELECTOR);
+  function installAlways() {
+    var nodes = document.querySelectorAll(ALWAYS);
     if (!nodes.length) return;
-
     if (!('IntersectionObserver' in window)) {
       for (var i = 0; i < nodes.length; i++) scheduleBuild(nodes[i]);
       return;
     }
-
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -365,25 +401,70 @@
           io.unobserve(entry.target);
         }
       });
-    }, { rootMargin: '280px 0px', threshold: 0.01 });
-
+    }, { rootMargin: '240px 0px', threshold: 0.01 });
     for (var j = 0; j < nodes.length; j++) {
-      if (records.has(nodes[j])) continue;
       io.observe(nodes[j]);
       var rect = nodes[j].getBoundingClientRect();
-      if (rect.top < window.innerHeight + 320 && rect.bottom > -320) {
+      if (rect.top < window.innerHeight + 260 && rect.bottom > -260) {
         scheduleBuild(nodes[j]);
       }
     }
+  }
 
+  function installHover() {
+    if (!canHover) return;
+    var nodes = document.querySelectorAll(HOVER);
+    if (!nodes.length) return;
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            idle(function () { precache(entry.target); });
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '220px 0px', threshold: 0.01 });
+      for (var i = 0; i < nodes.length; i++) io.observe(nodes[i]);
+    }
+
+    for (var j = 0; j < nodes.length; j++) {
+      (function (el) {
+        var leaveTimer = 0;
+        el.addEventListener('pointerenter', function () {
+          clearTimeout(leaveTimer);
+          if (build(el)) el.classList.add('qcl-liquid');
+        });
+        el.addEventListener('pointerleave', function () {
+          clearTimeout(leaveTimer);
+          leaveTimer = setTimeout(function () {
+            el.classList.remove('qcl-liquid');
+          }, 90);
+        });
+      })(nodes[j]);
+    }
+  }
+
+  function installResize() {
     var timer = 0;
     window.addEventListener('resize', function () {
       clearTimeout(timer);
       timer = setTimeout(function () {
-        var all = document.querySelectorAll(SELECTOR);
-        for (var k = 0; k < all.length; k++) build(all[k]);
-      }, 260);
+        var always = document.querySelectorAll(ALWAYS);
+        for (var i = 0; i < always.length; i++) build(always[i]);
+        if (canHover) {
+          var active = document.querySelectorAll(HOVER + '.qcl-liquid');
+          for (var j = 0; j < active.length; j++) build(active[j]);
+        }
+      }, 280);
     }, { passive: true });
+  }
+
+  function install() {
+    ensureDefs();
+    installAlways();
+    installHover();
+    installResize();
   }
 
   if (document.readyState === 'loading') {
