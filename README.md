@@ -27,11 +27,12 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 
 ## 项目状态与边界
 
-- **发布性质**：QCL-CE 是 QCL 社区版（CE）的官方发布线，由 CE 维护组基于上游源码构建；
+- **发布性质**：QCL-CE 是 QCL 社区版（CE）的官方发布线，由 QCL-CE Team 基于上游源码构建；
   不是对官方 APK 的二次打包、破解或魔改。
-- **签名**：release signing 已改为从仓库外的 `keystore.properties` 或 CI secrets 读取，
-  不再把密码写死在 Gradle。当前仓库没有 release keystore，因此不能产出正式签名包；
-  Debug 包仍可构建，但不能当作商店正式包。
+- **签名**：已生成独立 release keystore（不提交仓库），release 构建从
+  `keystore.properties` 或 CI secrets 读取；本地已产出 3.1.10 / Beta 1.0.6 的正式签名包。
+  当前公开 Release 仍是历史 Debug 包，换成新签名包前必须先卸载旧包；
+  `/sdcard/QCL` 数据保留，但应用私有账号/设置会丢失。密钥丢失后无法再发布同签名更新。
 - **测试**：GitHub Actions 已接入 `.github/workflows/ci.yml`，在 push/PR 时运行
   `:QCL:testDebugUnitTest`；测试覆盖 Java 运行时选择、下载源改写、版本排序、服务器配置和
   NeoForge 版本映射。手机开服全链路、MIUIX 排版、鸿蒙液态玻璃仍需要真机验收。
@@ -43,7 +44,7 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 
 ### 待改善
 
-- 正式签名：提供并备份 release keystore、签名轮换、可复现构建和产物校验。
+- 签名运维：keystore 离线备份、签名轮换、CI 自动签名和可复现构建产物校验。
 - 测试矩阵：真机覆盖、启动/开服/备份的自动冒烟测试和回归清单。
 - 维护结构：代码审查、发布负责人、Issue 分类与安全响应流程。
 - 生态扩展：NeoForge 真机验证、更多下载源与离线场景（arm64 是当前约束，不扩 ABI）。
