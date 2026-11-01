@@ -196,6 +196,12 @@ void main() {
   fragColor = vec4(color, opacity);
 }`;
 
+  // 内嵌形状，避免 file:// 下 canvas.getImageData 被跨源规则拦住。
+  var SHAPE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">'
+    + '<path d="M 381 189 A 150 150 0 1 0 381 291 L 381 420 L 440 420" fill="none" stroke="#000000" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<circle cx="231" cy="240" r="52" fill="#000000"/></svg>';
+  var SHAPE_DATA_URI = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(SHAPE_SVG);
+
   function loadImage(url) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
@@ -326,7 +332,7 @@ void main() {
 
     var imageData;
     try {
-      imageData = await buildEdgeTexture(container.getAttribute("data-shape") || "beta-icon-shape.svg");
+      imageData = await buildEdgeTexture(SHAPE_DATA_URI);
     } catch (e) {
       fallback.hidden = false;
       if (loading) loading.hidden = true;
