@@ -22,8 +22,10 @@ public class ExampleUnitTest {
             assertEquals(expected[i], GameLaunchSetting.selectJavaRuntime(required[i]));
         }
     }
-    @Test(expected = IllegalArgumentException.class) public void futureJavaIsNotSilentlyDowngraded() {
-        GameLaunchSetting.selectJavaRuntime(26);
+    @Test public void futureJavaClampsToBundledJre25() {
+        // 26.x 版本按 Java 25 处理；超出内置运行时的更高版本也回退到 JRE25。
+        assertEquals("JRE25", GameLaunchSetting.selectJavaRuntime(26));
+        assertEquals("JRE25", GameLaunchSetting.selectJavaRuntime(99));
     }
     @Test public void unknownRuntimeIsNotJava25() {
         assertEquals(-1, GameLaunchSetting.runtimeMajor("custom"));
