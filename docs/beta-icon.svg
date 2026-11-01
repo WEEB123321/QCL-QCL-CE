@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>QCL-CE Geometric Q Icon</title>
+  <desc>A minimalist geometric Q formed by a C-shaped outer ring, an inner solid o, and an L-shaped tail.</desc>
+
+  <!-- 黑色圆角底 -->
+  <rect width="512" height="512" rx="112" fill="#000000"/>
+
+  <!-- C 与 L 的连续线条（外圈） -->
+  <!-- 逆时针画大 C，到右下角垂直向下，再向右拐形成 L 的尾巴 -->
+  <path d="M 381 189 
+           A 150 150 0 1 0 381 291 
+           L 381 420 
+           L 440 420" 
+        fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 内部的实心 o：作为 Q 的核心 -->
+  <circle cx="231" cy="240" r="52" fill="#FFFFFF"/>
+</svg>

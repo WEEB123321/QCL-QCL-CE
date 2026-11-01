@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QCL-CE Beta 测试通道：独立包名、MIUIX 排版、手机开服、服务器插件下载。">
+<title>QCL-CE Beta · 测试通道</title>
+<link rel="icon" href="beta-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="beta.css">
+</head>
+<body class="beta-page">
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><i></i>QCL-CE</span>
+    <span class="links">
+      <a href="index.html#features">功能</a>
+      <a href="index.html#download">下载</a>
+      <a href="beta.html" aria-current="page">Beta</a>
+      <a href="https://weeb123321.github.io/QCL-Plugins/">插件市场</a>
+      <a href="wiki.html">Wiki</a>
+      <a href="sponsor.html">赞助</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE">GitHub</a>
+    </span>
+  </div>
+</nav>
+
+<section class="beta-hero">
+  <div class="hero-kicker beta-kicker">BETA CHANNEL · ANDROID · ARM64</div>
+
+  <div class="beta-logo-stage">
+    <div class="beta-logo-tile" data-liquid-logo data-shape="beta-icon-shape.svg">
+      <canvas id="beta-liquid-canvas" aria-hidden="true"></canvas>
+      <img src="beta-icon.svg" alt="QCL-CE Beta 图标">
+      <span class="beta-logo-loading">正在生成液态 Logo…</span>
+    </div>
+  </div>
+
+  <h1>QCL-CE <span>Beta</span></h1>
+  <p class="beta-lead">独立包名的测试通道。新图标、MIUIX 排版和手机开服的最新改动会先在这里出现，正式版验证稳定后再跟进。</p>
+  <div class="beta-version"><i></i>1.0.5-beta · versionCode 10005</div>
+
+  <div class="btns">
+    <a class="btn btn-primary" href="https://github.com/WEEB123321/QCL-QCL-CE/releases/download/v1.0.5-beta/QCL-CE-1.0.5-beta-arm64.apk">下载 Beta 1.0.5</a>
+    <a class="btn btn-ghost" href="index.html#download">正式版下载</a>
+    <a class="btn btn-ghost" href="https://github.com/WEEB123321/QCL-QCL-CE/releases">全部版本</a>
+  </div>
+  <p class="beta-note">Android Debug 签名 · 仅 arm64 · 安装包约 225 MiB</p>
+</section>
+
+<section class="beta-section">
+  <div class="wrap">
+    <h2>这一版有什么</h2>
+    <p class="lead">Beta 不是正式版的替代品，而是提前验证新入口和新交互的独立测试包。</p>
+    <div class="beta-card-grid">
+      <div class="card">
+        <h3>新的几何 Q 图标</h3>
+        <p>Beta 使用独立的自适应图标：黑色圆角底 + 白色几何 Q，内圆为实心。</p>
+      </div>
+      <div class="card">
+        <h3>MIUIX 排版</h3>
+        <p>底部悬浮 Dock、图标 + 文字、蓝色选中胶囊；主界面改为黑底蓝调，保持横屏。</p>
+      </div>
+      <div class="card">
+        <h3>手机开服</h3>
+        <p>服务器列表可直接启动、查看运行状态，并给服务端搜索下载插件或模组。</p>
+      </div>
+      <div class="card">
+        <h3>ATE 崩溃修复</h3>
+        <p>修复自适应图标在 Android Theme Engine 中被强转 BitmapDrawable 导致的启动崩溃。</p>
+      </div>
+      <div class="card">
+        <h3>独立包名</h3>
+        <p><code>com.qcl.launcher.ce.beta</code> 可与正式版、官方版同时安装，游戏目录仍共用。</p>
+      </div>
+      <div class="card">
+        <h3>控键布局导入</h3>
+        <p>继续支持 FCL、Zalith Launcher 2、Zalith Launcher、HMCL-PE 的控键布局。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="beta-section">
+  <div class="wrap beta-install">
+    <h2>安装 Beta</h2>
+    <ol class="steps">
+      <li>确认手机是 <b>arm64</b>；模拟器 x86_64 不能安装。</li>
+      <li>直接安装 APK。Beta 和正式版包名不同，可以共存，不需要卸载正式版。</li>
+      <li>首次启动会解压运行时，约 452 MB，需要几分钟；这一步可以离线完成。</li>
+      <li>Beta 的检查更新只读取预发布版本（<code>latestPrerelease</code>），不会把正式版当更新推送。</li>
+    </ol>
+    <div class="warn">
+      <b>注意：</b>Beta 与正式版都是 Android Debug 签名，仅用于测试；正式签名需要提供 keystore 后再构建。
+      手机上开服、服务器插件下载和 MIUIX 排版仍需要真机验收；遇到问题请附控制台日志、启动截图或 <code>startup_trace.log</code>。
+    </div>
+    <p><a class="beta-teaser-link" href="wiki.html">查看更多使用说明 →</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>QCL-CE · 社区版</span>
+    <span>GPL-3.0</span>
+    <span class="sp">by WEEB123321</span>
+  </div>
+</footer>
+
+<script src="theme.js"></script>
+<script src="liquid-glass.js"></script>
+<script src="liquid-logo.js"></script>
+</body>
+</html>

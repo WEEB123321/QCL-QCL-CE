@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>QCL-CE Beta liquid logo shape</title>
+  <desc>Transparent black silhouette used by the LiquidLogo shader.</desc>
+  <path d="M 381 189 A 150 150 0 1 0 381 291 L 381 420 L 440 420"
+        fill="none" stroke="#000000" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="231" cy="240" r="52" fill="#000000"/>
+</svg>

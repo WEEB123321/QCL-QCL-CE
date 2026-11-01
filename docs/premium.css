@@ -1057,3 +1057,35 @@ html[data-theme="light"] th { background: rgba(0, 0, 0, .035); }
   .qcl-reveal { opacity: 1; transform: none; }
   .qcl-atmosphere::before, .qcl-atmosphere::after { animation: none; }
 }
+
+/* Beta 入口 teaser（主页顶部） */
+.beta-teaser{
+  display:flex;align-items:center;gap:18px;
+  padding:18px 22px;border-radius:24px;
+  border:1px solid rgba(110,168,255,.30);
+  background:linear-gradient(135deg,rgba(75,141,255,.14),rgba(255,255,255,.035));
+  text-decoration:none;color:var(--text);
+  transition:border-color .2s ease,transform .2s ease,background .2s ease;
+}
+.beta-teaser:hover{
+  border-color:rgba(110,168,255,.55);
+  background:linear-gradient(135deg,rgba(75,141,255,.20),rgba(255,255,255,.05));
+  transform:translateY(-1px);
+}
+.beta-teaser img{
+  width:58px;height:58px;border-radius:16px;flex:none;
+  box-shadow:0 12px 28px rgba(0,0,0,.35);
+}
+.beta-teaser-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.beta-teaser-kicker{
+  font-size:9px;letter-spacing:.22em;color:#79aaff;
+}
+.beta-teaser strong{font-size:17px;letter-spacing:-.01em}
+.beta-teaser-copy span:last-child{font-size:13px;color:var(--sub);line-height:1.6}
+.beta-teaser-arrow{
+  margin-left:auto;flex:none;font-size:13px;color:#8bb6ff;white-space:nowrap;
+}
+@media (max-width:720px){
+  .beta-teaser{flex-wrap:wrap;gap:12px}
+  .beta-teaser-arrow{margin-left:74px;width:100%}
+}
