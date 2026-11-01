@@ -266,7 +266,7 @@ nav.qcl-scrolled {
   background: linear-gradient(145deg, var(--text), var(--muted)) !important;
   box-shadow: 0 0 18px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, .6);
 }
-nav .links { gap: 26px !important; font-size: 13px !important; }
+nav .links { gap: 26px !important; font-size: 13px !important; margin-left: auto; }
 nav .links a {
   position: relative;
   color: var(--sub) !important;
