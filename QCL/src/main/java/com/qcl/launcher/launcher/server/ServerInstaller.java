@@ -32,6 +32,7 @@ public final class ServerInstaller {
     private static final String PAPER_BASE = "https://fill.papermc.io/v3";
     private static final String PURPUR_BASE = "https://api.purpurmc.org/v2";
     private static final String FABRIC_META = "https://meta.fabricmc.net/v2";
+    private static final String BMCL_FABRIC = BMCL_BASE + "/fabric-meta/v2";
     private static final String FORGE_PROMOTIONS =
             "https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json";
     private static final String FORGE_MAVEN =
@@ -157,6 +158,8 @@ public final class ServerInstaller {
         String artifact = profile.version + "-" + forgeVersion;
         String fileName = "forge-" + artifact + "-installer.jar";
         String url = FORGE_MAVEN + "/" + artifact + "/" + fileName;
+        String mirrorUrl = BMCL_BASE + "/forge/download?mcversion=" + profile.version
+                + "&version=" + forgeVersion + "&category=installer&format=jar";
         File installer = new File(serverDir, fileName);
         String expectedSha1 = null;
         try {
@@ -172,7 +175,7 @@ public final class ServerInstaller {
         if (!valid) {
             listener.onLog("下载 Forge " + forgeVersion + " 安装器");
             File part = new File(serverDir, fileName + ".part");
-            downloadUnverified(url, part, listener);
+            downloadWithMirror(url, mirrorUrl, part, listener);
             if (expectedSha1 != null && !expectedSha1.equalsIgnoreCase(sha1(part))) {
                 part.delete();
                 throw new IllegalStateException("Forge 安装器校验失败");
@@ -488,7 +491,9 @@ public final class ServerInstaller {
 
     private static void ensureFabric(ServerProfile profile, File serverDir,
                                      Listener listener) throws Exception {
-        JsonArray loaders = getJsonArray(FABRIC_META + "/versions/loader/" + profile.version);
+        JsonArray loaders = getJsonArrayWithFallback(
+                FABRIC_META + "/versions/loader/" + profile.version,
+                BMCL_FABRIC + "/versions/loader/" + profile.version);
         String loaderVersion = null;
         for (JsonElement element : loaders) {
             JsonObject loader = element.getAsJsonObject().getAsJsonObject("loader");
@@ -505,7 +510,9 @@ public final class ServerInstaller {
             throw new IllegalStateException("Fabric 没有适配 " + profile.version + " 的 Loader");
         }
         String installerVersion = null;
-        JsonArray installers = getJsonArray(FABRIC_META + "/versions/installer");
+        JsonArray installers = getJsonArrayWithFallback(
+                FABRIC_META + "/versions/installer",
+                BMCL_FABRIC + "/versions/installer");
         for (JsonElement element : installers) {
             JsonObject item = element.getAsJsonObject();
             if (item.has("stable") && item.get("stable").getAsBoolean()) {
@@ -522,6 +529,8 @@ public final class ServerInstaller {
         }
         String url = FABRIC_META + "/versions/loader/" + profile.version + "/"
                 + loaderVersion + "/" + installerVersion + "/server/jar";
+        String mirrorUrl = BMCL_FABRIC + "/versions/loader/" + profile.version + "/"
+                + loaderVersion + "/" + installerVersion + "/server/jar";
         File jar = new File(serverDir, "server.jar");
         boolean valid = jar.isFile() && loaderVersion.equals(profile.loaderVersion)
                 && installerVersion.equals(profile.installerVersion)
@@ -530,7 +539,7 @@ public final class ServerInstaller {
         if (!valid) {
             listener.onLog("下载 Fabric Loader " + loaderVersion);
             File part = new File(serverDir, "server.jar.part");
-            downloadUnverified(url, part, listener);
+            downloadWithMirror(url, mirrorUrl, part, listener);
             if (!isZip(part)) {
                 part.delete();
                 throw new IllegalStateException("Fabric 服务端下载不完整");
@@ -621,7 +630,8 @@ public final class ServerInstaller {
 
     private static String resolveForgeVersion(String minecraftVersion) throws Exception {
         try {
-            JsonObject promotions = JsonParser.parseString(get(FORGE_PROMOTIONS))
+            JsonObject promotions = JsonParser.parseString(getWithFallback(
+                            FORGE_PROMOTIONS, BMCL_BASE + "/forge/promotions_slim.json"))
                     .getAsJsonObject();
             JsonObject promos = promotions.getAsJsonObject("promos");
             String recommended = minecraftVersion + "-recommended";
@@ -634,7 +644,8 @@ public final class ServerInstaller {
             }
         } catch (Throwable ignored) {
         }
-        String xml = get(FORGE_MAVEN + "/maven-metadata.xml");
+        String xml = getWithFallback(FORGE_MAVEN + "/maven-metadata.xml",
+                BMCL_BASE + "/maven/net/minecraftforge/forge/maven-metadata.xml");
         java.util.regex.Matcher matcher = java.util.regex.Pattern
                 .compile("<version>" + java.util.regex.Pattern.quote(minecraftVersion)
                         + "-([^<]+)</version>").matcher(xml);
@@ -773,6 +784,27 @@ public final class ServerInstaller {
 
     private static JsonArray getJsonArray(String url) throws Exception {
         return JsonParser.parseString(get(url)).getAsJsonArray();
+    }
+
+    private static JsonArray getJsonArrayWithFallback(String primary, String fallback)
+            throws Exception {
+        return JsonParser.parseString(getWithFallback(primary, fallback)).getAsJsonArray();
+    }
+
+    private static String getWithFallback(String primary, String fallback) throws Exception {
+        try {
+            return get(primary);
+        } catch (Exception primaryFailure) {
+            if (fallback == null || fallback.equals(primary)) {
+                throw primaryFailure;
+            }
+            try {
+                return get(fallback);
+            } catch (Exception fallbackFailure) {
+                fallbackFailure.addSuppressed(primaryFailure);
+                throw fallbackFailure;
+            }
+        }
     }
 
     private static void downloadWithMirror(String primary, String mirror, File target,

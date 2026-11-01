@@ -19,7 +19,6 @@ import android.os.Process;
 import android.util.Log;
 
 import com.qcl.launcher.R;
-import com.qcl.launcher.launcher.setting.game.GameLaunchSetting;
 import com.qcl.launcher.manifest.AppManifest;
 
 import net.kdt.pojavlaunch.utils.JREUtils;
@@ -137,17 +136,24 @@ public class ForgeInstallService extends Service {
                     ? ServerInstaller.prepareNeoForgeInstaller(serverDir, profile, listener)
                     : ServerInstaller.prepareForgeInstaller(serverDir, profile, listener);
             writeResult("RUNNING", profile.loaderVersion);
-            String runtimeName = GameLaunchSetting.selectJavaRuntime(profile.requiredJava);
-            File javaHome = new File(AppManifest.JAVA_DIR, runtimeName);
-            File marker = "default".equals(runtimeName)
-                    ? new File(javaHome, "bin/java") : new File(javaHome, "lib/modules");
-            if (!marker.exists()) {
-                throw new IllegalStateException("缺少 Java 运行时 " + runtimeName);
-            }
+            File javaHome = ServerRuntime.ensure(ForgeInstallService.this,
+                    profile.requiredJava, new ServerRuntime.Listener() {
+                        @Override
+                        public void onLog(String line) {
+                            appendLog(line);
+                        }
+
+                        @Override
+                        public void onProgress(int percent) {
+                            appendLog("Java 运行时安装进度 " + percent + "%");
+                        }
+                    });
+            int heap = ServerRuntime.clampHeap(ForgeInstallService.this,
+                    Math.max(1024, Math.min(profile.memoryMb, 2048)));
             ArrayList<String> args = new ArrayList<>();
-            args.add("-Djava.awt.headless=true");
-            args.add("-Dfile.encoding=UTF-8");
-            args.add("-Djava.io.tmpdir=" + getCacheDir().getAbsolutePath());
+            args.add("-Xms256M");
+            args.add("-Xmx" + heap + "M");
+            ServerRuntime.addJvmFlags(args, ForgeInstallService.this, javaHome, heap);
             args.add("-jar");
             args.add(installer.getName());
             args.add("--installServer");

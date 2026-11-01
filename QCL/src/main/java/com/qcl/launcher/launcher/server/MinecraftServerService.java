@@ -21,7 +21,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.qcl.launcher.R;
-import com.qcl.launcher.launcher.setting.game.GameLaunchSetting;
 import com.qcl.launcher.manifest.AppManifest;
 
 import net.kdt.pojavlaunch.utils.JREUtils;
@@ -34,7 +33,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class MinecraftServerService extends Service {
 
@@ -250,30 +248,35 @@ public class MinecraftServerService extends Service {
             if (stopRequested) {
                 return;
             }
-            String runtimeName = GameLaunchSetting.selectJavaRuntime(profile.requiredJava);
-            File javaHome = new File(AppManifest.JAVA_DIR, runtimeName);
-            File marker = "default".equals(runtimeName)
-                    ? new File(javaHome, "bin/java") : new File(javaHome, "lib/modules");
-            if (!marker.exists()) {
-                throw new IllegalStateException("缺少 Java 运行时 " + runtimeName
-                        + "，请先在运行环境页安装");
-            }
+            File javaHome = ServerRuntime.ensure(MinecraftServerService.this,
+                    profile.requiredJava, new ServerRuntime.Listener() {
+                        @Override
+                        public void onLog(String line) {
+                            appendLog(line);
+                        }
 
+                        @Override
+                        public void onProgress(int percent) {
+                            publishState(STATE_PREPARING,
+                                    "正在安装 Java 运行时 " + percent + "%");
+                        }
+                    });
+            appendLog("Java 运行时：" + javaHome.getAbsolutePath());
             if (!ServerStdio.createStdinPipe()) {
-                throw new IllegalStateException("无法创建服务端命令管道");
+                appendLog("警告：无法创建命令管道，控制台命令不可用；停止时将直接结束进程");
             }
             publishState(STATE_STARTING, "正在启动服务端");
             startReadyMonitor();
 
+            int heap = ServerRuntime.clampHeap(MinecraftServerService.this, profile.memoryMb);
+            if (heap < profile.memoryMb) {
+                appendLog("设备内存有限，堆内存由 " + profile.memoryMb
+                        + " MB 调整为 " + heap + " MB");
+            }
             ArrayList<String> args = new ArrayList<>();
-            int heap = Math.max(512, Math.min(profile.memoryMb, 4096));
             args.add("-Xms" + Math.min(512, heap) + "M");
             args.add("-Xmx" + heap + "M");
-            args.add("-Djava.awt.headless=true");
-            args.add("-Dfile.encoding=UTF-8");
-            args.add("-Djava.io.tmpdir=" + getCacheDir().getAbsolutePath());
-            args.add("-Dlog4j2.formatMsgNoLookups=true");
-            args.add("-Duser.language=" + Locale.getDefault().getLanguage());
+            ServerRuntime.addJvmFlags(args, MinecraftServerService.this, javaHome, heap);
             if (("forge".equals(profile.type) || "neoforge".equals(profile.type))
                     && profile.launchArgsFile != null
                     && !profile.launchArgsFile.isEmpty()) {

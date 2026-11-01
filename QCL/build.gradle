@@ -101,8 +101,8 @@ android {
         //      两者必须一起改（只改 versionName 会导致装不上）。
         //
         //   Beta 通道从 v1.0.0 重新起算（独立包名，不存在与正式版的 versionCode 比较）。
-        versionCode qclIsBeta ? 10006 : 30110
-        versionName qclIsBeta ? "1.0.6-beta" : "3.1.10"
+        versionCode qclIsBeta ? 10007 : 30111
+        versionName qclIsBeta ? "1.0.7-beta" : "3.1.11"
         buildConfigField "boolean", "BETA_CHANNEL", qclIsBeta.toString()
         manifestPlaceholders = [
                 qclAppLabel: qclIsBeta ? "QCL-CE Beta" : "@string/app_name",
