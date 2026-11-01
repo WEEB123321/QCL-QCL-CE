@@ -47,6 +47,7 @@ QCL 的 **1.1.0 及更早版本**基于 **HMCL-PE（Hello Minecraft! Launcher: P
 | OpenAL Soft | kcat 等 | LGPL-2.0 | 音频 |
 | OpenJDK / 移动端 JRE 构建 | OpenJDK、FCL 项目 | GPL-2.0 with Classpath Exception | Java 运行时 |
 | **FoldCraftLauncher (FCL)** | **FCL-Team** | **GPL-3.0** | **部分实现参考/借用**：Java 运行时的选择与安装、authlib-injector 的引入与校验等（详见下方说明） |
+| **MineServe-Mobile（Minexa）** | **lovehutaocute** | **GPL-3.0** | **手机开服实现参考**：Android 上的 JVM 兼容参数（JLine/JNA、Netty、OSHI）、按需 Java 运行时修复、服务端启动命令组织 |
 | **Terracotta**（`net.burningtnt.terracotta` JNI 封装） | **BurningTNT** | **AGPL-3.0** | 多人联机（NAT 穿透 / 组网 / 房间邀请码） |
 | **EasyTier**（Terracotta 模块内嵌的组网底层） | EasyTier 项目 | LGPL-3.0 | 组网底层 |
 | BMCLAPI | bangbang93 | 见其服务说明 | 国内下载镜像 |
@@ -65,6 +66,17 @@ QCL 在实现下列功能时，**参考并借用了 FCL（FoldCraftLauncher，FC
 FCL 以 **GPL-3.0** 授权。若你需要 FCL 的源码或其许可全文，请见其官方仓库
 <https://github.com/FCL-Team/FoldCraftLauncher>。
 在此对 FCL 的作者与社区致以诚挚谢意。
+
+## 关于 MineServe-Mobile（Minexa）的手机开服实现参考
+QCL 在修复手机端开服启动失败时，参考了 **MineServe-Mobile（Minexa）** 的以下实现：
+
+1. **Android 可用的 JVM 参数**：禁用 JLine 的 JNA provider、禁用 Netty 原生传输、
+   关闭 OSHI 在 Android 上必然失败的探测，并显式注入设备时区。
+2. **按需修复 Java 运行时**：启动前检查运行时完整性，缺失或版本过期时重新解压。
+3. **服务端启动命令组织**：内存上限、Metaspace/CodeCache 限制与临时目录处理。
+
+MineServe-Mobile 以 **GPL-3.0** 授权，源码见
+<https://github.com/lovehutaocute/MineServe-Mobile>。在此感谢其作者与贡献者。
 
 ## 署名位置
 启动器内「设置 → 关于」页已列出：BMCLAPI、MC 百科、原版项目（HMCL-PE / Tungs）、
