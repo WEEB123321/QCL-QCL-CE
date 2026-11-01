@@ -33,7 +33,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,6 +50,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.afollestad.appthemeengine.ATE;
 import com.afollestad.appthemeengine.Config;
+import com.afollestad.appthemeengine.customizers.ATETaskDescriptionCustomizer;
 import com.qcl.launcher.launcher.VerifyInterface;
 import com.qcl.launcher.launcher.dialogs.VerifyDialog;
 import com.qcl.launcher.launcher.dialogs.account.MicrosoftAccountSkinDialog;
@@ -69,7 +73,7 @@ import com.qcl.launcher.utils.LocaleUtils;
 import com.qcl.launcher.R;
 public class MainActivity
 extends AppCompatActivity
-implements View.OnClickListener {
+implements View.OnClickListener, ATETaskDescriptionCustomizer {
     public LinearLayout launcherLayout;
     public boolean isLoaded = false;
     public boolean dialogMode = false;
@@ -809,6 +813,45 @@ implements View.OnClickListener {
      * 全部逻辑在 {@code LauncherLayoutStyle} 里 —— 这里只负责把设置值传下去，
      * 这样「排版怎么变」和「什么时候变」是分开的，改排版不用碰 Activity。
      */
+    /**
+     * ATE 默认会用 {@code ApplicationInfo.loadIcon()} 然后强转 BitmapDrawable；
+     * 自适应图标（AdaptiveIconDrawable）会直接 ClassCastException。
+     * 实现这个接口后，ATE 改用这里返回的 Bitmap，不再强转。
+     */
+    @Override
+    public int getTaskDescriptionColor() {
+        try {
+            if (launcherSetting != null) {
+                return ExteriorSettingUI.parseThemeColorSafe(this,
+                        launcherSetting.launcherTheme);
+            }
+        } catch (Throwable ignored) {
+        }
+        return 0xFFB0552F;
+    }
+
+    private Bitmap taskDescriptionIcon;
+
+    @Override
+    public Bitmap getTaskDescriptionIcon() {
+        if (taskDescriptionIcon != null) {
+            return taskDescriptionIcon;
+        }
+        int size = Math.max(1, Math.round(64f
+                * getResources().getDisplayMetrics().density));
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        try {
+            Drawable drawable = getApplicationInfo().loadIcon(getPackageManager());
+            if (drawable != null) {
+                drawable.setBounds(0, 0, size, size);
+                drawable.draw(new Canvas(bitmap));
+            }
+        } catch (Throwable ignored) {
+        }
+        taskDescriptionIcon = bitmap;
+        return bitmap;
+    }
+
     public void applyLayoutStyle() {
         try {
             int style = this.launcherSetting == null ? 0 : this.launcherSetting.layoutStyle;
