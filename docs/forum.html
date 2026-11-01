@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QCL-CE 官方论坛：综合讨论、求助、教程、闲聊。先记录名字，再进入板块。">
+<title>QCL-CE 论坛</title>
+<link rel="icon" href="beta-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="forum.css">
+</head>
+<body class="forum-page">
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><i></i>QCL-CE</span>
+    <span class="links">
+      <a href="index.html#features">功能</a>
+      <a href="index.html#download">下载</a>
+      <a href="beta.html">Beta</a>
+      <a href="forum.html" aria-current="page">论坛</a>
+      <a href="https://weeb123321.github.io/QCL-Plugins/">插件市场</a>
+      <a href="wiki.html">Wiki</a>
+      <a href="sponsor.html">赞助</a>
+      <a href="https://github.com/WEEB123321/QCL-QCL-CE">GitHub</a>
+    </span>
+  </div>
+</nav>
+
+<section class="forum-hero">
+  <div class="hero-kicker">COMMUNITY · GITHUB DISCUSSIONS</div>
+  <h1>QCL-CE <span>论坛</span></h1>
+  <p class="lead">综合讨论、求助、教程和闲聊。进入板块前先记录你的称呼；评论区由 Giscus 和 GitHub Discussions 驱动。</p>
+</section>
+
+<section class="forum-shell wrap">
+  <div id="forum-gate" class="forum-gate">
+    <h2>先记录你的名字</h2>
+    <p>论坛需要一个称呼才开始。这个名字只保存在当前浏览器，用于页面显示；实际发表评论时仍需 GitHub 登录，评论作者会显示 GitHub 用户名。</p>
+    <form id="forum-name-form">
+      <input id="forum-name-input" maxlength="20" autocomplete="nickname" placeholder="例如：Steve" required>
+      <button class="btn btn-primary" type="submit">记录名字并进入论坛</button>
+    </form>
+    <p class="forum-small">不想填？关闭页面就不会保存；下次打开仍需先记录名字。</p>
+  </div>
+
+  <div id="forum-main" hidden>
+    <div class="forum-install-note" style="margin:0 0 14px">
+      <b>管理员首次配置：</b>评论区需要安装一次
+      <a href="https://github.com/apps/giscus/installations/new" target="_blank" rel="noopener">Giscus App</a>
+      并授权 <code>WEEB123321/QCL-QCL-CE</code>；安装后刷新本页即可评论。
+    </div>
+
+    <div class="forum-identity-bar">
+      <span>当前称呼：<b id="forum-current-name"></b> · 仅本机显示</span>
+      <button id="forum-change-name" class="forum-link" type="button">修改称呼</button>
+    </div>
+
+    <div class="forum-tabs" role="tablist">
+      <button type="button" class="active" data-term="QCL-CE 论坛 · 综合讨论">综合讨论</button>
+      <button type="button" data-term="QCL-CE 论坛 · 求助">求助</button>
+      <button type="button" data-term="QCL-CE 论坛 · 教程">教程</button>
+      <button type="button" data-term="QCL-CE 论坛 · 闲聊">闲聊</button>
+    </div>
+    <p class="forum-board-hint">每个板块是独立的 GitHub Discussion 线程；第一次发评论会自动创建对应讨论。</p>
+
+    <div id="giscus-container"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>QCL-CE · 社区版</span>
+    <span>GPL-3.0</span>
+    <span class="sp">by WEEB123321</span>
+  </div>
+</footer>
+
+<script src="theme.js"></script>
+<script src="liquid-glass.js"></script>
+<script src="forum.js"></script>
+</body>
+</html>

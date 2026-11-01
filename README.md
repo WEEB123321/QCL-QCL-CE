@@ -1,14 +1,16 @@
 # QCL-CE · Quanta Craft Launcher 社区版
 
-> 一个独立的社区分支，不是官方版本。基于 [Quanta Craft Launcher](https://github.com/ALLEN201123/Quanta-Craft-Launcher)
-> 开发，按 **GNU GPL-3.0** 授权发布。
+> QCL-CE 是 QCL 社区版（Community Edition）的**官方发布线**，由 CE 维护组基于
+> [Quanta Craft Launcher](https://github.com/ALLEN201123/Quanta-Craft-Launcher)
+> 上游源码构建；**不是对官方 APK 的二次打包、破解或魔改**。按 **GNU GPL-3.0** 授权发布。
 
 QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官方 QCL 的基础上重做了界面，
 内置 95 个插件和 19 种语言，并加入手机开服、服务器插件下载、控键布局同步和多种排版风格；
-官方版的核心能力（下载全部已归档远古版本、全远古版本中文补丁）全部保留。
+上游 QCL 的核心能力（下载全部已归档远古版本、全远古版本中文补丁）全部保留。
 
-**官方版的 README 保留在 [`docs/README-upstream.md`](docs/README-upstream.md)**，
-里面是上游项目的完整说明 —— 本项目的核心能力与它一致，本文只讲社区版多出来的部分。
+**上游 QCL 的 README 保留在 [`docs/README-upstream.md`](docs/README-upstream.md)**，
+里面是上游项目的完整说明 —— 本项目的核心能力与它一致，本文只讲 CE 多出来的部分。
+下文的「上游」均指 Quanta Craft Launcher 官方仓库，避免与 CE 官方发布线混淆。
 
 ---
 
@@ -16,16 +18,39 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 
 - **最新正式版 v3.1.7**（arm64，Android Debug 签名）：[GitHub Release](https://github.com/WEEB123321/QCL-QCL-CE/releases/tag/v3.1.7)
 - **最新 Beta 1.0.5**（独立包名，MIUIX 排版 + 新几何 Q 图标）：[GitHub Release](https://github.com/WEEB123321/QCL-QCL-CE/releases/tag/v1.0.5-beta)
-- 官网：[weeb123321.github.io/QCL-QCL-CE](https://weeb123321.github.io/QCL-QCL-CE/) ｜ [Beta 专属页](https://weeb123321.github.io/QCL-QCL-CE/beta.html)
+- 官网：[weeb123321.github.io/QCL-QCL-CE](https://weeb123321.github.io/QCL-QCL-CE/) ｜ [Beta 专属页](https://weeb123321.github.io/QCL-QCL-CE/beta.html) ｜ [论坛](https://weeb123321.github.io/QCL-QCL-CE/forum.html)
 - 仅提供 arm64；正式版与 Beta 都是 Debug 签名，仅用于测试。Beta 使用独立包名，可与正式版同时安装。
 
 ---
 
-## 与官方版的区别
+## 项目状态与边界
+
+- **发布性质**：QCL-CE 是 QCL 社区版（CE）的官方发布线，由 CE 维护组基于上游源码构建；
+  不是对官方 APK 的二次打包、破解或魔改。
+- **签名**：当前所有 APK 都是 **Android Debug 签名**，没有 release keystore，不能当作应用商店正式签名包。
+  正式签名、可复现构建与签名轮换记录仍是待改善项。
+- **测试声明**：构建与静态检查通过；手机开服全链路、MIUIX 排版、鸿蒙液态玻璃仍有真机验收缺口。
+  未经过真机验收的功能不会写成“已稳定”。
+- **维护方式**：目前主要单人维护，Issue / PR 尽力处理，没有 SLA；欢迎提供测试、日志和代码贡献。
+- **支持面**：仅 arm64、Android 8+；没有 x86_64 包；NeoForge 未接入；
+  部分功能依赖 GitHub / Modrinth / CurseForge / Terracotta 等第三方服务。
+- **论坛**：使用 Giscus + GitHub Discussions；进入前先记录称呼，实际评论身份为 GitHub 用户名。
+  首次启用需要仓库管理员安装 Giscus App。
+
+### 待改善
+
+- 正式签名与 CI 发布：release keystore、签名轮换、可复现构建、版本产物校验。
+- 测试矩阵：真机覆盖、启动/开服/备份的自动冒烟测试和回归清单。
+- 维护结构：多人代码审查、发布负责人、Issue 分类与安全响应流程。
+- 生态扩展：NeoForge、更多 ABI / 设备、更多下载源与离线场景。
+
+---
+
+## 与上游 QCL 的区别
 
 | 方面 | 说明 |
 |---|---|
-| **包名** | `com.qcl.launcher.ce` —— 可与官方版**同时安装**，互不冲突；Beta 使用 `com.qcl.launcher.ce.beta` |
+| **包名** | `com.qcl.launcher.ce` —— 可与上游 QCL**同时安装**，互不冲突；Beta 使用 `com.qcl.launcher.ce.beta` |
 | **界面** | 经典 QCL、FCL、HMCL 电脑端、ZL2、MIUIX（Beta）五种排版；编辑式主界面、液态玻璃 |
 | **插件** | 95 个内置插件 |
 | **多语言** | 19 种语言可切换 |
@@ -38,7 +63,7 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 
 ## 社区版新增功能
 
-下面这些是官方版没有的。官方版原有的能力（远古版本下载、全远古版本中文、ModLoader / Babric、
+下面这些是上游 QCL 没有的。上游原有的能力（远古版本下载、全远古版本中文、ModLoader / Babric、
 Pojav 启动后端等）全部保留，说明见 [`docs/README-upstream.md`](docs/README-upstream.md)。
 
 ### 界面
@@ -55,7 +80,7 @@ Pojav 启动后端等）全部保留，说明见 [`docs/README-upstream.md`](doc
 菲涅尔边缘光。**不支持 AGSL 的设备会自动走降级路径** —— 用位图矩阵做真实的光学放大，
 所以任何机器上都能看到透镜效果，不会出现「只有反光没有畸变」的半成品状态。
 
-**账号头像**。官方版主界面中间是 3D 人物模型（SurfaceView 独立图层，会盖住同级控件），
+**账号头像**。上游 QCL 主界面中间是 3D 人物模型（SurfaceView 独立图层，会盖住同级控件），
 社区版改成头像。尺寸按屏幕高度自适应（屏幕高度乘 18%，夹在 56 到 120 dp 之间），
 每次回到主界面重新计算，横竖屏切换、分屏、折叠屏都能跟上。
 
@@ -189,7 +214,8 @@ Português (Brasil)、Српски。
 - 1.1.0 及更早版本基于：[HMCL-PE](https://github.com/Tungs-HMCL/HMCL-PE)
 - 联机：[Terracotta](https://github.com/burningtnt/Terracotta)（仅限中国大陆地区）
 
-**本项目不是官方版本。** 社区版的问题请提到本仓库的 Issue，不要打扰上游作者。
+**本项目是 QCL 社区版（CE）的官方发布线**，不是上游官方 QCL 的替代品：CE 的问题请提到本仓库的 Issue，
+上游 QCL 的问题请提到上游仓库，不要打扰上游作者。
 
 ---
 
