@@ -258,6 +258,7 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
             View nav = activity.findViewById(R.id.qcl_bottom_nav);
             if (nav instanceof android.view.ViewGroup) {
                 android.widget.TextView btn = new android.widget.TextView(activity);
+                btn.setTag(com.qcl.launcher.launcher.ui.LauncherLayoutStyle.TAG_NAV_MENU);
                 btn.setText("≡\n菜\n单");
                 btn.setTextSize(12f);
                 btn.setGravity(android.view.Gravity.CENTER);
@@ -283,6 +284,9 @@ public class MainUI extends BaseUI implements View.OnClickListener, AdapterView.
                             startMultiPlayerUI, startSettingUI});
                 });
                 ((android.view.ViewGroup) nav).addView(btn);
+                com.qcl.launcher.launcher.ui.LauncherLayoutStyle.styleNavMenu(nav,
+                        com.qcl.launcher.launcher.ui.LauncherLayoutStyle.currentStyle()
+                                == com.qcl.launcher.launcher.ui.LauncherLayoutStyle.STYLE_MIUIX);
             }
         } catch (Throwable t) {
             // 折叠失败不能影响主页 —— 大不了还是原来的平铺

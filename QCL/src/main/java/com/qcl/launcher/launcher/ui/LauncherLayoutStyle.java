@@ -3,6 +3,7 @@ package com.qcl.launcher.launcher.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.Gravity;
@@ -110,6 +111,14 @@ public final class LauncherLayoutStyle {
 
     /** HMCL 顶部彩条在这个 ViewGroup 里的标记（用来找回来 / 移除）。 */
     private static final String TAG_HMCL_BAR = "qcl_hmcl_bar";
+    /** MainUI 动态加到导航栏的「≡ 菜单」按钮。MIUIX 的横排 Dock 里必须藏掉。 */
+    public static final String TAG_NAV_MENU = "qcl_nav_menu";
+
+    private static final int MIUIX_BLUE = 0xFF3482FF;
+    private static final Object MIUIX_APPLIED = new Object();
+    private static Drawable sMiuixMainBackground;
+    private static Drawable sMiuixPlayBackground;
+    private static Drawable sMiuixFabBackground;
 
     // ── Tab 的四种形态 ──
     /** QCL：罗马数字 + 中文（无图标）。 */
@@ -182,6 +191,9 @@ public final class LauncherLayoutStyle {
                 return;
             }
 
+            if (style != STYLE_MIUIX) {
+                resetMiuixColors(activity);
+            }
             switch (style) {
                 case STYLE_FCL:
                     applyFcl(activity, nav, content, fab, sidePanel);
@@ -358,6 +370,8 @@ public final class LauncherLayoutStyle {
         tabs(nav, TABS_MIUIX);
         setBrandVisible(nav, false);
         setNavFooterVisible(nav, false);
+        styleNavMenu(nav, true);
+        applyMiuixColors(a);
         hideHmclBar(content);
 
         content.setPadding(0, 0, 0, navH + margin * 2);
@@ -396,6 +410,74 @@ public final class LauncherLayoutStyle {
         nav.setLayoutParams(lp);
         nav.setVisibility(View.VISIBLE);
         nav.setElevation(dp(a, 10f));
+    }
+
+    private static void applyMiuixColors(Activity a) {
+        View main = a.findViewById(R.id.ui_main);
+        boolean first = main != null && main.getTag() != MIUIX_APPLIED;
+        try {
+            if (main != null) {
+                if (first) {
+                    sMiuixMainBackground = main.getBackground();
+                    main.setTag(MIUIX_APPLIED);
+                }
+                main.setBackgroundColor(isNight(a) ? 0xF20B0B0E : 0xFFF7F7FA);
+            }
+            TextView section = a.findViewById(R.id.main_section_no);
+            if (section != null) {
+                section.setTextColor(MIUIX_BLUE);
+            }
+            View dot = a.findViewById(R.id.main_dot_active);
+            if (dot != null) {
+                dot.setBackgroundColor(MIUIX_BLUE);
+            }
+            View play = a.findViewById(R.id.launcher_play_button);
+            if (play != null) {
+                if (first) {
+                    sMiuixPlayBackground = play.getBackground();
+                }
+                play.setBackgroundResource(R.drawable.qcl_play_button_bg_miuix);
+            }
+            View fab = a.findViewById(R.id.qcl_search_fab);
+            if (fab != null) {
+                if (first) {
+                    sMiuixFabBackground = fab.getBackground();
+                }
+                fab.setBackgroundResource(R.drawable.qcl_search_fab_bg_miuix);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void resetMiuixColors(Activity a) {
+        try {
+            View main = a.findViewById(R.id.ui_main);
+            if (main == null || main.getTag() != MIUIX_APPLIED) {
+                return;
+            }
+            main.setBackground(sMiuixMainBackground);
+            main.setTag(null);
+            TextView section = a.findViewById(R.id.main_section_no);
+            if (section != null) {
+                section.setTextColor(a.getColor(R.color.colorAccent));
+            }
+            View dot = a.findViewById(R.id.main_dot_active);
+            if (dot != null) {
+                dot.setBackgroundColor(a.getColor(R.color.colorAccent));
+            }
+            View play = a.findViewById(R.id.launcher_play_button);
+            if (play != null) {
+                play.setBackground(sMiuixPlayBackground);
+            }
+            View fab = a.findViewById(R.id.qcl_search_fab);
+            if (fab != null) {
+                fab.setBackground(sMiuixFabBackground);
+            }
+            sMiuixMainBackground = null;
+            sMiuixPlayBackground = null;
+            sMiuixFabBackground = null;
+        } catch (Throwable ignored) {
+        }
     }
 
     private static void navMiuixBackground(Activity a, View nav) {
@@ -468,6 +550,7 @@ public final class LauncherLayoutStyle {
         nav.setLayoutParams(lp);
         nav.setVisibility(View.VISIBLE);
         nav.setElevation(0);
+        styleNavMenu(nav, false);
     }
 
     /** 导航栏自身的方向 + 内边距。 */
@@ -865,6 +948,65 @@ public final class LauncherLayoutStyle {
                 version.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
         } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * MainUI 动态加的「≡ 菜单」按钮：在侧栏里保持原来的竖排大按钮；
+     * 在 MIUIX 的横排 Dock 里收成第 6 个等宽 Tab，避免 MATCH_PARENT 把 5 个主 Tab 挤没。
+     */
+    public static void styleNavMenu(View nav, boolean miuix) {
+        if (nav == null) {
+            return;
+        }
+        View menu = nav.findViewWithTag(TAG_NAV_MENU);
+        if (!(menu instanceof TextView)) {
+            return;
+        }
+        TextView tv = (TextView) menu;
+        Context c = tv.getContext();
+        if (miuix) {
+            tv.setText("≡ 菜单");
+            tv.setTextSize(9.5f);
+            tv.setTextColor(miuixTabColors(c));
+            tv.setSingleLine(true);
+            tv.setGravity(Gravity.CENTER);
+            tv.setDuplicateParentStateEnabled(true);
+            ViewGroup.LayoutParams raw = tv.getLayoutParams();
+            if (raw instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) raw;
+                lp.width = 0;
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.weight = 1f;
+                lp.topMargin = 0;
+                lp.bottomMargin = 0;
+                lp.leftMargin = dp(c, 2f);
+                lp.rightMargin = dp(c, 2f);
+                tv.setPadding(0, dp(c, 4f), 0, dp(c, 4f));
+                tv.setLayoutParams(lp);
+            }
+            tv.setBackgroundResource(R.drawable.qcl_nav_tab_bg_miuix);
+        } else {
+            tv.setText("≡\n菜\n单");
+            tv.setTextSize(12f);
+            tv.setTextColor(0xFFA8452F);
+            tv.setSingleLine(false);
+            tv.setGravity(Gravity.CENTER);
+            tv.setDuplicateParentStateEnabled(false);
+            ViewGroup.LayoutParams raw = tv.getLayoutParams();
+            if (raw instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) raw;
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                lp.weight = 0f;
+                lp.topMargin = dp(c, 4f);
+                lp.bottomMargin = 0;
+                lp.leftMargin = 0;
+                lp.rightMargin = 0;
+                tv.setPadding(0, dp(c, 8f), 0, dp(c, 8f));
+                tv.setLayoutParams(lp);
+            }
+            tv.setBackground(null);
         }
     }
 
