@@ -7,7 +7,7 @@
 <title>QCL-CE 论坛</title>
 <link rel="icon" href="beta-icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="premium.css">
-<link rel="stylesheet" href="forum.css">
+<link rel="stylesheet" href="forum.css?v=20261101b">
 </head>
 <body class="forum-page">
 
@@ -45,12 +45,6 @@
   </div>
 
   <div id="forum-main" hidden>
-    <div class="forum-install-note" style="margin:0 0 14px">
-      <b>管理员首次配置：</b>评论区需要安装一次
-      <a href="https://github.com/apps/giscus/installations/new" target="_blank" rel="noopener">Giscus App</a>
-      并授权 <code>WEEB123321/QCL-QCL-CE</code>；安装后刷新本页即可评论。
-    </div>
-
     <div class="forum-identity-bar">
       <span>当前称呼：<b id="forum-current-name"></b> · 仅本机显示</span>
       <button id="forum-change-name" class="forum-link" type="button">修改称呼</button>
@@ -62,8 +56,11 @@
       <button type="button" data-term="QCL-CE 论坛 · 教程">教程</button>
       <button type="button" data-term="QCL-CE 论坛 · 闲聊">闲聊</button>
     </div>
-    <p class="forum-board-hint">每个板块是独立的 GitHub Discussion 线程；第一次发评论会自动创建对应讨论。</p>
+    <p class="forum-board-hint">每个板块是独立的 GitHub Discussion 线程，评论会同步到 GitHub。
+      <a id="forum-board-link" href="https://github.com/WEEB123321/QCL-QCL-CE/discussions/1" target="_blank" rel="noopener">在 GitHub 打开本板块</a>
+    </p>
 
+    <div id="forum-status" class="forum-status" hidden></div>
     <div id="giscus-container"></div>
   </div>
 </section>
@@ -78,6 +75,6 @@
 
 <script src="theme.js"></script>
 <script src="liquid-glass.js"></script>
-<script src="forum.js"></script>
+<script src="forum.js?v=20261101b"></script>
 </body>
 </html>

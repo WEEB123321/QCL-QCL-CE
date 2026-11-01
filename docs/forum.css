@@ -147,6 +147,15 @@
   font-size: 12px;
 }
 
+.forum-board-hint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.forum-board-hint a:hover {
+  text-decoration: underline;
+}
+
 #giscus-container {
   min-height: 420px;
   padding: 8px 0;
@@ -156,19 +165,23 @@
   min-height: 420px;
 }
 
-.forum-install-note {
-  margin-top: 18px;
-  padding: 14px 18px;
-  border-radius: 16px;
+.forum-status {
+  margin: 0 0 14px;
+  padding: 12px 16px;
   border: 1px solid var(--line);
+  border-radius: 14px;
   background: var(--glass-fill);
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--sub);
+  font-size: 13px;
   line-height: 1.7;
 }
 
-.forum-install-note a {
+.forum-status a {
   color: var(--accent);
+}
+
+.forum-status[data-kind="error"] {
+  border-color: rgba(255, 120, 120, .45);
 }
 
 @media (max-width: 620px) {
