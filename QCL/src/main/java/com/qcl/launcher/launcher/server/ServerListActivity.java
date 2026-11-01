@@ -340,7 +340,7 @@ public class ServerListActivity extends AppCompatActivity {
 
     private static boolean supportsContent(ServerProfile profile) {
         return isPluginServer(profile) || "fabric".equals(profile.type)
-                || "forge".equals(profile.type);
+                || "forge".equals(profile.type) || "neoforge".equals(profile.type);
     }
 
     private static boolean isPluginServer(ServerProfile profile) {

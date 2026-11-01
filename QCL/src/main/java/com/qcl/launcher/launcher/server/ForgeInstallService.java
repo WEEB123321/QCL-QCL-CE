@@ -117,23 +117,25 @@ public class ForgeInstallService extends Service {
             ServerStdio.redirectStdoutAppend(logFile.getAbsolutePath());
             logStream = new PrintStream(new FileOutputStream(logFile, true),
                     true, "UTF-8");
-            appendLog("QCL-CE Forge 安装");
-            profile.type = "forge";
+            boolean neoForge = "neoforge".equals(profile.type);
+            appendLog(neoForge ? "QCL-CE NeoForge 安装" : "QCL-CE Forge 安装");
             profile.requiredJava = ServerInstaller.requiredJavaForVersion(profile.version);
             appendLog("Minecraft " + profile.version + "，计划使用 Java "
                     + profile.requiredJava);
-            File installer = ServerInstaller.prepareForgeInstaller(serverDir, profile,
-                    new ServerInstaller.Listener() {
-                        @Override
-                        public void onLog(String line) {
-                            appendLog(line);
-                        }
+            ServerInstaller.Listener listener = new ServerInstaller.Listener() {
+                @Override
+                public void onLog(String line) {
+                    appendLog(line);
+                }
 
-                        @Override
-                        public void onProgress(int percent) {
-                            appendLog("下载进度 " + percent + "%");
-                        }
-                    });
+                @Override
+                public void onProgress(int percent) {
+                    appendLog("下载进度 " + percent + "%");
+                }
+            };
+            File installer = neoForge
+                    ? ServerInstaller.prepareNeoForgeInstaller(serverDir, profile, listener)
+                    : ServerInstaller.prepareForgeInstaller(serverDir, profile, listener);
             writeResult("RUNNING", profile.loaderVersion);
             String runtimeName = GameLaunchSetting.selectJavaRuntime(profile.requiredJava);
             File javaHome = new File(AppManifest.JAVA_DIR, runtimeName);
@@ -149,10 +151,10 @@ public class ForgeInstallService extends Service {
             args.add("-jar");
             args.add(installer.getName());
             args.add("--installServer");
-            appendLog("运行 Forge 安装器 --installServer");
+            appendLog("运行 " + (neoForge ? "NeoForge" : "Forge") + " 安装器 --installServer");
             int exit = JREUtils.launchJavaMain(getApplicationContext(),
                     javaHome.getAbsolutePath(), serverDir.getAbsolutePath(), args);
-            appendLog("Forge 安装器退出码 " + exit);
+            appendLog((neoForge ? "NeoForge" : "Forge") + " 安装器退出码 " + exit);
             ServerInstaller.ensure(getApplicationContext(), serverDir, profile,
                     new ServerInstaller.Listener() {
                         @Override
@@ -165,13 +167,14 @@ public class ForgeInstallService extends Service {
                         }
                     });
             if (!ServerInstaller.isForgeInstalled(serverDir, profile)) {
-                throw new IllegalStateException("Forge 安装器未生成可启动文件");
+                throw new IllegalStateException((neoForge ? "NeoForge" : "Forge")
+                        + " 安装器未生成可启动文件");
             }
             writeResult("OK", profile.loaderVersion);
-            appendLog("Forge 安装完成，可以启动服务端");
+            appendLog((neoForge ? "NeoForge" : "Forge") + " 安装完成，可以启动服务端");
         } catch (Throwable t) {
-            Log.e(TAG, "Forge 安装失败", t);
-            appendLog("Forge 安装失败：" + t);
+            Log.e(TAG, "Forge/NeoForge 安装失败", t);
+            appendLog("Forge/NeoForge 安装失败：" + t);
             writeResult("ERROR", String.valueOf(t.getMessage()));
         } finally {
             finishService();
@@ -224,7 +227,7 @@ public class ForgeInstallService extends Service {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_qcl_gamecube_white)
-                .setContentTitle("Forge 安装器")
+                .setContentTitle("Forge / NeoForge 安装器")
                 .setContentText("正在安装服务端，请保持应用运行")
                 .setContentIntent(content)
                 .setOngoing(true)
@@ -244,7 +247,7 @@ public class ForgeInstallService extends Service {
             return;
         }
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                "Forge 安装器", NotificationManager.IMPORTANCE_LOW);
+                "Forge / NeoForge 安装器", NotificationManager.IMPORTANCE_LOW);
         manager.createNotificationChannel(channel);
     }
 

@@ -274,11 +274,12 @@ public class MinecraftServerService extends Service {
             args.add("-Djava.io.tmpdir=" + getCacheDir().getAbsolutePath());
             args.add("-Dlog4j2.formatMsgNoLookups=true");
             args.add("-Duser.language=" + Locale.getDefault().getLanguage());
-            if ("forge".equals(profile.type) && profile.launchArgsFile != null
+            if (("forge".equals(profile.type) || "neoforge".equals(profile.type))
+                    && profile.launchArgsFile != null
                     && !profile.launchArgsFile.isEmpty()) {
                 File argsFile = new File(serverDir, profile.launchArgsFile);
                 if (!argsFile.isFile()) {
-                    throw new IllegalStateException("Forge 启动参数文件缺失：" + argsFile);
+                    throw new IllegalStateException("Forge/NeoForge 启动参数文件缺失：" + argsFile);
                 }
                 args.addAll(ServerInstaller.readArgFile(argsFile));
                 args.add("nogui");

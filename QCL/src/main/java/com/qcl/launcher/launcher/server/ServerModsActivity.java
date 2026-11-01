@@ -66,7 +66,8 @@ public class ServerModsActivity extends AppCompatActivity {
         if ("paper".equals(profile.type) || "purpur".equals(profile.type)) {
             contentDir = new File(serverDir, "plugins");
             kind = "插件";
-        } else if ("fabric".equals(profile.type) || "forge".equals(profile.type)) {
+        } else if ("fabric".equals(profile.type) || "forge".equals(profile.type)
+                || "neoforge".equals(profile.type)) {
             contentDir = new File(serverDir, "mods");
             kind = "模组";
         } else {

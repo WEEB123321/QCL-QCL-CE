@@ -38,8 +38,8 @@ public final class ServerSetupDialog {
                 ServerProfile.currentInstanceName(activity), InputType.TYPE_CLASS_TEXT);
         Spinner type = new Spinner(activity);
         String[] typeNames = {"原版 Vanilla", "Paper（插件）", "Purpur（插件）",
-                "Fabric（模组）", "Forge（模组，实验）"};
-        String[] typeValues = {"vanilla", "paper", "purpur", "fabric", "forge"};
+                "Fabric（模组）", "Forge（模组，实验）", "NeoForge（模组，实验）"};
+        String[] typeValues = {"vanilla", "paper", "purpur", "fabric", "forge", "neoforge"};
         type.setAdapter(new ArrayAdapter<>(activity,
                 android.R.layout.simple_spinner_dropdown_item, typeNames));
         type.setPadding(0, dp(activity, 4), 0, dp(activity, 8));

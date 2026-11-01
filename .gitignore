@@ -46,3 +46,6 @@ ZipFileSystem/build/
 # ===== 本地验证脚本（含本机路径，不属于项目）=====
 .qcl-verify/
 .qcl-qr-verify/
+
+# 正式签名配置（含密码，不要提交）
+keystore.properties

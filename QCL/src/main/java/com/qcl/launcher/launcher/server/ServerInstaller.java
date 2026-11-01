@@ -6,6 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.qcl.launcher.launcher.download.neoforge.NeoForgeVersion;
+import com.qcl.launcher.launcher.download.neoforge.NeoForgeVersions;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -76,6 +78,8 @@ public final class ServerInstaller {
             listener.onLog("已安装文件校验通过，离线启动");
             if ("forge".equals(profile.type)) {
                 ensureForgeReady(profile, serverDir, listener);
+            } else if ("neoforge".equals(profile.type)) {
+                ensureNeoForgeReady(profile, serverDir, listener);
             }
         } else {
             Metadata base = resolve(profile.version);
@@ -88,6 +92,8 @@ public final class ServerInstaller {
                 ensureFabric(profile, serverDir, listener);
             } else if ("forge".equals(profile.type)) {
                 ensureForgeReady(profile, serverDir, listener);
+            } else if ("neoforge".equals(profile.type)) {
+                ensureNeoForgeReady(profile, serverDir, listener);
             } else {
                 ensureVanilla(profile, serverDir, listener, base);
             }
@@ -106,12 +112,15 @@ public final class ServerInstaller {
     }
 
     public static boolean isForgeInstalled(File serverDir, ServerProfile profile) {
+        if (profile != null && "neoforge".equals(profile.type)) {
+            return findNeoForgeLaunch(serverDir, profile) != null;
+        }
         return findForgeLaunch(serverDir, profile) != null;
     }
 
     private static boolean isLocallyReady(ServerProfile profile, File serverDir) {
         try {
-            if ("forge".equals(profile.type)) {
+            if ("forge".equals(profile.type) || "neoforge".equals(profile.type)) {
                 return isForgeInstalled(serverDir, profile);
             }
             File jar = profile.jarFile(serverDir);
@@ -179,6 +188,105 @@ public final class ServerInstaller {
         listener.onLog("Forge 安装器：" + installer.getName());
         profile.save(serverDir);
         return installer;
+    }
+
+    public static File prepareNeoForgeInstaller(File serverDir, ServerProfile profile,
+                                                Listener listener) throws Exception {
+        ArrayList<NeoForgeVersion> versions = NeoForgeVersions.fetchForMc(profile.version);
+        if (versions == null || versions.isEmpty()) {
+            throw new IllegalStateException("NeoForge 没有适配 " + profile.version + " 的版本");
+        }
+        NeoForgeVersion chosen = versions.get(0);
+        for (NeoForgeVersion version : versions) {
+            if (!version.getVersion().contains("-beta")) {
+                chosen = version;
+                break;
+            }
+        }
+        String neoVersion = chosen.getVersion();
+        profile.loaderVersion = neoVersion;
+        profile.requiredJava = requiredJavaForVersion(profile.version);
+        String fileName = "neoforge-" + neoVersion + "-installer.jar";
+        File installer = new File(serverDir, fileName);
+        if (installer.isFile() && installer.length() > 0) {
+            listener.onLog("NeoForge 安装器已存在：" + installer.getName());
+            profile.save(serverDir);
+            return installer;
+        }
+        File part = new File(serverDir, fileName + ".part");
+        String primary = NeoForgeVersions.bmclapiInstallerUrl(chosen);
+        String fallback = NeoForgeVersions.officialInstallerUrl(chosen);
+        listener.onLog("下载 NeoForge " + neoVersion + " 安装器");
+        try {
+            downloadUnverified(primary, part, listener);
+        } catch (Throwable t) {
+            part.delete();
+            listener.onLog("BMCLAPI 下载失败，切换官方源");
+            downloadUnverified(fallback, part, listener);
+        }
+        if (installer.exists()) {
+            installer.delete();
+        }
+        if (!part.renameTo(installer)) {
+            part.delete();
+            throw new IllegalStateException("无法保存 NeoForge 安装器");
+        }
+        listener.onLog("NeoForge 安装器：" + installer.getName());
+        profile.save(serverDir);
+        return installer;
+    }
+
+    private static void ensureNeoForgeReady(ServerProfile profile, File serverDir,
+                                            Listener listener) {
+        ForgeLaunch launch = findNeoForgeLaunch(serverDir, profile);
+        if (launch == null) {
+            throw new IllegalStateException("NeoForge 尚未安装，请从控制台重新启动以运行安装程序");
+        }
+        if (launch.argsFile != null) {
+            profile.launchArgsFile = relative(serverDir, launch.argsFile);
+            profile.serverJar = "";
+        } else {
+            profile.launchArgsFile = "";
+            profile.serverJar = relative(serverDir, launch.jar);
+        }
+        listener.onLog("NeoForge 运行文件已就绪");
+    }
+
+    private static ForgeLaunch findNeoForgeLaunch(File serverDir, ServerProfile profile) {
+        if (profile == null) {
+            return null;
+        }
+        if (profile.launchArgsFile != null && !profile.launchArgsFile.isEmpty()) {
+            File saved = new File(serverDir, profile.launchArgsFile);
+            if (saved.isFile()) {
+                return new ForgeLaunch(saved, null);
+            }
+        }
+        File[] roots = new File[]{
+                new File(serverDir, "libraries/net/neoforged/neoforge"),
+                new File(serverDir, "libraries/net/neoforged/forge")
+        };
+        File fallback = null;
+        for (File root : roots) {
+            File[] versions = root.listFiles(File::isDirectory);
+            if (versions == null) {
+                continue;
+            }
+            for (File versionDir : versions) {
+                File args = new File(versionDir, "unix_args.txt");
+                if (!args.isFile()) {
+                    continue;
+                }
+                if (profile.loaderVersion != null && !profile.loaderVersion.isEmpty()
+                        && versionDir.getName().contains(profile.loaderVersion)) {
+                    return new ForgeLaunch(args, null);
+                }
+                if (fallback == null) {
+                    fallback = args;
+                }
+            }
+        }
+        return fallback == null ? null : new ForgeLaunch(fallback, null);
     }
 
     public static List<String> readArgFile(File file) throws Exception {

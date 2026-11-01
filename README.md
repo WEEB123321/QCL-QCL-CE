@@ -1,6 +1,8 @@
 # QCL-CE · Quanta Craft Launcher 社区版
 
-> QCL-CE 是 QCL 社区版（Community Edition）的**官方发布线**，由 CE 维护组基于
+[![CI](https://github.com/WEEB123321/QCL-QCL-CE/actions/workflows/ci.yml/badge.svg)](https://github.com/WEEB123321/QCL-QCL-CE/actions/workflows/ci.yml)
+
+> QCL-CE 是 QCL 社区版（Community Edition）的**官方发布线**，由 QCL-CE Team 基于
 > [Quanta Craft Launcher](https://github.com/ALLEN201123/Quanta-Craft-Launcher)
 > 上游源码构建；**不是对官方 APK 的二次打包、破解或魔改**。按 **GNU GPL-3.0** 授权发布。
 
@@ -27,22 +29,24 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 
 - **发布性质**：QCL-CE 是 QCL 社区版（CE）的官方发布线，由 CE 维护组基于上游源码构建；
   不是对官方 APK 的二次打包、破解或魔改。
-- **签名**：当前所有 APK 都是 **Android Debug 签名**，没有 release keystore，不能当作应用商店正式签名包。
-  正式签名、可复现构建与签名轮换记录仍是待改善项。
-- **测试声明**：构建与静态检查通过；手机开服全链路、MIUIX 排版、鸿蒙液态玻璃仍有真机验收缺口。
-  未经过真机验收的功能不会写成“已稳定”。
-- **维护方式**：目前主要单人维护，Issue / PR 尽力处理，没有 SLA；欢迎提供测试、日志和代码贡献。
-- **支持面**：仅 arm64、Android 8+；没有 x86_64 包；NeoForge 未接入；
+- **签名**：release signing 已改为从仓库外的 `keystore.properties` 或 CI secrets 读取，
+  不再把密码写死在 Gradle。当前仓库没有 release keystore，因此不能产出正式签名包；
+  Debug 包仍可构建，但不能当作商店正式包。
+- **测试**：GitHub Actions 已接入 `.github/workflows/ci.yml`，在 push/PR 时运行
+  `:QCL:testDebugUnitTest`；测试覆盖 Java 运行时选择、下载源改写、版本排序、服务器配置和
+  NeoForge 版本映射。手机开服全链路、MIUIX 排版、鸿蒙液态玻璃仍需要真机验收。
+- **维护**：由 QCL-CE Team 维护；Issue / PR 尽力处理，没有 SLA；欢迎提供测试、日志和代码贡献。
+- **支持面**：仅 arm64、Android 8+；没有 x86_64 包；NeoForge 服务端已接入但仍是实验性；
   部分功能依赖 GitHub / Modrinth / CurseForge / Terracotta 等第三方服务。
 - **论坛**：使用 Giscus + GitHub Discussions；进入前先记录称呼，实际评论身份为 GitHub 用户名。
   首次启用需要仓库管理员安装 Giscus App。
 
 ### 待改善
 
-- 正式签名与 CI 发布：release keystore、签名轮换、可复现构建、版本产物校验。
+- 正式签名：提供并备份 release keystore、签名轮换、可复现构建和产物校验。
 - 测试矩阵：真机覆盖、启动/开服/备份的自动冒烟测试和回归清单。
-- 维护结构：多人代码审查、发布负责人、Issue 分类与安全响应流程。
-- 生态扩展：NeoForge、更多 ABI / 设备、更多下载源与离线场景。
+- 维护结构：代码审查、发布负责人、Issue 分类与安全响应流程。
+- 生态扩展：NeoForge 真机验证、更多下载源与离线场景（arm64 是当前约束，不扩 ABI）。
 
 ---
 
@@ -54,7 +58,7 @@ QCL-CE 是 Android 上运行《我的世界》Java 版的启动器。它在官�
 | **界面** | 经典 QCL、FCL、HMCL 电脑端、ZL2、MIUIX（Beta）五种排版；编辑式主界面、液态玻璃 |
 | **插件** | 95 个内置插件 |
 | **多语言** | 19 种语言可切换 |
-| **开服** | 原版 / Paper / Purpur / Fabric / Forge；控制台、插件或模组下载、世界备份、Terracotta 联机共享 |
+| **开服** | 原版 / Paper / Purpur / Fabric / Forge / NeoForge（实验）；控制台、插件或模组下载、世界备份、Terracotta 联机共享 |
 | **诊断** | 启动路标、崩溃弹窗一键分享日志、启动前检查 |
 
 详细的逐项说明见下一节。
@@ -92,7 +96,7 @@ Pojav 启动后端等）全部保留，说明见 [`docs/README-upstream.md`](doc
 
 启动器可以直接在手机上运行 Minecraft Java 服务端：
 
-- **服务端类型**：原版、Paper、Purpur、Fabric、Forge；从官方源或对应 API 获取构建，下载时校验哈希。
+- **服务端类型**：原版、Paper、Purpur、Fabric、Forge、NeoForge（实验）；从官方源或对应 API 获取构建，下载时校验哈希。
 - **运行**：独立 `:server` 进程 + 前台服务，带 WakeLock / WifiLock；退出启动器后服务端继续运行。
 - **服务器列表**：列出已创建的服务器，可直接启动、查看运行状态，再进入控制台。
 - **控制台与配置**：启停 / 重启、实时日志、发送命令；玩家 OP / 白名单 / 踢人；编辑端口、人数、MOTD 和 `server.properties`。

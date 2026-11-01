@@ -119,13 +119,17 @@ public final class ServerProfile {
         if ("forge".equals(value)) {
             return "Forge";
         }
+        if ("neoforge".equals(value)) {
+            return "NeoForge";
+        }
         return "原版";
     }
 
     private void normalize() {
         name = sanitizeName(name);
         if (!"paper".equals(type) && !"purpur".equals(type)
-                && !"fabric".equals(type) && !"forge".equals(type)) {
+                && !"fabric".equals(type) && !"forge".equals(type)
+                && !"neoforge".equals(type)) {
             type = "vanilla";
         }
         if (serverSha1 == null) {

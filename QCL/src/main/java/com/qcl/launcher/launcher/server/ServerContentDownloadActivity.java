@@ -99,7 +99,8 @@ public class ServerContentDownloadActivity extends AppCompatActivity {
         if ("paper".equals(profile.type) || "purpur".equals(profile.type)) {
             plugins = true;
             contentDir = new File(serverDir, "plugins");
-        } else if ("fabric".equals(profile.type) || "forge".equals(profile.type)) {
+        } else if ("fabric".equals(profile.type) || "forge".equals(profile.type)
+                || "neoforge".equals(profile.type)) {
             plugins = false;
             contentDir = new File(serverDir, "mods");
         } else {
@@ -302,7 +303,7 @@ public class ServerContentDownloadActivity extends AppCompatActivity {
                     if (gameVersions == null || !gameVersions.contains(profile.version)) {
                         continue;
                     }
-                    if (!plugins) {
+                    if (!plugins && !"neoforge".equals(profile.type)) {
                         List<ModLoaderType> loaders = version.getLoaders();
                         if (loaders != null && !loaders.isEmpty()) {
                             ModLoaderType wanted = "fabric".equals(profile.type)

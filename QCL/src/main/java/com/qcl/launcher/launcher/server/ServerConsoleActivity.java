@@ -683,7 +683,8 @@ public class ServerConsoleActivity extends AppCompatActivity {
             requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
                     1002);
         }
-        if ("forge".equals(profile.type) && !ServerInstaller.isForgeInstalled(serverDir, profile)) {
+        if (("forge".equals(profile.type) || "neoforge".equals(profile.type))
+                && !ServerInstaller.isForgeInstalled(serverDir, profile)) {
             startForgeInstall();
             return;
         }
@@ -721,7 +722,8 @@ public class ServerConsoleActivity extends AppCompatActivity {
             if (forgeInstallResultFile != null) {
                 forgeInstallResultFile.delete();
             }
-            applyState(MinecraftServerService.STATE_PREPARING, "正在安装 Forge，首次需要下载");
+            applyState(MinecraftServerService.STATE_PREPARING,
+                    "正在安装 " + profile.typeLabel() + "，首次需要下载");
             Intent intent = new Intent(this, ForgeInstallService.class)
                     .setAction(ForgeInstallService.ACTION_START)
                     .putExtra(ForgeInstallService.EXTRA_PROFILE,
@@ -729,7 +731,7 @@ public class ServerConsoleActivity extends AppCompatActivity {
             startForegroundService(intent);
             bindService(new Intent(this, ForgeInstallService.class),
                     forgeInstallConnection, Context.BIND_AUTO_CREATE);
-            toast("正在安装 Forge，日志显示在控制台");
+            toast("正在安装 " + profile.typeLabel() + "，日志显示在控制台");
         } catch (Throwable t) {
             waitingForgeInstall = false;
             applyState(MinecraftServerService.STATE_FAILED,
@@ -743,7 +745,7 @@ public class ServerConsoleActivity extends AppCompatActivity {
         }
         if (System.currentTimeMillis() - forgeInstallStartedAt > 20 * 60 * 1000L) {
             waitingForgeInstall = false;
-            applyState(MinecraftServerService.STATE_FAILED, "Forge 安装超时");
+            applyState(MinecraftServerService.STATE_FAILED, "Forge/NeoForge 安装超时");
             return;
         }
         String result = readFullText(forgeInstallResultFile);
@@ -755,7 +757,7 @@ public class ServerConsoleActivity extends AppCompatActivity {
             waitingForgeInstall = false;
             String[] lines = result.split("\\n", 3);
             String detail = lines.length > 1 ? lines[1] : "未知错误";
-            applyState(MinecraftServerService.STATE_FAILED, "Forge 安装失败：" + detail);
+            applyState(MinecraftServerService.STATE_FAILED, "Forge/NeoForge 安装失败：" + detail);
             return;
         }
         if (forgeInstallProcessGone) {
@@ -764,7 +766,7 @@ public class ServerConsoleActivity extends AppCompatActivity {
             } else {
                 waitingForgeInstall = false;
                 applyState(MinecraftServerService.STATE_FAILED,
-                        "Forge 安装进程已结束，但未生成启动文件");
+                        "Forge/NeoForge 安装进程已结束，但未生成启动文件");
             }
         }
     }
@@ -784,10 +786,10 @@ public class ServerConsoleActivity extends AppCompatActivity {
         profile = ServerProfile.load(serverDir);
         if (profile == null || !ServerInstaller.isForgeInstalled(serverDir, profile)) {
             applyState(MinecraftServerService.STATE_FAILED,
-                    "Forge 安装结果无法识别，请查看控制台日志");
+                    "Forge/NeoForge 安装结果无法识别，请查看控制台日志");
             return;
         }
-        toast("Forge 安装完成");
+        toast(profile.typeLabel() + " 安装完成");
         startServer();
     }
 

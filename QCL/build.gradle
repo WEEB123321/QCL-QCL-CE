@@ -2,6 +2,21 @@ plugins {
     id 'com.android.application'
 }
 
+// 正式签名从仓库外的 keystore.properties 或 CI secrets 读取；不要把密钥提交到仓库。
+def qclKeystorePropsFile = rootProject.file("keystore.properties")
+def qclKeystoreProps = new Properties()
+if (qclKeystorePropsFile.isFile()) {
+    qclKeystorePropsFile.withInputStream { qclKeystoreProps.load(it) }
+}
+def qclStorePath = qclKeystoreProps.getProperty("storeFile") ?: System.getenv("QCL_KEYSTORE")
+def qclStorePassword = qclKeystoreProps.getProperty("storePassword") ?: System.getenv("QCL_KEYSTORE_PASSWORD")
+def qclKeyAlias = qclKeystoreProps.getProperty("keyAlias") ?: System.getenv("QCL_KEY_ALIAS")
+def qclKeyPassword = qclKeystoreProps.getProperty("keyPassword") ?: System.getenv("QCL_KEY_PASSWORD")
+def qclHasReleaseKey = qclStorePath != null && !qclStorePath.trim().isEmpty()
+if (!qclHasReleaseKey) {
+    logger.lifecycle("QCL: release keystore not configured; release APK will be unsigned. See keystore.properties.example")
+}
+
 android {
     compileSdk 34
     dexOptions {
@@ -14,12 +29,12 @@ android {
 	
     signingConfigs {
         release {
-            // QCL is its own product: dedicated key, so it can be installed next to HMCL-PE
-            // instead of replacing it.
-            storeFile file("../qcl.keystore")
-            storePassword "qcl123456"
-            keyAlias "qcl"
-            keyPassword "qcl123456"
+            if (qclHasReleaseKey) {
+                storeFile rootProject.file(qclStorePath)
+                storePassword qclStorePassword
+                keyAlias qclKeyAlias
+                keyPassword qclKeyPassword
+            }
         }
     }
     
@@ -86,8 +101,8 @@ android {
         //      两者必须一起改（只改 versionName 会导致装不上）。
         //
         //   Beta 通道从 v1.0.0 重新起算（独立包名，不存在与正式版的 versionCode 比较）。
-        versionCode qclIsBeta ? 10005 : 30109
-        versionName qclIsBeta ? "1.0.5-beta" : "3.1.9"
+        versionCode qclIsBeta ? 10006 : 30110
+        versionName qclIsBeta ? "1.0.6-beta" : "3.1.10"
         buildConfigField "boolean", "BETA_CHANNEL", qclIsBeta.toString()
         manifestPlaceholders = [
                 qclAppLabel: qclIsBeta ? "QCL-CE Beta" : "@string/app_name",
@@ -99,7 +114,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig qclHasReleaseKey ? signingConfigs.release : null
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
