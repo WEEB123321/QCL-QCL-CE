@@ -166,6 +166,10 @@
       var number = numbers[term] || 0;
       updateBoardLink(term, number);
       renderGiscus(term, number);
+      if (location.protocol === "file:") {
+        showStatus("info", "当前是本地文件模式，GitHub 登录无法回调到 file://，评论会发送失败。请使用" +
+          "<a href=\"https://weeb123321.github.io/QCL-QCL-CE/forum.html\">线上论坛</a>发表评论。");
+      }
     });
   }
 
